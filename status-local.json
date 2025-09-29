@@ -1,5 +1,5 @@
 {
-    "active": true,
-    "message_vn": "✅ Dịch vụ hoạt động 24/7. Bấm 'Tính giá' để xem chi tiết đặt xe.",
-    "message_en": "Service is active 24/7. Click 'Calculate Price' for details."
+    "active": false, // <-- Đã TẮT
+    "message_vn": "❌ LƯU Ý: Dịch vụ tạm ngưng nhận đơn hàng do ảnh hưởng của bão. Xin lỗi quý khách!",
+    "message_en": "Service is temporarily inactive due to bad weather."
 }
