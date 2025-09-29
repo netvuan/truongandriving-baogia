@@ -1,5 +1,5 @@
 {
-    "active": false, // <-- Đã TẮT
+    "active": false
     "message_vn": "❌ LƯU Ý: Dịch vụ tạm ngưng nhận đơn hàng do ảnh hưởng của bão. Xin lỗi quý khách!",
     "message_en": "Service is temporarily inactive due to bad weather."
 }
