@@ -576,7 +576,7 @@ function attachAutocomplete(inputEl, boxEl){
       
       const fragment = document.createDocumentFragment();
       
-      if(!Array.isArray(data) || data.length === 0){ 
+      if(!ArrayularArray(data) || data.length === 0){ 
         boxEl.innerHTML = '<div>Không tìm thấy địa điểm</div>'; 
         setTimeout(() => boxEl.style.display = 'none', 1000); 
         return; 
@@ -911,16 +911,18 @@ calcBtn.addEventListener('click', async () => {
     }
     
     // ----------- TÍNH NĂNG MAPS LINK (RÚT GỌN) ĐÃ CẬP NHẬT -----------
-    const dropoffAddress = dropoffEl.value.trim();
-    // Mã hóa địa chỉ trả khách
-    const encodedDropOff = encodeURIComponent(dropoffAddress); 
+    const pickupAddress = pickupEl.value.trim();
+    const encodedPickup = encodeURIComponent(pickupAddress); 
+    const mapsPickupLink = `${GOOGLE_MAPS_SHORT_URL}${encodedPickup}`; // Link Rút gọn Đón
     
-    // Link Rút gọn: Chỉ cần đường link Tìm kiếm (Search) đến Điểm trả khách
-    const mapsDropoffLink = `${GOOGLE_MAPS_SHORT_URL}${encodedDropOff}`;
+    const dropoffAddress = dropoffEl.value.trim();
+    const encodedDropOff = encodeURIComponent(dropoffAddress); 
+    const mapsDropoffLink = `${GOOGLE_MAPS_SHORT_URL}${encodedDropOff}`; // Link Rút gọn Trả
     
     let mapsLinksSection = [
         `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHO TÀI XẾ ***`,
-        `🏁 Vị trí trả khách (NGẮN GỌN): ${mapsDropoffLink}`, // CHỈ CÓ 1 LINK RÚT GỌN NÀY
+        `📍 Vị trí đón (NGẮN GỌN): ${mapsPickupLink}`, 
+        `🏁 Vị trí trả (NGẮN GỌN): ${mapsDropoffLink}`,
         `\n`
     ].join('\n');
     // ----------- KẾT THÚC TÍNH NĂNG MAPS LINK (RÚT GỌN) -----------
@@ -931,13 +933,13 @@ calcBtn.addEventListener('click', async () => {
         `📞 SĐT Khách hàng: ${customerPhone}`, 
         `✅ Loại chuyến: ${tripType === '1' ? '1 Chiều' : `2 Chiều (${dist.toFixed(1)} km/chiều)`}`,
         `🚘 Loại xe: ${carType}`, 
-        `📍 Điểm đón: ${pickupEl.value.trim()}`,
+        `📍 Điểm đón: ${pickupAddress}`,
         ...(stopInputsValues.length ? [stopDetails] : []),
         `🏁 Điểm đến: ${dropoffAddress}`,
         `🕒 Ngày giờ đón: ${formattedDate}`,
         ...(tripType === '2' ? [zaloWaitingDetail] : []), 
         `💵 Tổng giá dự kiến: ${total.toLocaleString('vi-VN')} đ`,
-        mapsLinksSection, // Chèn đoạn Maps link ngắn (điểm trả)
+        mapsLinksSection, // Chèn cả 2 đoạn Maps link ngắn
         '-------------------------------',
         'Vui lòng xác nhận đơn hàng.',
     ].join('\n');
@@ -1066,3 +1068,4 @@ if ('serviceWorker' in navigator) {
 </script>
 </body>
 </html>
+
