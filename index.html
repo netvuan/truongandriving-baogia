@@ -1190,6 +1190,891 @@ calcBtn.addEventListener('click', async () => {
     
     breakdownHtml += `<hr style="margin:6px 0">• <b>Tổng cộng: ${total.toLocaleString('vi-VN')} đ</b>`;
     priceBreak.innerHTML = breakdownHtml;
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🚖 Dịch vụ Taxi Trường An Driving</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#28a745"> 
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    :root{--green:#28a745;--muted:#6c757d;}
+    *{box-sizing:border-box}
+    #main-content {
+      background:#f4f6f8;
+      padding: 0;
+    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111}
+    header{background:var(--green);color:#fff;padding:12px 10px;text-align:center;font-size:20px;font-weight:700;line-height:1.5}
+    .phone-number{font-size:18px;font-weight:700;margin-top:4px}
+    .container{padding:12px}
+    .label-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+    .label-row h3{margin:0;font-size:16px}
+
+    #location-status-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    #reloadLocationBtn {
+        cursor: pointer;
+        font-style: normal;
+        font-size: 20px;
+        color: #007bff;
+        transition: transform 0.2s;
+    }
+    #reloadLocationBtn:hover {
+        transform: rotate(45deg);
+    }
+    
+    .input-row{position:relative;margin-top:8px}
+    .input-row .clear-btn {
+        position: absolute; right: 80px; top: 11px; 
+        background: #f0f0f0; color: #666; border: none; padding: 3px 6px; 
+        border-radius: 4px; font-weight: 700; cursor: pointer; line-height: 1;
+        font-size: 14px; display: none; 
+        z-index: 1000;
+    }
+    .input-row input:focus + .clear-btn, .input-row .clear-btn:hover { 
+        display: block; 
+    }
+    input[type="text"], input[type="number"], input[type="datetime-local"], select, input[type="tel"]{
+      width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ddd; font-size:16px; background:#fff;
+    }
+    .map-btn{position:absolute; right:8px; top:8px; background:var(--green); color:#fff; border:0; padding:6px 8px; border-radius:6px; font-weight:700; cursor:pointer}
+    .add-stop{display:block;background:var(--green); color:#fff; border:none; padding:12px; border-radius:10px; font-size:16px; font-weight:700; margin-top:12px; cursor:pointer}
+    .calc-btn{display:block;background:var(--green); color:#fff; border:none; padding:14px; border-radius:10px; font-size:18px; font-weight:700; margin-top:12px; cursor:pointer}
+    #map{height:320px;margin-top:12px;border-radius:8px;overflow:hidden}
+    .suggestions{position:absolute; left:0; right:0; top:calc(100% + 6px); background:#fff;border:1px solid #ddd;border-radius:8px;max-height:220px;overflow:auto; -webkit-overflow-scrolling:touch; z-index:1200; box-shadow:0 8px 20px rgba(0,0,0,0.08)}
+    .suggestions div{padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer; display:flex; gap:8px; align-items: center}
+    .suggestions div:last-child{border-bottom:0}
+    .suggestions div:hover{background:#f8f9fa}
+    .result-box{margin-top:12px;padding:12px;border-radius:8px;background:#fff3cd;border:1px solid #ffeeba}
+    .result-row{display:flex;align-items:center;gap:8px}
+    .distance-text{font-size:16px}
+    .price-title{font-weight:700;margin-top:6px}
+    .price-value{font-size:22px;color:red;font-weight:800}
+    .price-break{margin-top:8px;font-size:15px}
+    .actions{display:flex;gap:10px;margin-top:12px}
+    .actions a{flex:1;text-align:center;padding:12px;border-radius:8px;color:#fff;text-decoration:none;font-weight:700; border: none; cursor:pointer;}
+    .zalo-btn {background:#0068ff;} 
+    .mail{background:#dc3545}
+    .note{margin-top:10px;font-size:13px;color:var(--muted);background:#fff;padding:10px;border-radius:8px}
+    .way-wrapper{position:relative;margin-top:8px}
+    .way-remove{position:absolute;right:6px;top:6px;background:#ff6b6b;color:#fff;border:0;padding:6px;border-radius:6px;cursor:pointer}
+
+    /* KILL SWITCH STYLES */
+    /* Vô hiệu hóa form và làm mờ khi dịch vụ tắt */
+    .disabled-form {
+        pointer-events: none;
+        opacity: 0.6; 
+        transition: opacity 0.3s;
+    }
+    #serviceOffNotice {
+      margin-top: 12px; 
+      padding: 10px; 
+      background: #dc3545; 
+      color: white; 
+      border-radius: 8px; 
+      font-size: 15px; 
+      font-weight: 600; 
+      text-align: center;
+    }
+
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.7); z-index: 9999; display: none;
+      justify-content: center; align-items: center; padding: 20px;
+      animation: fadeIn 0.3s;
+    }
+    .modal-content {
+      background: #fff; border-radius: 12px; padding: 20px;
+      width: 100%; max-width: 450px; 
+      max-height: 90vh; 
+      overflow-y: auto; 
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      animation: slideIn 0.3s;
+    }
+    .modal-content h3 {
+      margin-top: 0; color: var(--green); font-size: 20px; text-align: center;
+    }
+    #modal-text {
+      white-space: pre-wrap; 
+      font-family: monospace;
+      font-size: 14px;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      margin-bottom: 15px;
+    }
+    .modal-actions {
+      display: flex; gap: 10px;
+    }
+    .modal-actions button {
+      flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer;
+    }
+    #copyModalBtn { background: #ffc107; color: #333; } 
+    #zaloModalBtn { background: #0068ff; color: #fff; }
+    #closeModalBtn { background: #ccc; color: #333; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media(min-width:700px){.container{max-width:720px;margin:0 auto}}
+  </style>
+</head>
+<body>
+<div id="main-content">
+  <header>
+    🚖 Dịch Vụ Taxi<br>
+    Trường An Driving<br>
+    <a href="tel:0847526893" class="phone-number" style="color:white; text-decoration: none;">☎️ 0847526893</a> 
+  </header>
+
+  <div class="container">
+    
+    <div id="serviceOffNotice" style="display:none;">
+      </div>
+    
+    <div id="instructionText" style="margin-top: 12px; padding: 10px; background: #e9ecef; border-radius: 8px; font-size: 15px; font-weight: 600; text-align: center;">
+      💰 Đang kiểm tra trạng thái dịch vụ...
+    </div>
+
+    <div id="booking-form-wrapper"> 
+      <div class="label-row" style="margin-top:6px"><h3>📞 Số điện thoại của bạn</h3></div>
+      <input id="customerPhone" type="tel" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
+
+      <div class="label-row">
+        <h3>📍 Điểm đón</h3>
+        <div id="location-status-wrapper" style="display: flex; align-items: center; gap: 8px;">
+          <span id="location-status" style="font-size:12px; color:var(--muted); font-weight:bold;">(Đang tìm vị trí...)</span>
+          <i id="reloadLocationBtn" title="Thử lấy lại vị trí">🔄</i>
+        </div>
+      </div>
+      <div class="input-row">
+        <input id="pickup" type="text" placeholder="Nhập địa chỉ điểm đón (hoặc tự động lấy)">
+        <button class="clear-btn" data-input-id="pickup">✖</button> 
+        <button class="map-btn" id="pick-from-map">Bản đồ</button>
+        <div id="pickup-suggestions" class="suggestions" style="display:none"></div>
+      </div>
+
+      <div class="label-row" style="margin-top:12px"><h3>🕒 Ngày & Giờ đón</h3></div>
+      <input id="pickupDateTime" type="datetime-local">
+
+      <div id="stops"></div>
+      <button class="add-stop" id="add-stop-btn">＋ Thêm điểm dừng</button>
+
+      <div class="label-row"><h3>🏁 Điểm đến</h3></div>
+      <div class="input-row">
+        <input id="dropoff" type="text" placeholder="Nhập địa chỉ điểm đến cuối">
+        <button class="clear-btn" data-input-id="dropoff">✖</button> 
+        <button class="map-btn" id="pick-to-map">Bản đồ</button>
+        <div id="dropoff-suggestions" class="suggestions" style="display:none"></div>
+      </div>
+      
+      <div class="label-row" style="margin-top:12px"><h3>🚘 Loại xe</h3></div>
+      <select id="carType">
+        <option value="4 chỗ (10.000đ/km)">Xe 4 chỗ (10.000đ/km)</option> 
+        <option value="7 chỗ (12.000đ/km)">Xe 7 chỗ (12.000đ/km)</option> 
+      </select>
+
+      <div class="label-row" style="margin-top:12px"><h3>🚗 Loại chuyến đi</h3></div>
+      <select id="tripType">
+        <option value="1">1 chiều</option>
+        <option value="2">2 chiều (giảm 40% chiều về)</option>
+      </select>
+
+      <div id="waitingWrapper"> 
+        <div class="label-row" style="margin-top:12px"><h3>⏳ Thời gian chờ (giờ)</h3></div>
+        <input id="waiting" type="number" min="0" value="0" placeholder="Nhập số giờ chờ">
+      </div>
+
+      <button class="calc-btn" id="calc-btn">💰 Tính giá</button>
+    </div> <div id="map"></div>
+
+    <div id="result" class="result-box" style="display:none">
+      <div class="result-row">
+        <div class="distance-text" id="distanceText">✏️ Quãng đường: —</div>
+      </div>
+
+      <div class="price-title">💵 Giá dự kiến</div>
+      <div class="price-value" id="priceValue">— đ</div>
+
+      <div class="price-break" id="priceBreak"></div>
+
+      <div style="margin-top:8px;font-size:14px;color:#333" id="timeEst">⏱ Thời gian dự kiến: — phút</div>
+      <div style="margin-top:4px;font-size:14px;color:#333" id="pickupInfo">🕒 Ngày giờ đón: —</div>
+    </div>
+
+    <div class="actions">
+      <a id="zaloBtn" class="zalo-btn" style="display:none;" href="javascript:void(0);">📱 Đặt qua Zalo</a>
+      <a id="mailBtn" class="mail" href="mailto:netvuan@gmail.com" style="display:none;">📧 Đặt qua Mail</a>
+    </div>
+
+    <div class="note">
+      📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).
+      <br>
+      **Thời gian chờ:**
+      <ul>
+        <li>Chờ 0–3 giờ: **Miễn phí**.</li>
+        <li>Kể từ giờ thứ 4, mỗi giờ tiếp theo phát sinh phụ phí **50.000 VNĐ/giờ**.</li>
+        <li>Thời gian chờ được tính từ khi hành khách **hoàn tất việc xuống xe tại điểm đến** cho đến khi xe quay trở lại đón để về điểm xuất phát ban đầu.</li>
+      </ul>
+      Giá đã bao gồm phí cầu đường.
+    </div>
+  </div>
+</div>
+
+<div id="zaloModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h3>✅ THÔNG TIN ĐẶT XE</h3>
+        <p style="text-align:center; font-size:15px; font-weight:600;">Sao chép thông tin và gửi qua Zalo:</p>
+        <pre id="modal-text"></pre>
+        <div class="modal-actions">
+            <button id="copyModalBtn">📋 Sao Chép Thông Tin</button> 
+            <button id="zaloModalBtn">📱 Mở Zalo Chat</button>
+        </div>
+        <button id="closeModalBtn" style="width:100%; margin-top:10px; padding:8px; border-radius:8px;">Đóng</button>
+    </div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay" style="display:none"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+/* ---------- Cấu hình Tối Ưu Hóa ---------- */
+const REMOTE_STATUS_URL = "/status-local.json"; 
+const NOMINATIM = "https://nominatim.openstreetmap.org/search";
+const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse"; 
+const OSRM = "https://router.project-osrm.org/route/v1/driving";
+// URL Maps ngắn gọn (Sử dụng lệnh tìm kiếm địa chỉ)
+const GOOGLE_MAPS_SHORT_URL = "https://www.google.com/maps/dir/?api=1&origin=3"; 
+const TAXI_PHONE = "0847526893"; 
+const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`; 
+const DEBOUNCE_TIME = 300; 
+const DEFAULT_CENTER = [10.77653, 106.70098]; 
+const SOUTHERN_VN_VIEWBOX = '104.5,8.5,107.5,12.0'; 
+let userLocation = null; 
+let isServiceActive = false; 
+
+/* DOM */
+const customerPhoneEl = document.getElementById('customerPhone'); 
+const pickupEl = document.getElementById('pickup');
+const pickupSugg = document.getElementById('pickup-suggestions');
+const dropoffEl = document.getElementById('dropoff');
+const dropoffSugg = document.getElementById('dropoff-suggestions');
+const stopsContainer = document.getElementById('stops');
+const calcBtn = document.getElementById('calc-btn');
+const tripTypeEl = document.getElementById('tripType');
+const carTypeEl = document.getElementById('carType'); 
+const waitingEl = document.getElementById('waiting');
+const waitingWrapper = document.getElementById('waitingWrapper'); 
+const resultBox = document.getElementById('result');
+const distanceText = document.getElementById('distanceText');
+const priceValue = document.getElementById('priceValue');
+const priceBreak = document.getElementById('priceBreak');
+const timeEst = document.getElementById('timeEst');
+const pickupDateTime = document.getElementById('pickupDateTime');
+const zaloBtn = document.getElementById('zaloBtn'); 
+const mailBtn = document.getElementById('mailBtn');
+
+// Kill Switch DOM
+const instructionText = document.getElementById('instructionText');
+const serviceOffNotice = document.getElementById('serviceOffNotice'); 
+const bookingFormWrapper = document.getElementById('booking-form-wrapper'); 
+
+const locationStatusEl = document.getElementById('location-status'); 
+const reloadLocationBtn = document.getElementById('reloadLocationBtn'); 
+
+// Modal DOM
+const zaloModal = document.getElementById('zaloModal');
+const modalText = document.getElementById('modal-text');
+const copyModalBtn = document.getElementById('copyModalBtn'); 
+const zaloModalBtn = document.getElementById('zaloModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+let finalZaloMessage = ''; 
+let map; 
+let pickupMarker = null, dropoffMarker = null, routeLayer = null;
+let selecting = null; 
+let stopCount = 0;
+let lastFocusedStopId = null;
+
+/* ---------- TÍN HIỆU KILL SWITCH (Polling) ---------- */
+
+async function checkServiceStatus() {
+    const cacheBuster = `?t=${Date.now()}`; 
+    const finalUrl = REMOTE_STATUS_URL + cacheBuster;
+
+    try {
+        const response = await fetch(finalUrl, { cache: 'no-store', signal: AbortSignal.timeout(3000) }); 
+        
+        if (!response.ok) {
+            return { 
+                active: false, 
+                message_vn: "⚠️ CẢNH BÁO MẠNG: Không tìm thấy file trạng thái dịch vụ (404/Server Error). Chức năng đặt xe bị tạm ngưng." 
+            };
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        let msg = "⚠️ Thiết bị đang OFFLINE hoặc LỖI KẾT NỐI. Không thể xác nhận đơn hàng."
+        if (error.name === 'TimeoutError') {
+             msg = "⚠️ Kiểm tra trạng thái dịch vụ quá lâu. Việc đặt xe bị tạm ngưng."
+        }
+        console.error("Lỗi khi fetch trạng thái dịch vụ:", error);
+        return { 
+            active: false, 
+            message_vn: msg
+        };
+    }
+}
+
+
+async function updateUIBasedOnStatus(status) {
+    if (status.active !== isServiceActive) {
+        isServiceActive = status.active;
+    }
+    
+    instructionText.style.display = 'block'; // Hiển thị mặc định
+
+    if (!isServiceActive) {
+        // TẮT DỊCH VỤ
+        calcBtn.style.background = '#ccc';
+        calcBtn.style.cursor = 'not-allowed';
+        calcBtn.disabled = true;
+        
+        serviceOffNotice.style.display = 'block';
+        serviceOffNotice.innerHTML = status.message_vn;
+        
+        // Vô hiệu hóa form
+        bookingFormWrapper.classList.add('disabled-form');
+        
+        zaloBtn.style.display = 'none';
+        mailBtn.style.display = 'none';
+        resultBox.style.display = 'none';
+        instructionText.style.display = 'none';
+        
+    } else {
+        // MỞ DỊCH VỤ
+        calcBtn.style.background = 'var(--green)';
+        calcBtn.style.cursor = 'pointer';
+        calcBtn.disabled = false;
+        
+        serviceOffNotice.style.display = 'none';
+        
+        // Kích hoạt form
+        bookingFormWrapper.classList.remove('disabled-form');
+        
+        instructionText.innerHTML = status.message_vn || '💰 Bấm "Tính giá" để xem chi tiết đặt xe.';
+    }
+}
+
+/* ---------- Các hàm JS khác (InitMap, Geolocation, Autocomplete, Calculate...) GIỮ NGUYÊN ---------- */
+function initMap(center) {
+    if (!map) {
+        map = L.map('map').setView(center, 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        map.on('click', handleMapClick);
+        map.on('dblclick', handleMapDblClick);
+    } else {
+        map.setView(center, 11);
+    }
+}
+
+async function reverseGeocode(lat, lon) {
+    try {
+        const url = `${REVERSE_NOMINATIM}?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=vi`;
+        const r = await fetch(url);
+        const data = await r.json();
+        return data.display_name;
+    } catch (e) {
+        console.warn('Reverse Geocoding Error', e);
+        return `${lat.toFixed(6)}, ${lon.toFixed(6)} (Không tìm thấy địa chỉ)`;
+    }
+}
+
+function getGeolocation() {
+    locationStatusEl.textContent = '(Đang tìm vị trí...)';
+    locationStatusEl.style.color = 'var(--muted)';
+    reloadLocationBtn.style.color = '#ccc'; 
+    reloadLocationBtn.style.pointerEvents = 'none';
+
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(async (pos)=>{
+            userLocation = [pos.coords.latitude, pos.coords.longitude]; 
+            initMap(userLocation); 
+            
+            const address = await reverseGeocode(userLocation[0], userLocation[1]);
+            pickupEl.value = address;
+            pickupEl.dataset.lat = userLocation[0];
+            pickupEl.dataset.lon = userLocation[1];
+            pickupEl.parentNode.querySelector('.clear-btn').style.display = 'block';
+
+            if(pickupMarker) map.removeLayer(pickupMarker);
+            pickupMarker = L.marker(userLocation).addTo(map).bindPopup('📍 Vị trí hiện tại').openPopup();
+
+            locationStatusEl.textContent = '✅ Đã tìm thấy vị trí';
+            locationStatusEl.style.color = 'var(--green)';
+            reloadLocationBtn.style.color = '#007bff';
+            reloadLocationBtn.style.pointerEvents = 'auto';
+
+
+        }, (err)=>{
+            console.warn('Geolocation Error:', err.message);
+            initMap(DEFAULT_CENTER); 
+            
+            let statusText = '⚠️ Lỗi tìm vị trí. Nhập thủ công.';
+            if (err.code === err.PERMISSION_DENIED) {
+                 statusText = '❌ Bị từ chối quyền truy cập vị trí.';
+            } else if (err.code === err.POSITION_UNAVAILABLE) {
+                 statusText = '❌ Vị trí không khả dụng (Bật GPS).';
+            } else if (err.code === err.TIMEOUT) {
+                 statusText = '⚠️ Hết thời gian tìm vị trí.';
+            }
+            
+            locationStatusEl.textContent = statusText;
+            locationStatusEl.style.color = '#dc3545';
+            reloadLocationBtn.style.color = '#007bff';
+            reloadLocationBtn.style.pointerEvents = 'auto';
+
+
+        }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }); 
+    } else {
+        initMap(DEFAULT_CENTER); 
+        locationStatusEl.textContent = '❌ Trình duyệt không hỗ trợ Geolocation.';
+        locationStatusEl.style.color = '#dc3545';
+        reloadLocationBtn.style.color = '#ccc';
+        reloadLocationBtn.style.pointerEvents = 'none';
+    }
+}
+
+function debounce(func, timeout = DEBOUNCE_TIME) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+}
+
+function toggleWaitingInput(){
+    if(tripTypeEl.value === '1'){
+        waitingWrapper.style.display = 'none';
+    } else {
+        waitingWrapper.style.display = 'block';
+    }
+}
+
+tripTypeEl.addEventListener('change', toggleWaitingInput);
+toggleWaitingInput();
+
+document.querySelectorAll('.clear-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const inputId = e.target.dataset.inputId;
+        const inputEl = document.getElementById(inputId);
+        if (inputEl) {
+            inputEl.value = '';
+            delete inputEl.dataset.lat;
+            delete inputEl.dataset.lon;
+            if (inputId === 'pickup' && pickupMarker) {
+                map.removeLayer(pickupMarker);
+                pickupMarker = null;
+            } else if (inputId === 'dropoff' && dropoffMarker) {
+                map.removeLayer(dropoffMarker);
+                dropoffMarker = null;
+            }
+            const suggBox = document.getElementById(`${inputId}-suggestions`);
+            if (suggBox) suggBox.style.display = 'none';
+            inputEl.focus(); 
+        }
+    });
+});
+document.querySelectorAll('input[type="text"]').forEach(inputEl => {
+    const clearBtn = inputEl.parentNode.querySelector('.clear-btn');
+    if (clearBtn) {
+        inputEl.addEventListener('input', () => {
+            clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none';
+        });
+        inputEl.addEventListener('focus', () => {
+             clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none';
+        });
+        inputEl.addEventListener('blur', () => {
+             setTimeout(() => clearBtn.style.display = 'none', 150); 
+        });
+    }
+});
+
+
+async function geocodeOnce(query){
+  try{
+    let url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=VN&addressdetails=1`;
+    
+    if(userLocation) {
+        const [lat, lon] = userLocation;
+        url += `&viewbox=${lon - 0.5},${lat - 0.5},${lon + 0.5},${lat + 0.5}&bounded=1`;
+    } else {
+        url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
+    }
+
+    const r = await fetch(url);
+    const data = await r.json();
+    if(Array.isArray(data) && data.length>0) return data[0];
+  }catch(e){ console.warn('geocode once error', e); }
+  return null;
+}
+
+function attachAutocomplete(inputEl, boxEl){
+  let controller = null;
+
+  const doSearch = async ()=>{
+    const q = inputEl.value.trim();
+    const clearBtn = inputEl.parentNode.querySelector('.clear-btn');
+    
+    if(!q){ 
+        boxEl.style.display = 'none'; 
+        if(clearBtn) clearBtn.style.display = 'none';
+        return; 
+    }
+    if(clearBtn) clearBtn.style.display = 'block';
+
+    if(controller) controller.abort();
+    controller = new AbortController();
+    
+    boxEl.innerHTML = '<div>Đang tìm kiếm...</div>'; 
+    boxEl.style.display = 'block'; 
+
+    let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=vi`; 
+    
+    if(userLocation) {
+        const [lat, lon] = userLocation;
+        url += `&viewbox=${lon - 0.3},${lat - 0.3},${lon + 0.3},${lat + 0.3}&bounded=1`;
+    } else {
+        url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
+    }
+
+
+    try{
+      const res = await fetch(url, { signal: controller.signal });
+      const data = await res.json();
+      
+      const fragment = document.createDocumentFragment();
+      
+      if(!Array.isArray(data) || data.length === 0){ 
+        boxEl.innerHTML = '<div>Không tìm thấy địa điểm</div>'; 
+        setTimeout(() => boxEl.style.display = 'none', 1000); 
+        return; 
+      }
+
+      data.forEach(place => {
+        const d = document.createElement('div');
+        d.innerHTML = `<span style="font-size:16px">📍</span><div style="margin-left:8px">${place.display_name}</div>`;
+        d.addEventListener('click', ()=>{
+          inputEl.value = place.display_name;
+          inputEl.dataset.lat = place.lat;
+          inputEl.dataset.lon = place.lon;
+          boxEl.style.display = 'none';
+          if(clearBtn) clearBtn.style.display = 'block';
+
+          const latlng = [parseFloat(place.lat), parseFloat(place.lon)];
+          if(map) {
+            if(inputEl.id === 'pickup'){
+              if(pickupMarker) map.removeLayer(pickupMarker);
+              pickupMarker = L.marker(latlng).addTo(map).bindPopup('📍 Điểm đón').openPopup();
+              map.setView(latlng, 14);
+            } else if(inputEl.id === 'dropoff'){
+              if(dropoffMarker) map.removeLayer(dropoffMarker);
+              dropoffMarker = L.marker(latlng).addTo(map).bindPopup('🏁 Điểm đến').openPopup();
+              map.setView(latlng, 14);
+            } 
+          }
+        });
+        fragment.appendChild(d);
+      });
+      
+      boxEl.innerHTML = '';
+      boxEl.appendChild(fragment);
+      boxEl.style.display = 'block';
+      
+    }catch(err){
+      if(err.name === 'AbortError') return; 
+      console.error('suggest error', err);
+      boxEl.innerHTML = '<div>Lỗi mạng hoặc API. Thử lại</div>'; 
+      setTimeout(() => boxEl.style.display = 'none', 2000); 
+    }
+  }; 
+
+  inputEl.addEventListener('input', debounce(doSearch));
+
+  document.addEventListener('click', (ev)=>{
+    if(!boxEl.contains(ev.target) && ev.target !== inputEl) boxEl.style.display = 'none'; 
+  });
+
+  inputEl.addEventListener('focus', ()=> {
+    const inputId = inputEl.id; 
+    if(inputId && inputId.startsWith('stop-')) lastFocusedStopId = inputId;
+    else lastFocusedStopId = null;
+    
+    const clearBtn = inputEl.parentNode.querySelector('.clear-btn');
+    if(clearBtn) clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none';
+  });
+}
+
+attachAutocomplete(pickupEl, pickupSugg);
+attachAutocomplete(dropoffEl, dropoffSugg);
+
+function createStopInput(prefill=''){
+  stopCount++;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'way-wrapper input-row';
+  const inputId = `stop-${stopCount}`;
+  const suggId = `${inputId}-suggestions`;
+  wrapper.innerHTML = `
+    <input type="text" id="${inputId}" placeholder="Nhập điểm dừng ${stopCount}">
+    <button class="way-remove" title="Xóa">✖</button>
+    <div id="${suggId}" class="suggestions" style="display:none"></div>
+  `;
+  stopsContainer.appendChild(wrapper);
+
+  const inputEl = wrapper.querySelector('input');
+  const boxEl = wrapper.querySelector('.suggestions');
+  attachAutocomplete(inputEl, boxEl);
+
+  wrapper.querySelector('.way-remove').addEventListener('click', ()=> wrapper.remove());
+
+  inputEl.addEventListener('focus', ()=> lastFocusedStopId = inputId);
+
+  return inputEl;
+}
+
+document.getElementById('add-stop-btn').addEventListener('click', ()=> createStopInput());
+
+document.getElementById('pick-from-map').addEventListener('click', ()=> { selecting = 'pickup'; alert('Bấm vào bản đồ để chọn điểm đón'); });
+document.getElementById('pick-to-map').addEventListener('click', ()=> { selecting = 'dropoff'; alert('Bấm vào bản đồ để chọn điểm đến'); });
+
+const handleMapClick = async (e) => {
+  if (!map) return; 
+  const lat = e.latlng.lat, lon = e.latlng.lng;
+  if(selecting === 'pickup'){
+    if(pickupMarker) map.removeLayer(pickupMarker);
+    pickupMarker = L.marker([lat,lon]).addTo(map).bindPopup('📍 Điểm đón').openPopup();
+    
+    const address = await reverseGeocode(lat, lon);
+    pickupEl.value = address;
+    
+    pickupEl.dataset.lat = lat; pickupEl.dataset.lon = lon;
+    pickupEl.parentNode.querySelector('.clear-btn').style.display = 'block';
+    selecting = null;
+    return;
+  }
+  if(selecting === 'dropoff'){
+    if(dropoffMarker) map.removeLayer(dropoffMarker);
+    dropoffMarker = L.marker([lat,lon]).addTo(map).bindPopup('🏁 Điểm đến').openPopup();
+    
+    const address = await reverseGeocode(lat, lon);
+    dropoffEl.value = address;
+    
+    dropoffEl.dataset.lat = lat; dropoffEl.dataset.lon = lon;
+    dropoffEl.parentNode.querySelector('.clear-btn').style.display = 'block';
+    selecting = null;
+    return;
+  }
+  if(lastFocusedStopId){
+    const stopInput = document.getElementById(lastFocusedStopId);
+    if(stopInput){
+      const address = await reverseGeocode(lat, lon);
+      stopInput.value = address;
+      
+      stopInput.dataset.lat = lat; stopInput.dataset.lon = lon;
+      L.marker([lat,lon]).addTo(map).bindPopup('📍 Điểm dừng').openPopup();
+      lastFocusedStopId = null;
+    }
+  }
+};
+
+const handleMapDblClick = (e) => {
+  if (!map) return; 
+  if(lastFocusedStopId){
+    const stopInput = document.getElementById(lastFocusedStopId);
+    if(stopInput){
+      stopInput.value = `${e.latlng.lat.toFixed(6)},${e.latlng.lng.toFixed(6)}`;
+      stopInput.dataset.lat = e.latlng.lat; stopInput.dataset.lon = e.latlng.lng;
+      L.marker([e.latlng.lat,e.latlng.lng]).addTo(map).bindPopup('📍 Điểm dừng').openPopup();
+      lastFocusedStopId = null;
+    }
+  }
+};
+
+
+async function resolveCoordForInput(inputEl){
+  if(inputEl.dataset && inputEl.dataset.lat && inputEl.dataset.lon){
+    return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)];
+  }
+  const v = inputEl.value.trim();
+  if(!v) return null;
+  const parts = v.split(',');
+  if(parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))){
+    return [parseFloat(parts[0]), parseFloat(parts[1])];
+  }
+  const place = await geocodeOnce(v + ' Việt Nam');
+  if(place){
+    inputEl.dataset.lat = place.lat;
+    inputEl.dataset.lon = place.lon;
+    return [parseFloat(place.lat), parseFloat(place.lon)];
+  }
+  return null;
+}
+
+function validateInputs() {
+    const phone = customerPhoneEl.value.trim();
+    const phoneRegex = /^\d{10}$/; 
+    if (!phoneRegex.test(phone)) {
+        alert('❌ Vui lòng nhập Số điện thoại hợp lệ (chính xác 10 chữ số).');
+        customerPhoneEl.focus();
+        return false;
+    }
+    if (pickupEl.value.trim() === '') {
+        alert('❌ Vui lòng nhập Địa chỉ Điểm đón.');
+        pickupEl.focus();
+        return false;
+    }
+    if (dropoffEl.value.trim() === '') {
+        alert('❌ Vui lòng nhập Địa chỉ Điểm đến.');
+        dropoffEl.focus();
+        return false;
+    }
+    const tripType = tripTypeEl.value; 
+    const waiting = parseFloat(waitingEl.value); 
+    if (tripType === '2') {
+        if (isNaN(waiting) || waiting < 0) {
+            alert('❌ Vì bạn chọn chuyến 2 chiều, vui lòng nhập Thời gian chờ (số giờ) để chúng tôi sắp xếp xe. Giá trị phải ≥ 0.');
+            waitingEl.focus();
+            return false;
+        }
+    }
+    return true;
+}
+
+calcBtn.addEventListener('click', async () => {
+  if (!isServiceActive) {
+      alert('⚠️ Dịch vụ Taxi Trường An Driving hiện đang tạm ngừng nhận đơn hàng. Vui lòng kiểm tra thông báo trên màn hình.');
+      return;
+  }
+  
+  if (!validateInputs()) {
+    return;
+  }
+  
+  const customerPhone = customerPhoneEl.value.trim(); 
+
+  const pickupCoord = await resolveCoordForInput(pickupEl);
+  if(!pickupCoord){ alert('Không tìm thấy tọa độ Điểm đón. Hãy chọn gợi ý hoặc đặt trên bản đồ.'); return; }
+  const dropoffCoord = await resolveCoordForInput(dropoffEl);
+  if(!dropoffCoord){ alert('Không tìm thấy tọa độ Điểm đến. Hãy chọn gợi ý hoặc đặt trên bản đồ.'); return; }
+
+  const coords = [];
+  coords.push(pickupCoord);
+  const stopInputs = Array.from(stopsContainer.querySelectorAll('input[id^="stop-"]'));
+  for(const s of stopInputs){
+    if(s.value.trim()){
+      const sc = await resolveCoordForInput(s);
+      if(!sc){ alert('Không tìm thấy tọa độ cho một Điểm dừng.'); return; }
+      coords.push(sc);
+    }
+  }
+  coords.push(dropoffCoord);
+
+  const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
+  const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
+
+  resultBox.style.display = 'block';
+  distanceText.textContent = 'Đang tính lộ trình...';
+  priceValue.textContent = '...';
+  priceBreak.innerHTML = '';
+  timeEst.textContent = '';
+  finalZaloMessage = ''; 
+  zaloBtn.style.display = 'none'; 
+  mailBtn.style.display = 'none';
+  instructionText.innerHTML = 'Đang tính toán...';
+
+  try{
+    const r = await fetch(url);
+    const data = await r.json();
+    if(!data.routes || data.routes.length === 0){ distanceText.textContent = 'Không tính được lộ trình'; return; }
+    const route = data.routes[0];
+    const dist = route.distance / 1000; 
+    const minutes = Math.round((dist / 30) * 60);
+
+    if(map) {
+      if(routeLayer) map.removeLayer(routeLayer);
+      routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
+      map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
+    }
+
+    const tripType = tripTypeEl.value; 
+    const carType = carTypeEl.value; 
+    const waiting = parseFloat(waitingEl.value) || 0; 
+    
+    let perKm;
+    if (carType.includes('7 chỗ')) { 
+        perKm = 12000;
+    } else { 
+        perKm = 10000; 
+    }
+    const perKmReturnDiscount = Math.round(perKm * 0.6); 
+
+    const priceGo = Math.round(dist * perKm);
+    let priceReturn = 0;
+    let returnNote = ''; 
+
+    if(tripType === '2') {
+        if(dist >= 45) {
+            priceReturn = Math.round(dist * perKmReturnDiscount); 
+            returnNote = `Chiều về (giảm 40% do 1 chiều ≥ 45km => ${perKmReturnDiscount.toLocaleString('vi-VN')}đ/km)`;
+        } else {
+            priceReturn = Math.round(dist * perKm); 
+            returnNote = `Chiều về (Không giảm giá do 1 chiều < 45km => ${perKm.toLocaleString('vi-VN')}đ/km)`;
+        }
+    } else {
+        returnNote = '1 Chiều';
+    }
+
+    const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
+    const total = priceGo + priceReturn + waitFee;
+
+    distanceText.textContent = `Quãng đường: ${dist.toFixed(1)} km (một chiều)`;
+    priceValue.textContent = total.toLocaleString('vi-VN') + ' đ';
+
+    let breakdownHtml = '';
+    breakdownHtml += `• Giá chiều đi (${perKm.toLocaleString('vi-VN')}đ/km): <b>${priceGo.toLocaleString('vi-VN')} đ</b><br>`;
+    
+    if(tripType === '2'){
+      breakdownHtml += `• ${returnNote}: <b>${priceReturn.toLocaleString('vi-VN')} đ</b><br>`;
+    }
+
+    let waitDetail;
+    if (tripType === '2') {
+        if (waiting > 3) {
+            waitDetail = `Phí chờ (${waiting} giờ, miễn phí 0–3h): <b>${waitFee.toLocaleString('vi-VN')} đ</b>`;
+            breakdownHtml += `• ${waitDetail}<br>`;
+        } else if (waiting > 0) {
+            waitDetail = `Thời gian chờ (${waiting} giờ): <b>Miễn phí</b>`;
+            breakdownHtml += `• ${waitDetail}<br>`;
+        } 
+    } else {
+        waitDetail = ``; 
+    }
+    
+    breakdownHtml += `<hr style="margin:6px 0">• <b>Tổng cộng: ${total.toLocaleString('vi-VN')} đ</b>`;
+    priceBreak.innerHTML = breakdownHtml;
 
     timeEst.textContent = `⏱ Thời gian dự kiến (tính theo 30 km/h): ${minutes} phút`;
 
@@ -1217,26 +2102,21 @@ calcBtn.addEventListener('click', async () => {
         }
     }
     
-    // ----------- BẮT ĐẦU TÍNH NĂNG MAPS LINK MỚI -----------
+    // ----------- TÍNH NĂNG MAPS LINK (RÚT GỌN) -----------
     const pickupAddress = pickupEl.value.trim();
-    const dropoffAddress = dropoffEl.value.trim();
+    // Mã hóa địa chỉ đón
+    const encodedPickUp = encodeURIComponent(pickupAddress); 
     
-    const encodedPickUp = encodeURIComponent(pickupAddress);
-    const encodedDropOff = encodeURIComponent(dropoffAddress);
-    
-    // Link 1: Chỉ đường từ Điểm đón đến Điểm trả
-    const mapsDirectionLink = `${GOOGLE_MAPS_DIR_URL}${encodedPickUp}&destination=${encodedDropOff}&travelmode=driving`;
-    
-    // Link 2: Vị trí đón khách (search thẳng địa chỉ)
-    const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}${encodedPickUp}`;
+    // Link Rút gọn: Chỉ cần đường link Tìm kiếm (Search) đến Điểm đón 
+    // Link này ngắn hơn rất nhiều và đủ cho tài xế đến đón khách.
+    const mapsPickupLink = `${GOOGLE_MAPS_SHORT_URL}${encodedPickUp}`;
     
     let mapsLinksSection = [
         `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHO TÀI XẾ ***`,
-        `📍 Vị trí đón khách: ${mapsPickupLink}`,
-        `🛣️ Chỉ đường (Đón -> Trả): ${mapsDirectionLink}`,
+        `📍 Vị trí đón khách (NGẮN GỌN): ${mapsPickupLink}`,
         `\n`
     ].join('\n');
-    // ----------- KẾT THÚC TÍNH NĂNG MAPS LINK MỚI -----------
+    // ----------- KẾT THÚC TÍNH NĂNG MAPS LINK (RÚT GỌN) -----------
     
     finalZaloMessage = [
         '🚖 YÊU CẦU ĐẶT XE TRƯỜNG AN DRIVING',
@@ -1246,11 +2126,11 @@ calcBtn.addEventListener('click', async () => {
         `🚘 Loại xe: ${carType}`, 
         `📍 Điểm đón: ${pickupAddress}`,
         ...(stopInputsValues.length ? [stopDetails] : []),
-        `🏁 Điểm đến: ${dropoffAddress}`,
+        `🏁 Điểm đến: ${dropoffEl.value.trim()}`,
         `🕒 Ngày giờ đón: ${formattedDate}`,
         ...(tripType === '2' ? [zaloWaitingDetail] : []), 
         `💵 Tổng giá dự kiến: ${total.toLocaleString('vi-VN')} đ`,
-        mapsLinksSection, // Chèn đoạn Maps link vào đây
+        mapsLinksSection, // Chèn đoạn Maps link ngắn
         '-------------------------------',
         'Vui lòng xác nhận đơn hàng.',
     ].join('\n');
