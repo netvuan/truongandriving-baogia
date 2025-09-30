@@ -1254,9 +1254,40 @@ zaloModal.addEventListener('click', (e) => {
 });
 
 /* ------------------------------------------------------------------
+   CHỨC NĂNG MỚI: ĐẶT THỜI GIAN ĐÓN TỐI THIỂU (Minimum Pickup Time)
+   ------------------------------------------------------------------ */
+
+function setMinPickupDateTime() {
+    const now = new Date();
+    // Thêm 30 phút (30 * 60000 milliseconds)
+    const minTime = new Date(now.getTime() + 30 * 60000); 
+
+    // Hàm chuyển Date Object sang định dạng YYYY-MM-DDTHH:mm cho input[type="datetime-local"]
+    const formatDateTime = (date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const h = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        return `${y}-${m}-${d}T${h}:${min}`;
+    };
+
+    const minDateTimeString = formatDateTime(minTime);
+    
+    // Thiết lập thuộc tính min và giá trị mặc định (nếu chưa có)
+    pickupDateTime.setAttribute('min', minDateTimeString);
+    if (!pickupDateTime.value) {
+        pickupDateTime.value = minDateTimeString;
+    }
+}
+
+/* ------------------------------------------------------------------
    KHỞI TẠO VÀ POLLING (TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI)
    ------------------------------------------------------------------ */
 document.addEventListener('DOMContentLoaded', async ()=>{
+    // Gọi hàm thiết lập thời gian tối thiểu ngay khi tải trang
+    setMinPickupDateTime();
+    
     getGeolocation();
     
     const status = await checkServiceStatus();
@@ -1271,6 +1302,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         } else {
             console.log(`[Kill Switch] Trạng thái không đổi (${newStatus.active}). Tiếp tục polling...`);
         }
+        // Cập nhật lại thời gian tối thiểu mỗi lần polling để luôn theo sát thời gian thực
+        setMinPickupDateTime(); 
     }, 15000); 
     
     reloadLocationBtn.addEventListener('click', getGeolocation); 
