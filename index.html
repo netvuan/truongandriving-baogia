@@ -153,6 +153,12 @@
     }
     #depositModal #confirmDepositBtn { background: var(--green); color: white; }
     
+    /* Driver Select Highlight */
+    .driver-option-highlight {
+        color: red;
+        font-weight: bold;
+    }
+
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -213,7 +219,19 @@
         <option value="4 chỗ (10.000đ/km)">Xe 4 chỗ (10.000đ/km)</option> 
         <option value="7 chỗ (12.000đ/km)">Xe 7 chỗ (12.000đ/km)</option> 
       </select>
-
+      
+      <div class="label-row" style="margin-top:12px"><h3>🧑‍✈️ Yêu cầu Tài xế</h3></div>
+      <select id="driverRequest">
+        <option value="Trường An Driving" class="driver-option-highlight">Trường An Driving (Mặc định)</option>
+        <option value="Đình Tâm">Đình Tâm</option>
+        <option value="Hải Đăng">Hải Đăng</option>
+        <option value="Lê Tâm">Lê Tâm</option>
+        <option value="Nguyễn Thảo">Nguyễn Thảo</option>
+        <option value="Quốc Dũng">Quốc Dũng</option>
+        <option value="Tân Hồ">Tân Hồ</option>
+        <option value="Trần Vinh">Trần Vinh</option>
+        <option value="Xuân Phong">Xuân Phong</option>
+      </select>
       <div class="label-row" style="margin-top:12px"><h3>🚗 Loại chuyến đi</h3></div>
       <select id="tripType">
         <option value="1">1 chiều</option>
@@ -341,6 +359,7 @@ const stopsContainer = document.getElementById('stops');
 const calcBtn = document.getElementById('calc-btn');
 const tripTypeEl = document.getElementById('tripType');
 const carTypeEl = document.getElementById('carType'); 
+const driverRequestEl = document.getElementById('driverRequest'); // New Driver Select
 const waitingEl = document.getElementById('waiting');
 const waitingWrapper = document.getElementById('waitingWrapper'); 
 const resultBox = document.getElementById('result');
@@ -906,6 +925,7 @@ async function calculateAndGenerateMessage() {
 
         const tripType = tripTypeEl.value; 
         const carType = carTypeEl.value; 
+        const driverRequest = driverRequestEl.value; // Get driver request
         const waiting = parseFloat(waitingEl.value) || 0; 
         
         let perKm;
@@ -931,6 +951,7 @@ async function calculateAndGenerateMessage() {
         const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
         const total = priceGo + priceReturn + waitFee;
         finalTotalFee = total; // Lưu lại tổng phí
+        const depositAmountValue = Math.round(total * 0.2); // Tính tiền đặt cọc
 
         distanceText.textContent = `Quãng đường: ${dist.toFixed(1)} km (một chiều)`;
         priceValue.textContent = total.toLocaleString('vi-VN') + ' đ';
@@ -993,12 +1014,18 @@ async function calculateAndGenerateMessage() {
         const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}${pickupLatLon}`; 
         
         let mapsLinksSection = [
-            `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHÍNH XÁC ***`,
+            `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHÍNH XÁ ***`,
             `📍 Vị trí đón khách (Tọa độ): ${mapsPickupLink}`,
             `🛣️ Chỉ đường (Đón -> Trả): ${mapsDirectionLink}`,
             `\n`
         ].join('\n');
         
+        // Thêm thông tin đặt cọc (Deposit)
+        let depositSection = '';
+        if (tripType === '2') {
+            depositSection = `\n💰 ĐẶT CỌC: ${depositAmountValue.toLocaleString('vi-VN')} đ (20% Tổng phí)`;
+        }
+
         // Tạo tin nhắn Zalo Tạm thời (Chưa có SĐT)
         finalZaloMessage = [
             '🚖 YÊU CẦU ĐẶT XE TRƯỜNG AN DRIVING',
@@ -1006,12 +1033,14 @@ async function calculateAndGenerateMessage() {
             `📞 SĐT Khách hàng: [CHƯA CÓ]`, // Sẽ được chèn sau
             `✅ Loại chuyến: ${tripType === '1' ? '1 Chiều' : `2 Chiều (${dist.toFixed(1)} km/chiều)`}`,
             `🚘 Loại xe: ${carType}`, 
+            `🧑‍✈️ Yêu cầu tài xế: ${driverRequest}`, // Add Driver Request
             `📍 Điểm đón: ${pickupAddress}`,
             ...(stopInputsValues.length ? [stopDetails] : []),
             `🏁 Điểm đến: ${dropoffAddress}`,
             `🕒 Ngày giờ đón: ${formattedDate}`,
             ...(tripType === '2' ? [zaloWaitingDetail] : []), 
             `💵 Tổng giá dự kiến: ${total.toLocaleString('vi-VN')} đ`,
+            depositSection, // Add Deposit Section
             mapsLinksSection, 
             '-------------------------------',
             'Vui lòng xác nhận đơn hàng.',
