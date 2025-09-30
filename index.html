@@ -76,7 +76,6 @@
     .way-remove{position:absolute;right:6px;top:6px;background:#ff6b6b;color:#fff;border:0;padding:6px;border-radius:6px;cursor:pointer}
 
     /* KILL SWITCH STYLES */
-    /* Vô hiệu hóa form và làm mờ khi dịch vụ tắt */
     .disabled-form {
         pointer-events: none;
         opacity: 0.6; 
@@ -153,10 +152,21 @@
     }
     #depositModal #confirmDepositBtn { background: var(--green); color: white; }
     
-    /* Driver Select Highlight */
+    /* NEW: Driver Select Styling */
+    #driverRequest {
+        font-size: 18px; /* Tăng cỡ chữ */
+        font-weight: 600;
+        border: 2px solid var(--green); /* Viền nổi bật */
+    }
     .driver-option-highlight {
-        color: red;
-        font-weight: bold;
+        color: red; /* Màu đỏ nổi bật cho Trường An Driving */
+        font-weight: 900 !important; /* Đảm bảo nổi bật */
+        background-color: #f7f7f7;
+    }
+    .driver-option-avatar {
+        margin-right: 5px; 
+        font-size: 1.1em;
+        vertical-align: middle;
     }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -220,7 +230,12 @@
         <option value="7 chỗ (12.000đ/km)">Xe 7 chỗ (12.000đ/km)</option> 
       </select>
       
-      <div class="label-row" style="margin-top:12px"><h3>🧑‍✈️ Yêu cầu Tài xế</h3></div>
+      <div class="label-row" style="margin-top:12px">
+        <h3>
+            🧑‍✈️ Yêu cầu Tài xế 
+            <span class="driver-option-avatar" title="Icon này có thể thay bằng Avatar">👤</span>
+        </h3>
+      </div>
       <select id="driverRequest">
         <option value="Trường An Driving" class="driver-option-highlight">Trường An Driving (Mặc định)</option>
         <option value="Đình Tâm">Đình Tâm</option>
@@ -337,7 +352,6 @@ const NOMINATIM = "https://nominatim.openstreetmap.org/search";
 const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse"; 
 const OSRM = "https://router.project-osrm.org/route/v1/driving";
 
-// CẬP NHẬT: Thay thế link rút gọn không hoạt động bằng URL Google Maps tiêu chuẩn
 const GOOGLE_MAPS_BASE_URL = "https://www.google.com/maps/search/"; 
 const GOOGLE_MAPS_DIR_URL = "https://www.google.com/maps/dir/"; 
 
