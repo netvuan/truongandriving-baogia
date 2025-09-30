@@ -131,7 +131,28 @@
     #copyModalBtn { background: #ffc107; color: #333; } 
     #zaloModalBtn { background: #0068ff; color: #fff; }
     #closeModalBtn { background: #ccc; color: #333; }
+    
+    /* Phone Modal Styles */
+    #phoneModal .modal-content { background: #f8d7da; border: 1px solid #f5c6cb; }
+    #phoneModal h3 { color: #721c24; }
+    #phoneModal #inputPhoneForBooking { margin-top: 15px; }
+    #phoneModal #confirmPhoneBtn { background: #007bff; color: white; }
 
+    /* Deposit Modal Styles */
+    #depositModal .modal-content { background: #d4edda; border: 1px solid #c3e6cb; }
+    #depositModal h3 { color: #155724; }
+    #depositModal p { margin-bottom: 15px; }
+    #depositModal #depositAmount { 
+        font-weight: 800; 
+        font-size: 20px; 
+        color: #007bff; 
+        background: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        display: inline-block;
+    }
+    #depositModal #confirmDepositBtn { background: var(--green); color: white; }
+    
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -156,8 +177,8 @@
     </div>
 
     <div id="booking-form-wrapper"> 
-      <div class="label-row" style="margin-top:6px"><h3>📞 Số điện thoại của bạn</h3></div>
-      <input id="customerPhone" type="tel" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
+      <div class="label-row" style="margin-top:6px"><h3>📞 Số điện thoại của bạn (Không bắt buộc để Tính giá)</h3></div>
+      <input id="customerPhone" type="tel" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel">
 
       <div class="label-row">
         <h3>📍 Điểm đón</h3>
@@ -222,8 +243,8 @@
     </div>
 
     <div class="actions">
-      <a id="zaloBtn" class="zalo-btn" style="display:none;" href="javascript:void(0);">📱 Đặt qua Zalo</a>
-      <a id="mailBtn" class="mail" href="mailto:netvuan@gmail.com" style="display:none;">📧 Đặt qua Mail</a>
+      <a id="zaloBtn" class="zalo-btn" href="javascript:void(0);" style="display:none;">📱 Đặt qua Zalo</a>
+      <a id="mailBtn" class="mail" href="javascript:void(0);" style="display:none;">📧 Đặt qua Mail</a>
     </div>
 
     <div class="note">
@@ -238,6 +259,41 @@
       Giá đã bao gồm phí cầu đường.
     </div>
   </div>
+</div>
+
+<div id="depositModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h3>📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều</h3>
+        <p>
+            **Quý khách vui lòng lưu ý:**<br>
+            Để xác nhận và đảm bảo chất lượng phục vụ cho chuyến đi **Hai chiều** của Quý khách, chúng tôi kính mong Quý khách **đặt cọc trước 20%** trên tổng giá cước dự kiến.
+        </p>
+        <p style="text-align:center; font-size:18px;">
+            Số tiền đặt cọc dự kiến: <span id="depositAmount">0 đ</span>
+        </p>
+        <p>
+            Khi nhân viên **Trường An Driving** phản hồi qua Zalo, chúng tôi sẽ gửi **hướng dẫn thanh toán cụ thể** (chuyển khoản) để hoàn tất thủ tục đặt cọc.
+        </p>
+        <p style="font-size:14px; color:#555;">
+            **Lưu ý:** Phần còn lại của cước phí sẽ được thanh toán trực tiếp cho tài xế sau khi kết thúc chuyến đi.
+            Xin chân thành cảm ơn Quý khách đã tin tưởng dịch vụ.
+        </p>
+        <div class="modal-actions" style="margin-top:10px;">
+            <button id="confirmDepositBtn" style="width:100%;">Đã hiểu và Tiếp tục</button>
+        </div>
+    </div>
+</div>
+
+<div id="phoneModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h3>📞 Vui lòng nhập Số điện thoại</h3>
+        <p style="text-align:center;">Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.</p>
+        <input id="inputPhoneForBooking" type="tel" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
+        <div class="modal-actions" style="margin-top:15px;">
+            <button id="confirmPhoneBtn">Xác nhận</button> 
+        </div>
+        <button id="closePhoneModalBtn" style="width:100%; margin-top:10px; padding:8px; border-radius:8px; background:#ccc; color:#333;">Đóng</button>
+    </div>
 </div>
 
 <div id="zaloModal" class="modal-overlay" style="display:none;">
@@ -311,12 +367,23 @@ const copyModalBtn = document.getElementById('copyModalBtn');
 const zaloModalBtn = document.getElementById('zaloModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
+// New Modal DOM
+const phoneModal = document.getElementById('phoneModal');
+const inputPhoneForBooking = document.getElementById('inputPhoneForBooking');
+const confirmPhoneBtn = document.getElementById('confirmPhoneBtn');
+const closePhoneModalBtn = document.getElementById('closePhoneModalBtn');
+const depositModal = document.getElementById('depositModal');
+const depositAmount = document.getElementById('depositAmount');
+const confirmDepositBtn = document.getElementById('confirmDepositBtn');
+
 let finalZaloMessage = ''; 
+let finalTotalFee = 0; 
 let map; 
 let pickupMarker = null, dropoffMarker = null, routeLayer = null;
 let selecting = null; 
 let stopCount = 0;
 let lastFocusedStopId = null;
+let bookingAction = null; // 'zalo' or 'mail'
 
 /* ---------- TÍN HIỆU KILL SWITCH (Polling) ---------- */
 
@@ -650,6 +717,7 @@ function createStopInput(prefill=''){
   const suggId = `${inputId}-suggestions`;
   wrapper.innerHTML = `
     <input type="text" id="${inputId}" placeholder="Nhập điểm dừng ${stopCount}">
+    <button class="clear-btn" data-input-id="${inputId}">✖</button> 
     <button class="way-remove" title="Xóa">✖</button>
     <div id="${suggId}" class="suggestions" style="display:none"></div>
   `;
@@ -658,6 +726,20 @@ function createStopInput(prefill=''){
   const inputEl = wrapper.querySelector('input');
   const boxEl = wrapper.querySelector('.suggestions');
   attachAutocomplete(inputEl, boxEl);
+  
+  const clearBtn = wrapper.querySelector('.clear-btn');
+  inputEl.addEventListener('input', () => { clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; });
+  inputEl.addEventListener('focus', () => { clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; });
+  inputEl.addEventListener('blur', () => { setTimeout(() => clearBtn.style.display = 'none', 150); });
+  clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); 
+    inputEl.value = ''; 
+    delete inputEl.dataset.lat;
+    delete inputEl.dataset.lon;
+    boxEl.style.display = 'none';
+    inputEl.focus();
+  });
+
 
   wrapper.querySelector('.way-remove').addEventListener('click', ()=> wrapper.remove());
 
@@ -674,42 +756,40 @@ document.getElementById('pick-to-map').addEventListener('click', ()=> { selectin
 const handleMapClick = async (e) => {
   if (!map) return; 
   const lat = e.latlng.lat, lon = e.latlng.lng;
+  
+  let targetInput, targetMarker;
+
   if(selecting === 'pickup'){
+    targetInput = pickupEl;
+    targetMarker = pickupMarker;
     if(pickupMarker) map.removeLayer(pickupMarker);
     pickupMarker = L.marker([lat,lon]).addTo(map).bindPopup('📍 Điểm đón').openPopup();
-    
-    const address = await reverseGeocode(lat, lon);
-    pickupEl.value = address;
-    
-    pickupEl.dataset.lat = lat; pickupEl.dataset.lon = lon;
-    pickupEl.parentNode.querySelector('.clear-btn').style.display = 'block';
     selecting = null;
-    return;
-  }
-  if(selecting === 'dropoff'){
+  } else if(selecting === 'dropoff'){
+    targetInput = dropoffEl;
+    targetMarker = dropoffMarker;
     if(dropoffMarker) map.removeLayer(dropoffMarker);
     dropoffMarker = L.marker([lat,lon]).addTo(map).bindPopup('🏁 Điểm đến').openPopup();
-    
-    const address = await reverseGeocode(lat, lon);
-    dropoffEl.value = address;
-    
-    dropoffEl.dataset.lat = lat; dropoffEl.dataset.lon = lon;
-    dropoffEl.parentNode.querySelector('.clear-btn').style.display = 'block';
     selecting = null;
-    return;
-  }
-  if(lastFocusedStopId){
-    const stopInput = document.getElementById(lastFocusedStopId);
-    if(stopInput){
-      const address = await reverseGeocode(lat, lon);
-      stopInput.value = address;
-      
-      stopInput.dataset.lat = lat; stopInput.dataset.lon = lon;
+  } else if(lastFocusedStopId){
+    targetInput = document.getElementById(lastFocusedStopId);
+    if(targetInput){
       L.marker([lat,lon]).addTo(map).bindPopup('📍 Điểm dừng').openPopup();
       lastFocusedStopId = null;
     }
   }
+
+  if(targetInput){
+    const address = await reverseGeocode(lat, lon);
+    targetInput.value = address;
+    
+    targetInput.dataset.lat = lat; targetInput.dataset.lon = lon;
+    targetInput.parentNode.querySelector('.clear-btn').style.display = 'block';
+    
+    if(targetMarker) map.setView([lat,lon], 14);
+  }
 };
+
 
 const handleMapDblClick = (e) => {
   if (!map) return; 
@@ -745,14 +825,7 @@ async function resolveCoordForInput(inputEl){
   return null;
 }
 
-function validateInputs() {
-    const phone = customerPhoneEl.value.trim();
-    const phoneRegex = /^\d{10}$/; 
-    if (!phoneRegex.test(phone)) {
-        alert('❌ Vui lòng nhập Số điện thoại hợp lệ (chính xác 10 chữ số).');
-        customerPhoneEl.focus();
-        return false;
-    }
+function validateRouteInputs() {
     if (pickupEl.value.trim() === '') {
         alert('❌ Vui lòng nhập Địa chỉ Điểm đón.');
         pickupEl.focus();
@@ -775,205 +848,310 @@ function validateInputs() {
     return true;
 }
 
+function validatePhone(phone) {
+    const phoneRegex = /^\d{10}$/; 
+    return phoneRegex.test(phone);
+}
+
+// Hàm chính tính giá cước và tạo tin nhắn Zalo
+async function calculateAndGenerateMessage() {
+    if (!validateRouteInputs()) {
+        return false; 
+    }
+    
+    const pickupCoord = await resolveCoordForInput(pickupEl);
+    if(!pickupCoord){ alert('Không tìm thấy tọa độ Điểm đón. Hãy chọn gợi ý hoặc đặt trên bản đồ.'); return false; }
+    const dropoffCoord = await resolveCoordForInput(dropoffEl);
+    if(!dropoffCoord){ alert('Không tìm thấy tọa độ Điểm đến. Hãy chọn gợi ý hoặc đặt trên bản đồ.'); return false; }
+
+    const coords = [];
+    coords.push(pickupCoord);
+    const stopInputs = Array.from(stopsContainer.querySelectorAll('input[id^="stop-"]'));
+    for(const s of stopInputs){
+        if(s.value.trim()){
+            const sc = await resolveCoordForInput(s);
+            if(!sc){ alert('Không tìm thấy tọa độ cho một Điểm dừng.'); return false; }
+            coords.push(sc);
+        }
+    }
+    coords.push(dropoffCoord);
+
+    const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
+    const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
+
+    resultBox.style.display = 'block';
+    distanceText.textContent = 'Đang tính lộ trình...';
+    priceValue.textContent = '...';
+    priceBreak.innerHTML = '';
+    timeEst.textContent = '';
+    finalZaloMessage = ''; 
+    finalTotalFee = 0;
+    zaloBtn.style.display = 'none'; 
+    mailBtn.style.display = 'none';
+    instructionText.innerHTML = 'Đang tính toán...';
+
+    try{
+        const r = await fetch(url);
+        const data = await r.json();
+        if(!data.routes || data.routes.length === 0){ distanceText.textContent = 'Không tính được lộ trình'; return false; }
+        const route = data.routes[0];
+        const dist = route.distance / 1000; 
+        const minutes = Math.round((dist / 30) * 60);
+
+        if(map) {
+            if(routeLayer) map.removeLayer(routeLayer);
+            routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
+            map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
+        }
+
+        const tripType = tripTypeEl.value; 
+        const carType = carTypeEl.value; 
+        const waiting = parseFloat(waitingEl.value) || 0; 
+        
+        let perKm;
+        if (carType.includes('7 chỗ')) { perKm = 12000; } else { perKm = 10000; }
+        const perKmReturnDiscount = Math.round(perKm * 0.6); 
+
+        const priceGo = Math.round(dist * perKm);
+        let priceReturn = 0;
+        let returnNote = ''; 
+
+        if(tripType === '2') {
+            if(dist >= 45) {
+                priceReturn = Math.round(dist * perKmReturnDiscount); 
+                returnNote = `Chiều về (giảm 40% do 1 chiều ≥ 45km => ${perKmReturnDiscount.toLocaleString('vi-VN')}đ/km)`;
+            } else {
+                priceReturn = Math.round(dist * perKm); 
+                returnNote = `Chiều về (Không giảm giá do 1 chiều < 45km => ${perKm.toLocaleString('vi-VN')}đ/km)`;
+            }
+        } else {
+            returnNote = '1 Chiều';
+        }
+
+        const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
+        const total = priceGo + priceReturn + waitFee;
+        finalTotalFee = total; // Lưu lại tổng phí
+
+        distanceText.textContent = `Quãng đường: ${dist.toFixed(1)} km (một chiều)`;
+        priceValue.textContent = total.toLocaleString('vi-VN') + ' đ';
+
+        let breakdownHtml = '';
+        breakdownHtml += `• Giá chiều đi (${perKm.toLocaleString('vi-VN')}đ/km): <b>${priceGo.toLocaleString('vi-VN')} đ</b><br>`;
+        
+        if(tripType === '2'){
+            breakdownHtml += `• ${returnNote}: <b>${priceReturn.toLocaleString('vi-VN')} đ</b><br>`;
+        }
+
+        let waitDetail;
+        if (tripType === '2') {
+            if (waiting > 3) {
+                waitDetail = `Phí chờ (${waiting} giờ, miễn phí 0–3h): <b>${waitFee.toLocaleString('vi-VN')} đ</b>`;
+                breakdownHtml += `• ${waitDetail}<br>`;
+            } else if (waiting > 0) {
+                waitDetail = `Thời gian chờ (${waiting} giờ): <b>Miễn phí</b>`;
+                breakdownHtml += `• ${waitDetail}<br>`;
+            } 
+        } else {
+            waitDetail = ``; 
+        }
+        
+        breakdownHtml += `<hr style="margin:6px 0">• <b>Tổng cộng: ${total.toLocaleString('vi-VN')} đ</b>`;
+        priceBreak.innerHTML = breakdownHtml;
+
+        timeEst.textContent = `⏱ Thời gian dự kiến (tính theo 30 km/h): ${minutes} phút`;
+
+        const dateVal = pickupDateTime.value;
+        const formattedDate = dateVal ? new Date(dateVal).toLocaleString('vi-VN', { 
+            year: 'numeric', month: 'numeric', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit', 
+            hour12: false 
+        }) : '(Chưa chọn)';
+        pickupInfo.textContent = `🕒 Ngày giờ đón: ${formattedDate}`;
+        
+        const stopInputsValues = Array.from(stopsContainer.querySelectorAll('input[id^="stop-"]'))
+            .map(s => s.value.trim()).filter(v => v);
+        
+        const stopDetails = stopInputsValues.map((v, i) => `🛣️ Điểm dừng ${i+1}: ${v}`).join('\n');
+        
+        let zaloWaitingDetail;
+        if (tripType === '2') {
+            if (waiting > 3) {
+                zaloWaitingDetail = `⏳ Thời gian chờ: ${waiting} giờ (Phí chờ phát sinh: ${waitFee.toLocaleString('vi-VN')} đ)`;
+            } else if (waiting > 0) {
+                zaloWaitingDetail = `⏳ Thời gian chờ: ${waiting} giờ (Miễn phí)`;
+            } else {
+                 zaloWaitingDetail = `⏳ Thời gian chờ: 0 giờ (Miễn phí)`;
+            }
+        }
+        
+        // Tạo Maps Link
+        const pickupAddress = pickupEl.value.trim();
+        const dropoffAddress = dropoffEl.value.trim();
+        const pickupLatLon = `${pickupCoord[0]},${pickupCoord[1]}`;
+        const dropoffLatLon = `${dropoffCoord[0]},${dropoffCoord[1]}`;
+        const mapsDirectionLink = `${GOOGLE_MAPS_DIR_URL}${pickupLatLon}/${dropoffLatLon}`;
+        const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}${pickupLatLon}`; 
+        
+        let mapsLinksSection = [
+            `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHÍNH XÁC ***`,
+            `📍 Vị trí đón khách (Tọa độ): ${mapsPickupLink}`,
+            `🛣️ Chỉ đường (Đón -> Trả): ${mapsDirectionLink}`,
+            `\n`
+        ].join('\n');
+        
+        // Tạo tin nhắn Zalo Tạm thời (Chưa có SĐT)
+        finalZaloMessage = [
+            '🚖 YÊU CẦU ĐẶT XE TRƯỜNG AN DRIVING',
+            '-------------------------------',
+            `📞 SĐT Khách hàng: [CHƯA CÓ]`, // Sẽ được chèn sau
+            `✅ Loại chuyến: ${tripType === '1' ? '1 Chiều' : `2 Chiều (${dist.toFixed(1)} km/chiều)`}`,
+            `🚘 Loại xe: ${carType}`, 
+            `📍 Điểm đón: ${pickupAddress}`,
+            ...(stopInputsValues.length ? [stopDetails] : []),
+            `🏁 Điểm đến: ${dropoffAddress}`,
+            `🕒 Ngày giờ đón: ${formattedDate}`,
+            ...(tripType === '2' ? [zaloWaitingDetail] : []), 
+            `💵 Tổng giá dự kiến: ${total.toLocaleString('vi-VN')} đ`,
+            mapsLinksSection, 
+            '-------------------------------',
+            'Vui lòng xác nhận đơn hàng.',
+        ].join('\n');
+
+        // Hiển thị nút đặt xe và cuộn đến kết quả
+        zaloBtn.style.display = 'block'; 
+        mailBtn.style.display = 'block'; 
+        instructionText.style.display = 'block';
+        instructionText.innerHTML = '✅ **Tính toán thành công!** Vui lòng bấm **Đặt qua Zalo/Mail** để hoàn tất đơn hàng.';
+
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        return true; 
+    }catch(err){
+        console.error('Route error', err);
+        distanceText.textContent = 'Lỗi khi tính lộ trình. Thử lại.';
+        priceValue.textContent = '—';
+        mailBtn.href = `mailto:netvuan@gmail.com`;
+        zaloBtn.style.display = 'none';
+        mailBtn.style.display = 'none';
+        instructionText.innerHTML = 'Lỗi tính toán.';
+        return false;
+    }
+}
+
+// Xử lý nút Tính giá
 calcBtn.addEventListener('click', async () => {
   if (!isServiceActive) {
       alert('⚠️ Dịch vụ Taxi Trường An Driving hiện đang tạm ngừng nhận đơn hàng. Vui lòng kiểm tra thông báo trên màn hình.');
       return;
   }
   
-  if (!validateInputs()) {
-    return;
-  }
-  
-  const customerPhone = customerPhoneEl.value.trim(); 
+  const success = await calculateAndGenerateMessage();
 
-  const pickupCoord = await resolveCoordForInput(pickupEl);
-  if(!pickupCoord){ alert('Không tìm thấy tọa độ Điểm đón. Hãy chọn gợi ý hoặc đặt trên bản đồ.'); return; }
-  const dropoffCoord = await resolveCoordForInput(dropoffEl);
-  if(!dropoffCoord){ alert('Không tìm thấy tọa độ Điểm đến. Hãy chọn gợi ý hoặc đặt trên bản đồ.'); return; }
-
-  const coords = [];
-  coords.push(pickupCoord);
-  const stopInputs = Array.from(stopsContainer.querySelectorAll('input[id^="stop-"]'));
-  for(const s of stopInputs){
-    if(s.value.trim()){
-      const sc = await resolveCoordForInput(s);
-      if(!sc){ alert('Không tìm thấy tọa độ cho một Điểm dừng.'); return; }
-      coords.push(sc);
-    }
-  }
-  coords.push(dropoffCoord);
-
-  const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
-  const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
-
-  resultBox.style.display = 'block';
-  distanceText.textContent = 'Đang tính lộ trình...';
-  priceValue.textContent = '...';
-  priceBreak.innerHTML = '';
-  timeEst.textContent = '';
-  finalZaloMessage = ''; 
-  zaloBtn.style.display = 'none'; 
-  mailBtn.style.display = 'none';
-  instructionText.innerHTML = 'Đang tính toán...';
-
-  try{
-    const r = await fetch(url);
-    const data = await r.json();
-    if(!data.routes || data.routes.length === 0){ distanceText.textContent = 'Không tính được lộ trình'; return; }
-    const route = data.routes[0];
-    const dist = route.distance / 1000; 
-    const minutes = Math.round((dist / 30) * 60);
-
-    if(map) {
-      if(routeLayer) map.removeLayer(routeLayer);
-      routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
-      map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
-    }
-
-    const tripType = tripTypeEl.value; 
-    const carType = carTypeEl.value; 
-    const waiting = parseFloat(waitingEl.value) || 0; 
-    
-    let perKm;
-    if (carType.includes('7 chỗ')) { 
-        perKm = 12000;
-    } else { 
-        perKm = 10000; 
-    }
-    const perKmReturnDiscount = Math.round(perKm * 0.6); 
-
-    const priceGo = Math.round(dist * perKm);
-    let priceReturn = 0;
-    let returnNote = ''; 
-
-    if(tripType === '2') {
-        if(dist >= 45) {
-            priceReturn = Math.round(dist * perKmReturnDiscount); 
-            returnNote = `Chiều về (giảm 40% do 1 chiều ≥ 45km => ${perKmReturnDiscount.toLocaleString('vi-VN')}đ/km)`;
-        } else {
-            priceReturn = Math.round(dist * perKm); 
-            returnNote = `Chiều về (Không giảm giá do 1 chiều < 45km => ${perKm.toLocaleString('vi-VN')}đ/km)`;
-        }
-    } else {
-        returnNote = '1 Chiều';
-    }
-
-    const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
-    const total = priceGo + priceReturn + waitFee;
-
-    distanceText.textContent = `Quãng đường: ${dist.toFixed(1)} km (một chiều)`;
-    priceValue.textContent = total.toLocaleString('vi-VN') + ' đ';
-
-    let breakdownHtml = '';
-    breakdownHtml += `• Giá chiều đi (${perKm.toLocaleString('vi-VN')}đ/km): <b>${priceGo.toLocaleString('vi-VN')} đ</b><br>`;
-    
-    if(tripType === '2'){
-      breakdownHtml += `• ${returnNote}: <b>${priceReturn.toLocaleString('vi-VN')} đ</b><br>`;
-    }
-
-    let waitDetail;
-    if (tripType === '2') {
-        if (waiting > 3) {
-            waitDetail = `Phí chờ (${waiting} giờ, miễn phí 0–3h): <b>${waitFee.toLocaleString('vi-VN')} đ</b>`;
-            breakdownHtml += `• ${waitDetail}<br>`;
-        } else if (waiting > 0) {
-            waitDetail = `Thời gian chờ (${waiting} giờ): <b>Miễn phí</b>`;
-            breakdownHtml += `• ${waitDetail}<br>`;
-        } 
-    } else {
-        waitDetail = ``; 
-    }
-    
-    breakdownHtml += `<hr style="margin:6px 0">• <b>Tổng cộng: ${total.toLocaleString('vi-VN')} đ</b>`;
-    priceBreak.innerHTML = breakdownHtml;
-
-    timeEst.textContent = `⏱ Thời gian dự kiến (tính theo 30 km/h): ${minutes} phút`;
-
-    const dateVal = pickupDateTime.value;
-    const formattedDate = dateVal ? new Date(dateVal).toLocaleString('vi-VN', { 
-        year: 'numeric', month: 'numeric', day: 'numeric', 
-        hour: '2-digit', minute: '2-digit', 
-        hour12: false 
-    }) : '(Chưa chọn)';
-    pickupInfo.textContent = `🕒 Ngày giờ đón: ${formattedDate}`;
-    
-    const stopInputsValues = Array.from(stopsContainer.querySelectorAll('input[id^="stop-"]'))
-        .map(s => s.value.trim()).filter(v => v);
-    
-    const stopDetails = stopInputsValues.map((v, i) => `🛣️ Điểm dừng ${i+1}: ${v}`).join('\n');
-    
-    let zaloWaitingDetail;
-    if (tripType === '2') {
-        if (waiting > 3) {
-            zaloWaitingDetail = `⏳ Thời gian chờ: ${waiting} giờ (Phí chờ phát sinh: ${waitFee.toLocaleString('vi-VN')} đ)`;
-        } else if (waiting > 0) {
-            zaloWaitingDetail = `⏳ Thời gian chờ: ${waiting} giờ (Miễn phí)`;
-        } else {
-             zaloWaitingDetail = `⏳ Thời gian chờ: 0 giờ (Miễn phí)`;
-        }
-    }
-    
-    // ----------- BẮT ĐẦU TÍNH NĂNG MAPS LINK SỬ DỤNG TỌA ĐỘ CHÍNH XÁC -----------
-    const pickupAddress = pickupEl.value.trim();
-    const dropoffAddress = dropoffEl.value.trim();
-    
-    // Định dạng tọa độ cho link Google Maps
-    const pickupLatLon = `${pickupCoord[0]},${pickupCoord[1]}`;
-    const dropoffLatLon = `${dropoffCoord[0]},${dropoffCoord[1]}`;
-    
-    // Link 1: Chỉ đường từ Điểm đón đến Điểm trả (Dùng tọa độ)
-    // URL: https://www.google.com/maps/dir/lat_don,lon_don/lat_tra,lon_tra
-    const mapsDirectionLink = `${GOOGLE_MAPS_DIR_URL}${pickupLatLon}/${dropoffLatLon}`;
-    
-    // Link 2: Vị trí đón khách (Dùng tọa độ)
-    // URL: https://www.google.com/maps/search/lat_don,lon_don
-    const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}${pickupLatLon}`; 
-    
-    let mapsLinksSection = [
-        `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHÍNH XÁC ***`,
-        `📍 Vị trí đón khách (Tọa độ): ${mapsPickupLink}`,
-        `🛣️ Chỉ đường (Đón -> Trả): ${mapsDirectionLink}`,
-        `\n`
-    ].join('\n');
-    // ----------- KẾT THÚC TÍNH NĂNG MAPS LINK SỬ DỤNG TỌA ĐỘ CHÍNH XÁC -----------
-    
-    finalZaloMessage = [
-        '🚖 YÊU CẦU ĐẶT XE TRƯỜNG AN DRIVING',
-        '-------------------------------',
-        `📞 SĐT Khách hàng: ${customerPhone}`, 
-        `✅ Loại chuyến: ${tripType === '1' ? '1 Chiều' : `2 Chiều (${dist.toFixed(1)} km/chiều)`}`,
-        `🚘 Loại xe: ${carType}`, 
-        `📍 Điểm đón: ${pickupAddress}`,
-        ...(stopInputsValues.length ? [stopDetails] : []),
-        `🏁 Điểm đến: ${dropoffAddress}`,
-        `🕒 Ngày giờ đón: ${formattedDate}`,
-        ...(tripType === '2' ? [zaloWaitingDetail] : []), 
-        `💵 Tổng giá dự kiến: ${total.toLocaleString('vi-VN')} đ`,
-        mapsLinksSection, // Chèn đoạn Maps link đã sửa vào đây
-        '-------------------------------',
-        'Vui lòng xác nhận đơn hàng.',
-    ].join('\n');
-
-    const encodedMsg = encodeURIComponent(finalZaloMessage);
-    mailBtn.href = `mailto:netvuan@gmail.com?subject=${encodeURIComponent('Yêu cầu Đặt xe Trường An')} - ${dist.toFixed(1)} km&body=${encodedMsg}`;
-
-    zaloBtn.style.display = 'block'; 
-    mailBtn.style.display = 'block'; 
-    instructionText.style.display = 'block';
-    instructionText.innerHTML = '✅ **Tính toán thành công!** Bấm nút **Đặt qua Zalo** để gửi thông tin đơn hàng.';
-
-    resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }catch(err){
-    console.error('Route error', err);
-    distanceText.textContent = 'Lỗi khi tính lộ trình. Thử lại.';
-    priceValue.textContent = '—';
-    mailBtn.href = `mailto:netvuan@gmail.com`;
-    zaloBtn.style.display = 'none';
-    mailBtn.style.display = 'none';
-    instructionText.innerHTML = 'Lỗi tính toán.';
+  if(success && tripTypeEl.value === '2') {
+    const deposit = Math.round(finalTotalFee * 0.2);
+    depositAmount.textContent = deposit.toLocaleString('vi-VN') + ' đ';
+    depositModal.style.display = 'flex';
   }
 });
+
+// Xử lý nút Đặt qua Zalo / Mail
+function handleBookingClick(action) {
+    if (finalTotalFee === 0) {
+        alert('⚠️ Vui lòng bấm "Tính giá" trước để tạo thông tin chuyến đi.');
+        return;
+    }
+    
+    bookingAction = action;
+    const phone = customerPhoneEl.value.trim();
+
+    if (!validatePhone(phone)) {
+        inputPhoneForBooking.value = phone;
+        phoneModal.style.display = 'flex';
+        inputPhoneForBooking.focus();
+    } else {
+        openFinalZaloModal(phone);
+    }
+}
+
+zaloBtn.addEventListener('click', () => handleBookingClick('zalo'));
+mailBtn.addEventListener('click', () => handleBookingClick('mail'));
+
+// Xử lý xác nhận SĐT trong Phone Modal
+confirmPhoneBtn.addEventListener('click', () => {
+    const phone = inputPhoneForBooking.value.trim();
+    if (!validatePhone(phone)) {
+        alert('❌ Vui lòng nhập Số điện thoại hợp lệ (chính xác 10 chữ số).');
+        inputPhoneForBooking.focus();
+        return;
+    }
+    customerPhoneEl.value = phone; 
+    phoneModal.style.display = 'none';
+
+    // Mở modal chính sau khi có SĐT
+    if (bookingAction) {
+        openFinalZaloModal(phone);
+    }
+});
+
+closePhoneModalBtn.addEventListener('click', () => {
+    phoneModal.style.display = 'none';
+    bookingAction = null; 
+});
+phoneModal.addEventListener('click', (e) => {
+    if (e.target === phoneModal) {
+        phoneModal.style.display = 'none';
+        bookingAction = null; 
+    }
+});
+
+
+// Xử lý xác nhận đặt cọc
+confirmDepositBtn.addEventListener('click', () => {
+    depositModal.style.display = 'none';
+});
+depositModal.addEventListener('click', (e) => {
+    if (e.target === depositModal) {
+        depositModal.style.display = 'none';
+    }
+});
+
+
+// Mở Modal Zalo/Mail chính
+function openFinalZaloModal(phone) {
+    let finalMessage = finalZaloMessage.replace('[CHƯA CÓ]', phone);
+    modalText.textContent = finalMessage;
+
+    if(bookingAction === 'mail') {
+        const encodedMsg = encodeURIComponent(finalMessage);
+        const subject = encodeURIComponent(`Yêu cầu Đặt xe Trường An - ${distanceText.textContent.split(': ')[1]}`);
+        mailBtn.href = `mailto:netvuan@gmail.com?subject=${subject}&body=${encodedMsg}`;
+        alert('✅ Vui lòng kiểm tra lại thông tin mail đã được điền tự động và bấm "Gửi"');
+        // Do không thể mở ứng dụng mail và Zalo cùng lúc, ta sẽ mở mail và đóng modal
+        window.location.href = mailBtn.href;
+        zaloModal.style.display = 'none';
+        bookingAction = null;
+        return;
+    }
+
+    // Nếu là Zalo
+    zaloModal.style.display = 'flex'; 
+
+    const range = document.createRange();
+    range.selectNodeContents(modalText);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    // Tự động sao chép cho trải nghiệm Zalo tốt hơn
+    copyToClipboard(finalMessage).then(success => {
+        if(success) {
+            console.log("Đã sao chép tin nhắn Zalo thành công.");
+        }
+    });
+
+    bookingAction = null; 
+}
+
 
 async function copyToClipboard(text) {
     try {
@@ -997,23 +1175,8 @@ async function copyToClipboard(text) {
     }
 }
 
-zaloBtn.addEventListener('click', () => {
-    if (!finalZaloMessage) {
-        alert('Vui lòng bấm "Tính giá" trước để tạo thông tin chuyến đi.');
-        return;
-    }
-    modalText.textContent = finalZaloMessage;
-    zaloModal.style.display = 'flex'; 
-
-    const range = document.createRange();
-    range.selectNodeContents(modalText);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-});
-
 copyModalBtn.addEventListener('click', async () => {
-    const success = await copyToClipboard(finalZaloMessage);
+    const success = await copyToClipboard(modalText.textContent);
     
     if (success) {
         alert('📋 Đã sao chép thông tin chuyến xe vào bộ nhớ tạm! Bây giờ bạn có thể Mở Zalo Chat và Dán (Paste) để gửi.');
