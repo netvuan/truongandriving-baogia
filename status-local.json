@@ -1,5 +1,6 @@
 {
     "active": true,
     "message_vn": "✅ Dịch vụ hoạt động 24/7. Bấm 'Tính giá' để xem chi tiết đặt xe.",
-    "message_en": "Service is active 24/7. Click 'Calculate Price' for details."
+    "message_en": "✅ Service is active 24/7. Click 'Calculate Price' for details.",
+    "message_zh": "✅ 服务24/7可用。点击“计算价格”查看详情。"
 }
