@@ -345,10 +345,12 @@
 /* ------------------------------------------------------------------
    CẤU HÌNH NGÔN NGỮ VÀ TRẠNG THÁI (MULTI-LANGUAGE & KILL SWITCH CONFIG)
    ------------------------------------------------------------------ */
+// LƯU Ý QUAN TRỌNG: OSRM Public Server có thể bị quá tải, gây lỗi Route
+// Nếu lỗi tính lộ trình vẫn xảy ra, bạn cần xem xét sử dụng một dịch vụ định tuyến khác.
 const REMOTE_STATUS_URL = "/status-local.json"; 
 const NOMINATIM = "https://nominatim.openstreetmap.org/search";
 const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse"; 
-const OSRM = "https://router.project-osrm.org/route/v1/driving";
+const OSRM = "https://router.project-osrm.org/route/v1/driving"; // API Định tuyến
 const GOOGLE_MAPS_BASE_URL = "https://www.google.com/maps/search/"; 
 const GOOGLE_MAPS_DIR_URL = "https://www.google.com/maps/dir/"; 
 const TAXI_PHONE = "0847526893"; 
@@ -432,7 +434,7 @@ const LANGUAGES = {
 
 
 /* ------------------------------------------------------------------
-   CẬP NHẬT GIAO DIỆN THEO NGÔN NGỮ (LANGUAGE UI UPDATE) - Tinh chỉnh
+   CẬP NHẬT GIAO DIỆN THEO NGÔN NGỮ (LANGUAGE UI UPDATE) - Giữ nguyên
    ------------------------------------------------------------------ */
 
 function updateUIWithLanguage(langKey) {
@@ -539,7 +541,7 @@ function updateUIWithLanguage(langKey) {
 }
 
 /* ------------------------------------------------------------------
-   CHỨC NĂNG CƠ BẢN VÀ KILL SWITCH (CORE FUNCTIONS) - Tinh chỉnh
+   CHỨC NĂNG CƠ BẢN VÀ KILL SWITCH (CORE FUNCTIONS) - Giữ nguyên
    ------------------------------------------------------------------ */
 
 async function checkServiceStatus() {
@@ -662,19 +664,21 @@ async function reverseGeocode(lat, lon) {
     }
 }
 
-// BỘ CODE SỬA LỖI ĐIỂM ĐÓN ĐƯỢC TÍCH HỢP Ở ĐÂY
 function getGeolocation() {
     const L = LANGUAGES[currentLang];
     locationStatusEl.textContent = L.pickup_status_loading;
     locationStatusEl.style.color = 'var(--muted)';
     reloadLocationBtn.style.color = '#ccc'; 
-    reloadLocationBtn.style.pointerEvents = 'none'; // Tắt nút khi đang tìm kiếm
+    reloadLocationBtn.style.pointerEvents = 'none'; 
+    // Xóa tọa độ cũ khi tìm lại vị trí
+    delete pickupEl.dataset.lat;
+    delete pickupEl.dataset.lon;
 
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(async (pos)=>{
             // --- LOGIC THÀNH CÔNG ---
             userLocation = [pos.coords.latitude, pos.coords.longitude]; 
-            initMap(userLocation); // Khởi tạo map bằng vị trí người dùng
+            initMap(userLocation); 
             
             const address = await reverseGeocode(userLocation[0], userLocation[1]);
             pickupEl.value = address;
@@ -683,28 +687,27 @@ function getGeolocation() {
             pickupEl.parentNode.querySelector('.clear-btn').style.display = 'block';
 
             if(pickupMarker) map.removeLayer(pickupMarker);
-            // FIX: Cập nhật pop-up ngôn ngữ
             pickupMarker = L.marker(userLocation).addTo(map).bindPopup(L.pickup_label.replace('📍 ','')).openPopup(); 
 
             locationStatusEl.textContent = L.pickup_status_success;
             locationStatusEl.style.color = 'var(--green)';
             
-            // KÍCH HOẠT LẠI NÚT TẢI LẠI
             reloadLocationBtn.style.color = '#007bff';
             reloadLocationBtn.style.pointerEvents = 'auto';
 
-            // KÍCH HOẠT LẠI NÚT TÍNH GIÁ
             updateCalcButtonState();
 
 
         }, (err)=>{
             // --- LOGIC THẤT BẠI ---
-            console.warn('Geolocation Error:', err.message);
-            initMap(DEFAULT_CENTER); // Khởi tạo map bằng vị trí mặc định
+            console.warn('Geolocation Error:', err.message, err.code);
+            initMap(DEFAULT_CENTER); 
             
             let statusText = L.pickup_status_fail;
             if (err.code === err.PERMISSION_DENIED) {
                  statusText = L.pickup_status_denied;
+                 // Xóa luôn nội dung input nếu bị từ chối truy cập vị trí
+                 pickupEl.value = '';
             } else if (err.code === err.POSITION_UNAVAILABLE) {
                  statusText = L.pickup_status_unavailable;
             } else if (err.code === err.TIMEOUT) {
@@ -714,7 +717,6 @@ function getGeolocation() {
             locationStatusEl.textContent = statusText;
             locationStatusEl.style.color = '#dc3545';
             
-            // KÍCH HOẠT LẠI NÚT TẢI LẠI KHI THẤT BẠI
             reloadLocationBtn.style.color = '#007bff';
             reloadLocationBtn.style.pointerEvents = 'auto';
 
@@ -722,16 +724,15 @@ function getGeolocation() {
         }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }); 
     } else {
         // --- LOGIC TRÌNH DUYỆT KHÔNG HỖ TRỢ ---
-        initMap(DEFAULT_CENTER); // Khởi tạo map bằng vị trí mặc định
+        initMap(DEFAULT_CENTER); 
         locationStatusEl.textContent = L.pickup_status_notsup;
         locationStatusEl.style.color = '#dc3545';
         
-        // Tắt nút vĩnh viễn nếu trình duyệt không hỗ trợ
         reloadLocationBtn.style.color = '#ccc';
         reloadLocationBtn.style.pointerEvents = 'none';
     }
 }
-// KẾT THÚC BỘ CODE SỬA LỖI ĐIỂM ĐÓN
+
 
 function debounce(func, timeout = DEBOUNCE_TIME) {
   let timer;
@@ -751,7 +752,7 @@ function toggleWaitingInput(){
 
 tripTypeEl.addEventListener('change', () => {
     toggleWaitingInput();
-    updateCalcButtonState(); // Cần gọi lại khi đổi loại chuyến đi
+    updateCalcButtonState(); 
 });
 toggleWaitingInput();
 
@@ -784,10 +785,9 @@ function attachAutocomplete(inputEl, boxEl){
     if(!q){ 
         boxEl.style.display = 'none'; 
         if(clearBtn) clearBtn.style.display = 'none';
-        // Xóa data-lat/lon khi input trống
         delete inputEl.dataset.lat;
         delete inputEl.dataset.lon;
-        updateCalcButtonState(); // Cập nhật trạng thái nút
+        updateCalcButtonState(); 
         return; 
     }
     if(clearBtn) clearBtn.style.display = 'block';
@@ -795,7 +795,7 @@ function attachAutocomplete(inputEl, boxEl){
     if(controller) controller.abort();
     controller = new AbortController();
     
-    boxEl.innerHTML = `<div>${LANGUAGES[currentLang].instruction_loading}</div>`; // Translated
+    boxEl.innerHTML = `<div>${LANGUAGES[currentLang].instruction_loading}</div>`; 
     boxEl.style.display = 'block'; 
 
     let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=${currentLang}`; 
@@ -815,7 +815,7 @@ function attachAutocomplete(inputEl, boxEl){
       const fragment = document.createDocumentFragment();
       
       if(!Array.isArray(data) || data.length === 0){ 
-        boxEl.innerHTML = `<div>${LANGUAGES[currentLang].alert_route_fail}</div>`; // Translated
+        boxEl.innerHTML = `<div>${LANGUAGES[currentLang].alert_route_fail}</div>`; 
         setTimeout(() => boxEl.style.display = 'none', 1000); 
         return; 
       }
@@ -833,6 +833,7 @@ function attachAutocomplete(inputEl, boxEl){
           const latlng = [parseFloat(place.lat), parseFloat(place.lon)];
           if(map) {
             const L = LANGUAGES[currentLang];
+            // Xóa hết marker cũ (FIX: Đã loại bỏ marker stop cũ để tránh trùng lặp)
             if(inputEl.id === 'pickup'){
               if(pickupMarker) map.removeLayer(pickupMarker);
               pickupMarker = L.marker(latlng).addTo(map).bindPopup(L.pickup_label.replace('📍 ','')).openPopup(); 
@@ -842,10 +843,12 @@ function attachAutocomplete(inputEl, boxEl){
               dropoffMarker = L.marker(latlng).addTo(map).bindPopup(L.dropoff_label.replace('🏁 ','')).openPopup(); 
               map.setView(latlng, 14);
             } else if(inputEl.id.startsWith('stop-')){
-                 // Xử lý marker cho điểm dừng
+                 // Thêm marker cho điểm dừng (Lưu ý: Marker stop sẽ bị xóa khi tính lộ trình)
+                 L.marker(latlng).addTo(map).bindPopup(L.add_stop_btn.replace('＋ ','')).openPopup();
             }
           }
-          // KÍCH HOẠT LẠI NÚT TÍNH GIÁ SAU KHI CHỌN ĐỊA CHỈ
+          // GỌI THÊM SỰ KIỆN CHANGE (FIX LỖI KÍCH HOẠT NÚT)
+          inputEl.dispatchEvent(new Event('change'));
           updateCalcButtonState(); 
         });
         fragment.appendChild(d);
@@ -858,24 +861,17 @@ function attachAutocomplete(inputEl, boxEl){
     }catch(err){
       if(err.name === 'AbortError') return; 
       console.error('suggest error', err);
-      boxEl.innerHTML = `<div>${LANGUAGES[currentLang].alert_route_error}</div>`; // Translated
+      boxEl.innerHTML = `<div>${LANGUAGES[currentLang].alert_route_error}</div>`; 
       setTimeout(() => boxEl.style.display = 'none', 2000); 
     }
   }; 
 
   inputEl.addEventListener('input', debounce(doSearch));
+  // FIX: Thêm listener cho sự kiện change để đảm bảo updateCalcButtonState() được gọi
+  inputEl.addEventListener('change', updateCalcButtonState);
 
   document.addEventListener('click', (ev)=>{
     if(!boxEl.contains(ev.target) && ev.target !== inputEl) boxEl.style.display = 'none'; 
-  });
-
-  inputEl.addEventListener('focus', ()=> {
-    const inputId = inputEl.id; 
-    if(inputId && inputId.startsWith('stop-')) lastFocusedStopId = inputId;
-    else lastFocusedStopId = null;
-    
-    const clearBtn = inputEl.parentNode.querySelector('.clear-btn');
-    if(clearBtn) clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none';
   });
 }
 
@@ -902,8 +898,9 @@ function updateCalcButtonState() {
 // Gắn sự kiện để kiểm tra và kích hoạt nút ngay lập tức khi người dùng nhập liệu
 pickupEl.addEventListener('input', updateCalcButtonState);
 dropoffEl.addEventListener('input', updateCalcButtonState);
-stopsContainer.addEventListener('input', updateCalcButtonState); // Theo dõi cả stop inputs
-stopsContainer.addEventListener('change', updateCalcButtonState); 
+stopsContainer.addEventListener('input', updateCalcButtonState); 
+// Đã thêm 'change' trong attachAutocomplete()
+
 // =========================================================================
 // !!! CODE KHẮC PHỤC LỖI TÍNH LỘ TRÌNH END !!!
 // =========================================================================
@@ -930,8 +927,9 @@ function createStopInput(prefill=''){
   const clearBtn = wrapper.querySelector('.clear-btn');
   inputEl.addEventListener('input', () => { 
     clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; 
-    updateCalcButtonState(); // Cập nhật trạng thái nút
+    updateCalcButtonState(); 
   });
+  inputEl.addEventListener('change', updateCalcButtonState); // FIX
   inputEl.addEventListener('focus', () => { 
     clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; 
   });
@@ -945,18 +943,18 @@ function createStopInput(prefill=''){
     delete inputEl.dataset.lon;
     boxEl.style.display = 'none';
     inputEl.focus();
-    updateCalcButtonState(); // Cập nhật trạng thái nút
+    updateCalcButtonState(); 
   });
 
 
   wrapper.querySelector('.way-remove').addEventListener('click', ()=> {
     wrapper.remove();
-    updateCalcButtonState(); // Cập nhật trạng thái nút
+    updateCalcButtonState(); 
   });
 
   inputEl.addEventListener('focus', ()=> lastFocusedStopId = inputId);
   
-  updateCalcButtonState(); // Cập nhật trạng thái nút sau khi thêm stop
+  updateCalcButtonState(); 
 
   return inputEl;
 }
@@ -1000,7 +998,8 @@ const handleMapClick = async (e) => {
     
     if(targetInput === pickupEl || targetInput === dropoffEl) map.setView([lat,lon], 14);
     
-    // KÍCH HOẠT LẠI NÚT TÍNH GIÁ SAU KHI CHỌN TRÊN MAP
+    // BẮN SỰ KIỆN CHANGE ĐỂ KÍCH HOẠT NÚT TÍNH GIÁ
+    targetInput.dispatchEvent(new Event('change'));
     updateCalcButtonState(); 
   }
 };
@@ -1016,7 +1015,9 @@ const handleMapDblClick = (e) => {
       stopInput.dataset.lat = e.latlng.lat; stopInput.dataset.lon = e.latlng.lng;
       L.marker([e.latlng.lat,e.latlng.lng]).addTo(map).bindPopup(L.add_stop_btn.replace('＋ ','')).openPopup();
       lastFocusedStopId = null;
-      updateCalcButtonState(); // Cập nhật trạng thái nút
+      // BẮN SỰ KIỆN CHANGE
+      stopInput.dispatchEvent(new Event('change'));
+      updateCalcButtonState(); 
     }
   }
 };
@@ -1032,6 +1033,7 @@ async function resolveCoordForInput(inputEl){
   if(parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))){
     return [parseFloat(parts[0]), parseFloat(parts[1])]; 
   }
+  // Nếu không có data-lat/lon, cố gắng geocode (chỉ xảy ra khi người dùng nhập tay)
   const place = await geocodeOnce(v + ' Việt Nam');
   if(place){
     inputEl.dataset.lat = place.lat;
@@ -1043,8 +1045,6 @@ async function resolveCoordForInput(inputEl){
 
 function validateRouteInputs() {
     const L = LANGUAGES[currentLang];
-    // Kiểm tra này đã được cover bởi updateCalcButtonState và nút disabled
-    // Nhưng vẫn giữ lại cho tính năng báo lỗi chi tiết khi người dùng cố tình bypass
     if (pickupEl.value.trim() === '') {
         alert(L.alert_pickup_empty);
         pickupEl.focus();
@@ -1114,17 +1114,42 @@ async function calculateAndGenerateMessage() {
 
     try{
         const r = await fetch(url);
+        // FIX: Bắt lỗi JSON parse nếu OSRM trả về response lỗi (thường là 404/500)
+        if (!r.ok) {
+             throw new Error(`OSRM API error: ${r.statusText}`);
+        }
         const data = await r.json();
+        
         if(!data.routes || data.routes.length === 0){ distanceText.textContent = L.alert_route_fail; return false; }
+        
         const route = data.routes[0];
         const dist = route.distance / 1000; 
-        const minutes = Math.round((route.duration / 60)); // OSRM trả về duration là giây
+        const minutes = Math.round((route.duration / 60)); 
 
         if(map) {
+            // FIX: Xóa tất cả markers/layers cũ trước khi vẽ lại route và markers
             if(routeLayer) map.removeLayer(routeLayer);
+            if(pickupMarker) map.removeLayer(pickupMarker);
+            if(dropoffMarker) map.removeLayer(dropoffMarker);
+            
+            // Xóa các marker stop cũ
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer !== pickupMarker && layer !== dropoffMarker && !layer.getPopup()?.getContent()?.includes('Điểm đến') && !layer.getPopup()?.getContent()?.includes('Điểm đón')) {
+                    map.removeLayer(layer);
+                }
+            });
+            
             routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
+            
+            // Thêm lại markers cho điểm đầu và cuối
+            const startCoord = coords[0];
+            const endCoord = coords[coords.length - 1];
+            
+            pickupMarker = L.marker(startCoord).addTo(map).bindPopup(L.pickup_label.replace('📍 ','')).openPopup();
+            dropoffMarker = L.marker(endCoord).addTo(map).bindPopup(L.dropoff_label.replace('🏁 ','')).openPopup();
+            
             map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
-            map.invalidateSize(); // FIX: Đảm bảo bản đồ cập nhật kích thước sau khi tính toán route
+            map.invalidateSize(); 
         }
 
         const tripType = tripTypeEl.value; 
@@ -1244,12 +1269,17 @@ async function calculateAndGenerateMessage() {
         return true; 
     }catch(err){
         console.error('Route error', err);
-        distanceText.textContent = L.alert_route_error;
+        // THÔNG BÁO LỖI RÕ RÀNG HƠN KHI OSRM GẶP VẤN ĐỀ
+        let errorMsg = L.alert_route_error;
+        if (err.message.includes('OSRM API error')) {
+            errorMsg = `⚠️ Lỗi máy chủ Định tuyến (OSRM). Vui lòng thử lại sau vài giây hoặc kiểm tra kết nối mạng.`;
+        }
+        distanceText.textContent = errorMsg;
         priceValue.textContent = '—';
         mailBtn.href = `mailto:netvuan@gmail.com`;
         zaloBtn.style.display = 'none';
         mailBtn.style.display = 'none';
-        instructionText.innerHTML = L.alert_route_error;
+        instructionText.innerHTML = errorMsg;
         return false;
     }
 }
@@ -1261,7 +1291,6 @@ calcBtn.addEventListener('click', async () => {
       return;
   }
   
-  // Kiểm tra lần cuối (dù nút đã disabled, nhưng để catch trường hợp bypass)
   if(!updateCalcButtonState()) {
     alert(LANGUAGES[currentLang].alert_pickup_empty + ' & ' + LANGUAGES[currentLang].alert_dropoff_empty);
     return;
@@ -1406,7 +1435,7 @@ zaloModalBtn.addEventListener('click', () => {
 
 
 /* ------------------------------------------------------------------
-   CHỨC NĂNG PHỤ TRỢ (HELPER FUNCTIONS) - Tinh chỉnh
+   CHỨC NĂNG PHỤ TRỢ (HELPER FUNCTIONS) - Giữ nguyên
    ------------------------------------------------------------------ */
 function setMinPickupDateTime() {
     const now = new Date();
@@ -1447,7 +1476,6 @@ document.querySelectorAll('.clear-btn').forEach(btn => {
             const suggBox = document.getElementById(`${inputId}-suggestions`);
             if (suggBox) suggBox.style.display = 'none';
             inputEl.focus(); 
-            // CẬP NHẬT TRẠNG THÁI NÚT KHI CLEAR
             updateCalcButtonState(); 
         }
     });
@@ -1508,12 +1536,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     });
 
     setMinPickupDateTime();
-    getGeolocation(); // Gọi để khởi tạo map và lấy vị trí
+    getGeolocation(); 
     
     const status = await checkServiceStatus();
     await updateUIBasedOnStatus(status);
     
-    // GỌI HÀM KIỂM TRA LẠI TRẠNG THÁI NÚT SAU KHI XÁC ĐỊNH TRẠNG THÁI DỊCH VỤ
     updateCalcButtonState(); 
 
     setInterval(async () => {
