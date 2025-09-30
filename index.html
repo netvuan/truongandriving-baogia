@@ -262,8 +262,9 @@ const REMOTE_STATUS_URL = "/status-local.json";
 const NOMINATIM = "https://nominatim.openstreetmap.org/search";
 const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse"; 
 const OSRM = "https://router.project-osrm.org/route/v1/driving";
-// URL Maps ngắn gọn (Sử dụng lệnh tìm kiếm địa chỉ)
-const GOOGLE_MAPS_SHORT_URL = "https://www.google.com/maps/dir/?api=1&origin=3"; 
+// Đã thay đổi URL Maps link rút gọn
+const GOOGLE_MAPS_BASE_URL = "https://maps.app.goo.gl/?q="; // Dùng để tra cứu 1 địa điểm
+const GOOGLE_MAPS_DIR_URL = "https://maps.app.goo.gl/dir/"; // Dùng cho chỉ đường
 const TAXI_PHONE = "0847526893"; 
 const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`; 
 const DEBOUNCE_TIME = 300; 
@@ -576,7 +577,7 @@ function attachAutocomplete(inputEl, boxEl){
       
       const fragment = document.createDocumentFragment();
       
-      if(!ArrayularArray(data) || data.length === 0){ 
+      if(!Array.isArray(data) || data.length === 0){ 
         boxEl.innerHTML = '<div>Không tìm thấy địa điểm</div>'; 
         setTimeout(() => boxEl.style.display = 'none', 1000); 
         return; 
@@ -910,22 +911,26 @@ calcBtn.addEventListener('click', async () => {
         }
     }
     
-    // ----------- TÍNH NĂNG MAPS LINK (RÚT GỌN) ĐÃ CẬP NHẬT -----------
+    // ----------- BẮT ĐẦU TÍNH NĂNG MAPS LINK MỚI ĐÃ RÚT GỌN -----------
     const pickupAddress = pickupEl.value.trim();
-    const encodedPickup = encodeURIComponent(pickupAddress); 
-    const mapsPickupLink = `${GOOGLE_MAPS_SHORT_URL}${encodedPickup}`; // Link Rút gọn Đón
-    
     const dropoffAddress = dropoffEl.value.trim();
-    const encodedDropOff = encodeURIComponent(dropoffAddress); 
-    const mapsDropoffLink = `${GOOGLE_MAPS_SHORT_URL}${encodedDropOff}`; // Link Rút gọn Trả
+    
+    const encodedPickUp = encodeURIComponent(pickupAddress);
+    const encodedDropOff = encodeURIComponent(dropoffAddress);
+    
+    // Link 1: Chỉ đường từ Điểm đón đến Điểm trả (Sử dụng Maps.app.goo.gl/dir)
+    const mapsDirectionLink = `${GOOGLE_MAPS_DIR_URL}${encodedPickUp}/${encodedDropOff}`;
+    
+    // Link 2: Vị trí đón khách (Sử dụng Maps.app.goo.gl/?q=)
+    const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}${encodedPickUp}`;
     
     let mapsLinksSection = [
         `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHO TÀI XẾ ***`,
-        `📍 Vị trí đón (NGẮN GỌN): ${mapsPickupLink}`, 
-        `🏁 Vị trí trả (NGẮN GỌN): ${mapsDropoffLink}`,
+        `📍 Vị trí đón khách (Tìm kiếm): ${mapsPickupLink}`,
+        `🛣️ Chỉ đường (Đón -> Trả): ${mapsDirectionLink}`,
         `\n`
     ].join('\n');
-    // ----------- KẾT THÚC TÍNH NĂNG MAPS LINK (RÚT GỌN) -----------
+    // ----------- KẾT THÚC TÍNH NĂNG MAPS LINK MỚI ĐÃ RÚT GỌN -----------
     
     finalZaloMessage = [
         '🚖 YÊU CẦU ĐẶT XE TRƯỜNG AN DRIVING',
@@ -939,7 +944,7 @@ calcBtn.addEventListener('click', async () => {
         `🕒 Ngày giờ đón: ${formattedDate}`,
         ...(tripType === '2' ? [zaloWaitingDetail] : []), 
         `💵 Tổng giá dự kiến: ${total.toLocaleString('vi-VN')} đ`,
-        mapsLinksSection, // Chèn cả 2 đoạn Maps link ngắn
+        mapsLinksSection, // Chèn đoạn Maps link vào đây
         '-------------------------------',
         'Vui lòng xác nhận đơn hàng.',
     ].join('\n');
