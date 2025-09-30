@@ -53,6 +53,7 @@
             align-items: center;
             width: 100%;
             max-width: 720px; /* Giữ giới hạn cho màn hình lớn */
+            /* Thay đổi này sẽ được ưu tiên trên màn hình lớn */
         }
         .header-title {
             font-size:22px;
@@ -63,11 +64,13 @@
             font-size: 14px;
             font-weight: 500;
             margin-top: 4px;
+            display: flex;
+            align-items: center;
         }
         .phone-number{
             font-size:18px;
             font-weight:900;
-            margin-top:4px;
+            margin-top:0px; /* Đã được căn chỉnh bởi flex */
         }
         #language-switcher {
             /* Vị trí ban đầu: Tách khỏi SĐT, sang phải */
@@ -86,20 +89,22 @@
             align-items: center;
         }
         header .header-title {
-            text-align: center;
+            text-align: center; /* Căn giữa tiêu đề chính */
             font-size: 20px;
         }
-        header .phone-number {
-            margin-top: 8px;
-        }
         header .header-info {
-            display: flex;
-            align-items: center;
             margin-top: 8px;
         }
         header #language-switcher {
-            margin-left: 15px; /* Thêm khoảng cách nếu không phải là phần của title */
+            margin-left: 15px;
         }
+        header > div:last-child {
+            /* Dòng "Trường An Driving" */
+            font-size: 16px;
+            margin-top: 4px;
+            text-align: center; /* Đảm bảo căn giữa */
+        }
+
 
         /* CONTAINER & LAYOUT */
         .container{
@@ -354,7 +359,6 @@
             border: none;
             cursor:pointer;
             transition: opacity 0.2s, transform 0.1s, background 0.2s; /* Thêm transition cho background */
-            /* opacity: 0.5; */ /* FIX: Loại bỏ opacity mặc định để kiểm soát bằng class */
         }
         .actions a.active-booking {
             opacity: 1; /* Nút kích hoạt */
@@ -385,10 +389,26 @@
             border-radius:12px;
             border: 1px solid #ddd;
         }
+        /* Cập nhật định dạng cho phần Ghi chú */
         .note ul {
             margin-top: 8px;
             padding-left: 20px;
+            margin-bottom: 0;
+            list-style: '📌 '; /* Thêm icon cho list item */
         }
+        .note ul li {
+            padding-left: 5px; /* Điều chỉnh padding cho list item */
+            margin-bottom: 4px;
+        }
+        .note ul li::marker {
+            font-size: 1.1em;
+            color: var(--primary);
+        }
+        .note p {
+            margin-top: 0;
+        }
+
+
         #instructionText {
             margin-top: 16px !important;
             padding: 12px !important;
@@ -552,7 +572,7 @@
                 </select>
             </div>
         </div>
-        <div style="font-size: 16px;">Trường An Driving</div>
+        <div style="font-size: 16px; font-weight: 900; margin-top: 4px;">⭐⭐ Trường An Driving ⭐⭐</div>
     </header>
 
     <div class="container">
@@ -669,8 +689,7 @@
         </div>
 
         <div class="note" data-i18n="noteMain">
-            📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).
-            <br>
+            <p>📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).</p>
             **Thời gian chờ:**
             <ul>
                 <li>Chờ 0–3 giờ: **Miễn phí**.</li>
@@ -702,18 +721,6 @@
         <div class="modal-actions" style="margin-top:10px;">
             <button id="confirmDepositBtn" style="width:100%;" data-i18n="modalDepositConfirm">Đã hiểu và Tiếp tục</button>
         </div>
-    </div>
-</div>
-
-<div id="phoneModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <h3 data-i18n="modalPhoneTitle">📞 Vui lòng nhập Số điện thoại</h3>
-        <p style="text-align:center;" data-i18n="modalPhoneNotice">Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.</p>
-        <input id="inputPhoneForBooking" type="tel" data-i18n-placeholder="placeholderPhone" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
-        <div class="modal-actions" style="margin-top:15px;">
-            <button id="confirmPhoneBtn" data-i18n="modalPhoneConfirm">Xác nhận</button>
-        </div>
-        <button id="closePhoneModalBtn" style="width:100%; margin-top:10px; padding:12px; border-radius:10px; background:#ccc; color:#333;" data-i18n="modalClose">Đóng</button>
     </div>
 </div>
 
@@ -799,10 +806,8 @@ const i18n = {
         modalBtnCopy: "📋 Sao Chép Thông Tin",
         modalBtnZalo: "📱 Mở Zalo Chat",
 
-        // Phone Modal
-        modalPhoneTitle: "📞 Vui lòng nhập Số điện thoại",
-        modalPhoneNotice: "Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.",
-        modalPhoneConfirm: "Xác nhận",
+        // Phone Modal (Used for Alert)
+        alertPhoneInvalid: "Vui lòng nhập SĐT 10 số hợp lệ (VD: 0987654321) để đặt xe.",
 
         // Deposit Modal
         modalDepositTitle: "📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều",
@@ -900,10 +905,8 @@ const i18n = {
         modalBtnCopy: "📋 Copy Information",
         modalBtnZalo: "📱 Open Zalo Chat",
 
-        // Phone Modal
-        modalPhoneTitle: "📞 Please Enter Your Phone Number",
-        modalPhoneNotice: "Please enter your phone number so we can contact you to confirm the order.",
-        modalPhoneConfirm: "Confirm",
+        // Phone Modal (Used for Alert)
+        alertPhoneInvalid: "Please enter a valid 10-digit phone number (e.g., 0987654321) to place an order.",
 
         // Deposit Modal
         modalDepositTitle: "📝 Deposit Required for Two-Way Trip",
@@ -1000,10 +1003,8 @@ const i18n = {
         modalBtnCopy: "📋 复制信息",
         modalBtnZalo: "📱 打开 Zalo 聊天",
 
-        // Phone Modal
-        modalPhoneTitle: "📞 请输入电话号码",
-        modalPhoneNotice: "请输入您的电话号码，以便我们联系您确认订单。",
-        modalPhoneConfirm: "确认",
+        // Phone Modal (Used for Alert)
+        alertPhoneInvalid: "请输入有效的10位电话号码 (例如 0987654321) 来下订单。",
 
         // Deposit Modal
         modalDepositTitle: "📝 双程旅行需支付押金",
@@ -1121,8 +1122,7 @@ const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse";
 const OSRM = "https://router.project-osrm.org/route/v1/driving";
 
 /* FIX: Đường link Google Maps bị lỗi. Thay thế bằng đường link chuẩn (dùng cho Zalo/Mail) */
-const GOOGLE_MAPS_BASE_URL = "https://www.google.com/maps/search/?api=1&query=";
-const GOOGLE_MAPS_DIR_URL = "https://www.google.com/maps/dir/?api=1&destination=";
+const GOOGLE_MAPS_BASE_URL = "http://maps.google.com/maps?q=";
 
 const TAXI_PHONE = "0847526893";
 const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`;
@@ -1169,11 +1169,7 @@ const copyModalBtn = document.getElementById('copyModalBtn');
 const zaloModalBtn = document.getElementById('zaloModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
-// New Modal DOM
-const phoneModal = document.getElementById('phoneModal');
-const inputPhoneForBooking = document.getElementById('inputPhoneForBooking');
-const confirmPhoneBtn = document.getElementById('confirmPhoneBtn');
-const closePhoneModalBtn = document.getElementById('closePhoneModalBtn');
+// Deposit Modal DOM
 const depositModal = document.getElementById('depositModal');
 const depositAmount = document.getElementById('depositAmount');
 const confirmDepositBtn = document.getElementById('confirmDepositBtn');
@@ -1277,7 +1273,7 @@ function checkPhoneStatus() {
     const isValid = validatePhone(phone);
     const hasPrice = resultBox.style.display === 'block';
 
-    if (isValid && hasPrice) {
+    if (isValid && hasPrice && isServiceActive) {
         zaloBtn.classList.remove('inactive-booking');
         mailBtn.classList.remove('inactive-booking');
     } else {
@@ -1820,38 +1816,43 @@ async function calculateAndGenerateMessage() {
         const pickupDt = pickupDateTime.value ? new Date(pickupDateTime.value).toLocaleString(currentLang === 'en' ? 'en-US' : 'vi-VN', { dateStyle: 'short', timeStyle: 'short' }) : 'Không có';
         pickupInfo.textContent = `${translations.resultPickupTime} ${pickupDt}`;
 
-            /* FIX: Cập nhật tin nhắn Zalo/Mail có thêm link Google Maps */
+            /* Cập nhật tin nhắn Zalo/Mail có icon và link Google Maps */
             const getMapLink = (lat, lon) => `${GOOGLE_MAPS_BASE_URL}${lat},${lon}`;
 
-        const stopAddresses = stopCoords.map((item, i) => {
+            const stopAddresses = stopCoords.map((item, i) => {
                 const mapLink = getMapLink(item.coord[0], item.coord[1]);
-                const label = `${currentLang === 'en' ? 'Stopover' : (currentLang === 'zh' ? '经停点' : 'Điểm dừng')} ${i+1}:`;
-                return `${label} ${item.input.value}\n   [Link Vị Trí: ${mapLink}]`;
+                const label = `${currentLang === 'en' ? '📍 Stopover' : (currentLang === 'zh' ? '📍 经停点' : '📍 Điểm dừng')} ${i+1}:`;
+                return `${label} ${item.input.value}\n   [🔗 Vị Trí: ${mapLink}]`;
             }).join('\n');
 
             const pickupMapLink = getMapLink(pickupCoord[0], pickupCoord[1]);
             const dropoffMapLink = getMapLink(dropoffCoord[0], dropoffCoord[1]);
+            const directionMapLink = `http://maps.google.com/maps?saddr=${pickupCoord[0]},${pickupCoord[1]}&daddr=${dropoffCoord[0]},${dropoffCoord[1]}`;
+
 
             const zaloMessageLines = [
-                `**${translations.modalBookingTitle.replace('✅ ', '')}**`,
-                `---`,
-                `${translations.labelPhone.replace('📞 ', '').split(' (')[0]}: ${customerPhoneEl.value || (currentLang === 'en' ? 'Not provided' : (currentLang === 'zh' ? '未提供' : 'Chưa cung cấp'))}`,
-                `${translations.labelPickup.replace('📍 ', '')}: ${pickupEl.value}`,
-                `   [Link Vị Trí Đón: ${pickupMapLink}]`,
+                `**✅ ${translations.modalBookingTitle.replace('✅ ', '')} ✅**`,
+                `----------------------------------------------------`,
+                `📞 ${translations.labelPhone.replace('📞 ', '').split(' (')[0]}: ${customerPhoneEl.value || (currentLang === 'en' ? 'Not provided' : (currentLang === 'zh' ? '未提供' : 'Chưa cung cấp'))}`,
+                `📍 ${translations.labelPickup.replace('📍 ', '')}: ${pickupEl.value}`,
+                `   [🔗 Vị Trí Đón: ${pickupMapLink}]`,
                 stopAddresses ? `\n${stopAddresses}\n` : '',
-                `${translations.labelDropoff.replace('🏁 ', '')}: ${dropoffEl.value}`,
-                `   [Link Vị Trí Trả: ${dropoffMapLink}]`,
-                `${translations.labelTime.replace('🕒 ', '')}: ${pickupDt}`,
-                `${translations.labelCarType.replace('🚘 ', '')}: ${carName}`,
-                `${translations.labelTripType.replace('🚗 ', '')}: ${tripTypeEl.options[tripTypeEl.selectedIndex].text}`,
-                `${translations.labelDriverRequest.replace(/🧑‍✈️|👤 /, '').split(' (')[0]}: ${driverRequest}`,
-                (tripType === '2' && waiting > 0) ? `${translations.labelWaiting.replace('⏳ ', '').replace(' (giờ)', '')}: ${waiting} ${currentLang === 'en' ? 'hours' : (currentLang === 'zh' ? '小时' : 'giờ')}` : '',
+                `🏁 ${translations.labelDropoff.replace('🏁 ', '')}: ${dropoffEl.value}`,
+                `   [🔗 Vị Trí Trả: ${dropoffMapLink}]`,
                 `---`,
-                `${translations.resultDistance} ${dist.toFixed(1)} km`,
-                `${translations.resultPriceTitle.replace('💵 ', '')}: ${total.toLocaleString(currentLang === 'en' ? 'en-US' : (currentLang === 'zh' ? 'zh-CN' : 'vi-VN'))} đ (Ước tính)`,
+                `🗺️ Link Chỉ Đường Tổng Thể: ${directionMapLink}`,
+                `---`,
+                `🕒 ${translations.labelTime.replace('🕒 ', '')}: ${pickupDt}`,
+                `🚘 ${translations.labelCarType.replace('🚘 ', '')}: ${carName}`,
+                `🚗 ${translations.labelTripType.replace('🚗 ', '')}: ${tripTypeEl.options[tripTypeEl.selectedIndex].text}`,
+                `🧑‍✈️ Yêu cầu Tài xế: ${driverRequest}`,
+                (tripType === '2' && waiting > 0) ? `⏳ Thời gian chờ: ${waiting} ${currentLang === 'en' ? 'hours' : (currentLang === 'zh' ? '小时' : 'giờ')}` : '',
+                `---`,
+                `💵 **${translations.resultPriceTitle.replace('💵 ', '')}: ${total.toLocaleString(currentLang === 'en' ? 'en-US' : (currentLang === 'zh' ? 'zh-CN' : 'vi-VN'))} đ (Ước tính)**`,
                 `(${translations.tripOneWay}: ${priceGo.toLocaleString(currentLang === 'en' ? 'en-US' : (currentLang === 'zh' ? 'zh-CN' : 'vi-VN'))} đ ${tripType === '2' ? '+ ' + returnNote.split('(')[0].trim() + ' ' + priceReturn.toLocaleString(currentLang === 'en' ? 'en-US' : (currentLang === 'zh' ? 'zh-CN' : 'vi-VN')) + ' đ' : ''}${waitFee > 0 ? ' + phí chờ' : ''})`,
-                `---`,
-                currentLang === 'en' ? 'Please confirm this information.' : (currentLang === 'zh' ? '请确认这些信息。' : 'Vui lòng xác nhận lại thông tin này.'),
+                tripType === '2' ? `💰 Đặt cọc (20%): ${depositAmountValue.toLocaleString(currentLang === 'en' ? 'en-US' : (currentLang === 'zh' ? 'zh-CN' : 'vi-VN'))} đ` : '',
+                `----------------------------------------------------`,
+                currentLang === 'en' ? 'Please confirm this information for the staff to process the order.' : (currentLang === 'zh' ? '请确认这些信息，以便工作人员处理订单。' : 'Vui lòng xác nhận lại thông tin này để nhân viên xử lý đơn hàng.'),
             ];
 
             finalZaloMessage = zaloMessageLines.filter(line => line.trim() !== '').join('\n');
@@ -1899,7 +1900,7 @@ function closeModal(modalEl){
 zaloBtn.addEventListener('click', async (e) => {
     if (!isServiceActive) return;
     if (e.currentTarget.classList.contains('inactive-booking')) {
-        alert(currentLang === 'en' ? 'Please enter a valid 10-digit phone number (e.g., 0987654321) to place an order.' : (currentLang === 'zh' ? '请输入有效的10位电话号码 (例如 0987654321) 来下订单。' : 'Vui lòng nhập SĐT 10 số hợp lệ (VD: 0987654321) để đặt xe.'));
+        alert(i18n[currentLang].alertPhoneInvalid);
         customerPhoneEl.focus();
         return;
     }
@@ -1924,7 +1925,7 @@ zaloBtn.addEventListener('click', async (e) => {
 mailBtn.addEventListener('click', async (e) => {
     if (!isServiceActive) return;
     if (e.currentTarget.classList.contains('inactive-booking')) {
-        alert(currentLang === 'en' ? 'Please enter a valid 10-digit phone number (e.g., 0987654321) to place an order.' : (currentLang === 'zh' ? '请输入有效的10位电话号码 (例如 0987654321) 来下订单。' : 'Vui lòng nhập SĐT 10 số hợp lệ (VD: 0987654321) để đặt xe.'));
+        alert(i18n[currentLang].alertPhoneInvalid);
         customerPhoneEl.focus();
         return;
     }
@@ -1947,31 +1948,11 @@ mailBtn.addEventListener('click', async (e) => {
 
 confirmDepositBtn.addEventListener('click', () => {
     closeModal(depositModal);
-    // Phone validation is already done before confirming deposit (via checkPhoneStatus/click handler)
     
     if (bookingAction === 'zalo') showZaloModal();
     else if (bookingAction === 'mail') showZaloModal(true);
 });
 
-confirmPhoneBtn.addEventListener('click', () => {
-    const phone = inputPhoneForBooking.value.trim();
-    if (validatePhone(phone)) {
-        customerPhoneEl.value = phone; // Update the main phone field
-        closeModal(phoneModal);
-
-        // Re-calculate and open final modal (in case price calc was skipped)
-        calculateAndGenerateMessage().then(success => {
-            if (success) {
-                if (bookingAction === 'zalo') showZaloModal();
-                else if (bookingAction === 'mail') showZaloModal(true);
-            }
-        });
-    } else {
-        alert(currentLang === 'en' ? 'Please enter a valid 10-digit phone number (e.g., 0987654321).' : (currentLang === 'zh' ? '请输入有效的10位电话号码 (例如 0987654321)。' : 'Vui lòng nhập SĐT 10 số hợp lệ (VD: 0987654321).'));
-    }
-});
-
-closePhoneModalBtn.addEventListener('click', () => closeModal(phoneModal));
 closeModalBtn.addEventListener('click', () => closeModal(zaloModal));
 
 function showZaloModal(isMail = false) {
@@ -1983,7 +1964,7 @@ function showZaloModal(isMail = false) {
     const noticeEl = zaloModal.querySelector('p:nth-of-type(1)'); // The first <p> element
 
     if (isMail) {
-        titleEl.textContent = translations.modalBookingTitle.replace('Zalo', 'Mail');
+        titleEl.textContent = translations.modalBookingTitle.replace('✅ ', '').replace('THÔNG TIN ĐẶT XE', 'THÔNG TIN ĐẶT MAIL');
         noticeEl.innerHTML = currentLang === 'en' ? 'Copy the information and send via **Email**:' :
                            (currentLang === 'zh' ? '复制信息并通过 **邮件** 发送:' :
                            'Sao chép thông tin và gửi qua **Email**:');
