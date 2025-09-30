@@ -64,6 +64,7 @@
         color:#fff; border:0; padding:6px 8px; border-radius:6px; 
         font-weight:700; cursor:pointer;
         line-height: 1.5; /* Đảm bảo chiều cao nút khớp */
+        z-index: 1000; /* Đảm bảo nút luôn nằm trên input */
     }
     input[type="text"], input[type="number"], input[type="datetime-local"], select, input[type="tel"]{
       width:100%; padding:12px 85px 12px 14px; /* Tăng padding phải để tránh nút Map/Clear */
@@ -323,7 +324,6 @@
 <script>
 /* ------------------------------------------------------------------
    CẤU HÌNH NGÔN NGỮ VÀ TRẠNG THÁI (MULTI-LANGUAGE & KILL SWITCH CONFIG)
-   (Phần này giữ nguyên logic đa ngôn ngữ)
    ------------------------------------------------------------------ */
 const REMOTE_STATUS_URL = "/status-local.json"; 
 const NOMINATIM = "https://nominatim.openstreetmap.org/search";
@@ -416,7 +416,6 @@ const LANGUAGES = {
    ------------------------------------------------------------------ */
 
 function updateUIWithLanguage(langKey) {
-    // ... (Hàm này giữ nguyên)
     const L = LANGUAGES[langKey];
     if (!L) return;
 
@@ -505,8 +504,6 @@ function updateUIWithLanguage(langKey) {
 /* ------------------------------------------------------------------
    CHỨC NĂNG CƠ BẢN VÀ KILL SWITCH (CORE FUNCTIONS) - Giữ nguyên logic
    ------------------------------------------------------------------ */
-
-// ... (Các hàm checkServiceStatus, updateUIBasedOnStatus, debounce giữ nguyên)
 
 async function checkServiceStatus() {
     const cacheBuster = `?t=${Date.now()}`; 
@@ -1142,8 +1139,6 @@ async function calculateAndGenerateMessage() {
         return false;
     }
 }
-
-// ... (Các phần còn lại của logic JS giữ nguyên)
 
 // Xử lý nút Tính giá
 calcBtn.addEventListener('click', async () => {
