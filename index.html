@@ -231,26 +231,25 @@
       </select>
       
       <div class="label-row" style="margin-top:12px">
-  <h3>
-      🧑‍✈️ Yêu cầu Tài xế 
-      <span class="driver-option-avatar" title="Icon này có thể thay bằng Avatar">👤</span>
-  </h3>
-</div>
-<select id="driverRequest">
-  <option value="Trường An Driving" class="driver-option-highlight">
-      ⭐ Trường An Driving (Mặc định)
-  </option>
-  <option value="Thanh Loan">👸 Thanh Loan</option>
-  <option value="Đình Tâm">🧑‍✈️ Đình Tâm</option>
-  <option value="Hải Đăng">🧑‍✈️ Hải Đăng</option>
-  <option value="Lê Tâm">🧑‍✈️ Lê Tâm</option>
-  <option value="Nguyễn Thảo">👸 Nguyễn Thảo</option>
-  <option value="Quốc Dũng">🧑‍✈️ Quốc Dũng</option>
-  <option value="Tân Hồ">🧑‍✈️ Tân Hồ</option>
-  <option value="Trần Vinh">🧑‍✈️ Trần Vinh</option>
-  <option value="Xuân Phong">🧑‍✈️ Xuân Phong</option>
-</select>
-
+        <h3>
+            🧑‍✈️ Yêu cầu Tài xế 
+            <span class="driver-option-avatar" title="Icon này có thể thay bằng Avatar">👤</span>
+        </h3>
+      </div>
+      <select id="driverRequest">
+        <option value="Trường An Driving" class="driver-option-highlight">
+            ⭐ Trường An Driving (Mặc định)
+        </option>
+        <option value="Thanh Loan">👸 Thanh Loan</option>
+        <option value="Đình Tâm">🧑‍✈️ Đình Tâm</option>
+        <option value="Hải Đăng">🧑‍✈️ Hải Đăng</option>
+        <option value="Lê Tâm">🧑‍✈️ Lê Tâm</option>
+        <option value="Nguyễn Thảo">👸 Nguyễn Thảo</option>
+        <option value="Quốc Dũng">🧑‍✈️ Quốc Dũng</option>
+        <option value="Tân Hồ">🧑‍✈️ Tân Hồ</option>
+        <option value="Trần Vinh">🧑‍✈️ Trần Vinh</option>
+        <option value="Xuân Phong">🧑‍✈️ Xuân Phong</option>
+      </select>
       <div class="label-row" style="margin-top:12px"><h3>🚗 Loại chuyến đi</h3></div>
       <select id="tripType">
         <option value="1">1 chiều</option>
@@ -633,9 +632,10 @@ async function geocodeOnce(query){
   try{
     let url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=VN&addressdetails=1`;
     
-    if(userLocation) {
+    // FIX: Removed &bounded=1 to allow searching for locations far from userLocation
+    if(userLocation) { 
         const [lat, lon] = userLocation;
-        url += `&viewbox=${lon - 0.5},${lat - 0.5},${lon + 0.5},${lat + 0.5}&bounded=1`;
+        url += `&viewbox=${lon - 0.5},${lat - 0.5},${lon + 0.5},${lat + 0.5}`;
     } else {
         url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
     }
@@ -669,9 +669,10 @@ function attachAutocomplete(inputEl, boxEl){
 
     let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=vi`; 
     
+    // FIX: Removed &bounded=1 to allow searching for locations far from userLocation
     if(userLocation) {
         const [lat, lon] = userLocation;
-        url += `&viewbox=${lon - 0.3},${lat - 0.3},${lon + 0.3},${lat + 0.3}&bounded=1`;
+        url += `&viewbox=${lon - 0.3},${lat - 0.3},${lon + 0.3},${lat + 0.3}`;
     } else {
         url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
     }
