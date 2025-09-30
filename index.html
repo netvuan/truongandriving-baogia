@@ -264,8 +264,8 @@ const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse";
 const OSRM = "https://router.project-osrm.org/route/v1/driving";
 
 // CẬP NHẬT: Thay thế link rút gọn không hoạt động bằng URL Google Maps tiêu chuẩn
-const GOOGLE_MAPS_BASE_URL = "https://maps.app.goo.gl/"; // Base link cho tìm kiếm/địa điểm
-const GOOGLE_MAPS_DIR_URL = "https://www.google.com/maps/dir/"; // Base link cho chỉ đường
+const GOOGLE_MAPS_BASE_URL = "https://www.google.com/maps/search/"; 
+const GOOGLE_MAPS_DIR_URL = "https://www.google.com/maps/dir/"; 
 
 const TAXI_PHONE = "0847526893"; 
 const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`; 
@@ -923,12 +923,12 @@ calcBtn.addEventListener('click', async () => {
     const dropoffLatLon = `${dropoffCoord[0]},${dropoffCoord[1]}`;
     
     // Link 1: Chỉ đường từ Điểm đón đến Điểm trả (Dùng tọa độ)
-    // URL: https://www.google.com/maps/dir/lat,lon/lat,lon
+    // URL: https://www.google.com/maps/dir/lat_don,lon_don/lat_tra,lon_tra
     const mapsDirectionLink = `${GOOGLE_MAPS_DIR_URL}${pickupLatLon}/${dropoffLatLon}`;
     
-    // Link 2: Vị trí đón khách (Dùng tọa độ - URL maps.app.goo.gl sẽ chuyển hướng đến link chính thức)
-    // URL: https://maps.app.goo.gl/?q=lat,lon
-    const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}?q=${pickupLatLon}`; 
+    // Link 2: Vị trí đón khách (Dùng tọa độ)
+    // URL: https://www.google.com/maps/search/lat_don,lon_don
+    const mapsPickupLink = `${GOOGLE_MAPS_BASE_URL}${pickupLatLon}`; 
     
     let mapsLinksSection = [
         `\n*** 🗺️ LIÊN KẾT BẢN ĐỒ CHÍNH XÁC ***`,
