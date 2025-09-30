@@ -24,8 +24,26 @@
     .phone-number{font-size:18px;font-weight:700;margin-top:4px}
     /* Căn giữa cho thiết bị lớn */
     .container{padding:12px; max-width:720px; margin:0 auto;} 
+    
+    /* Cải thiện căn chỉnh chung */
     .label-row{display:flex;align-items:center;gap:8px;margin-top:10px}
     .label-row h3{margin:0;font-size:16px}
+
+    /* FIX LỖI LỆCH HÀNG NGÔN NGỮ */
+    .language-row-fix {
+        display: flex;
+        justify-content: space-between; /* Đẩy hai phần tử sang hai bên */
+        align-items: center; /* Căn giữa theo chiều dọc */
+        margin-bottom:12px;
+    }
+    #languageSelector {
+        padding: 8px 10px !important; /* Tinh chỉnh padding riêng */
+        border-radius: 6px; 
+        font-size:16px;
+        width: auto; 
+        min-width: 120px;
+        max-width: 50%;
+    }
 
     #location-status-wrapper {
         display: flex;
@@ -71,7 +89,8 @@
       border-radius:8px; border:1px solid #ddd; font-size:16px; background:#fff;
     }
     /* Sửa padding cho các input không có nút Map */
-    #customerPhone, #pickupDateTime, #carType, #driverRequest, #tripType, #waiting, #languageSelector {
+    /* Đã thêm #languageSelector vào đây, nhưng đã fix bằng CSS riêng bên trên */
+    #customerPhone, #pickupDateTime, #carType, #driverRequest, #tripType, #waiting {
         padding: 12px 14px !important;
     }
     /* Đảm bảo nút clear không bị ẩn bởi input */
@@ -135,7 +154,6 @@
     .driver-option-avatar { margin-right: 5px; font-size: 1.1em; vertical-align: middle; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    /* @media(min-width:700px){.container{max-width:720px;margin:0 auto}} (Đã gộp vào .container) */
   </style>
 </head>
 <body>
@@ -148,9 +166,9 @@
 
   <div class="container">
 
-    <div class="label-row" style="margin-bottom:12px;">
-        <h3>🌎 Chọn Ngôn ngữ / Language</h3>
-        <select id="languageSelector" style="padding: 8px 10px; border-radius: 6px; font-size:16px;">
+    <div class="language-row-fix">
+        <h3 style="margin:0;">🌎 Chọn Ngôn ngữ / Language</h3>
+        <select id="languageSelector">
             <option value="vn">🇻🇳 Tiếng Việt</option>
             <option value="en">🇬🇧 English</option>
             <option value="cn">🇨🇳 中文 (Chinese)</option>
@@ -412,7 +430,7 @@ const LANGUAGES = {
 
 
 /* ------------------------------------------------------------------
-   CẬP NHẬT GIAO DIỆN THEO NGÔN NGỮ (LANGUAGE UI UPDATE) - Giữ nguyên
+   CẬP NHẬT GIAO DIỆN THEO NGÔN NGỮ (LANGUAGE UI UPDATE) - Giữ nguyên logic, thêm tinh chỉnh nhỏ
    ------------------------------------------------------------------ */
 
 function updateUIWithLanguage(langKey) {
@@ -425,6 +443,10 @@ function updateUIWithLanguage(langKey) {
         `🚖 ${L.headerText1}<br>${L.headerText2}<br><a href="tel:${TAXI_PHONE}" class="phone-number" style="color:white; text-decoration: none;">${L.headerPhone} ${TAXI_PHONE}</a>`;
     
     // 2. Cập nhật các Label/Placeholder
+    // Cập nhật Hàng Ngôn ngữ (Không còn là .label-row nữa)
+    document.querySelector('.language-row-fix h3').textContent = L.pickup_label;
+    document.querySelector('.language-row-fix h3').innerHTML = `🌎 ${L.title.split(' ')[0]} / Language`; // Cập nhật lại cho chuẩn
+
     document.querySelectorAll('.label-row h3')[0].innerHTML = L.phone_label + `<span style="font-size:14px; font-weight:normal; color:#6c757d;"> ${L.phone_label_optional}</span>`;
     customerPhoneEl.placeholder = L.phone_placeholder;
 
@@ -574,8 +596,6 @@ async function updateUIBasedOnStatus(status) {
         calcBtn.disabled = false;
         
         serviceOffNotice.style.display = 'none';
-        
-        bookingFormWrapper.classList.remove('disabled-form');
         
         let active_msg = status.message_active 
             ? status[`message_${currentLang}`] || status.message_vn 
