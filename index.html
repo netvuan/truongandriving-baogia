@@ -12,78 +12,30 @@
   <style>
     :root{--green:#28a745;--muted:#6c757d;}
     *{box-sizing:border-box}
-    #main-content {
-      background:#f4f6f8;
-      padding: 0;
-    }
+    #main-content { background:#f4f6f8; padding: 0; }
     body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111}
     header{background:var(--green);color:#fff;padding:12px 10px;text-align:center;font-size:20px;font-weight:700;line-height:1.5}
     .phone-number{font-size:18px;font-weight:700;margin-top:4px}
     .container{padding:12px}
     .label-row{display:flex;align-items:center;gap:8px;margin-top:6px}
     .label-row h3{margin:0;font-size:16px}
-
-    /* --- NEW: Language Switcher Styles --- */
-    .lang-switcher {
-      text-align: center;
-      padding: 8px 0;
-      background-color: #f0f0f0;
-    }
-    .lang-btn {
-      background: none;
-      border: 2px solid transparent;
-      font-size: 24px;
-      cursor: pointer;
-      padding: 2px 8px;
-      border-radius: 8px;
-      margin: 0 5px;
-      transition: border-color 0.2s;
-    }
-    .lang-btn:hover {
-      border-color: #ccc;
-    }
-    .lang-btn.active {
-      border-color: var(--green);
-      background-color: #e9f5ee;
-    }
-    /* --- End Language Switcher Styles --- */
-
-    #location-status-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    #reloadLocationBtn {
-        cursor: pointer;
-        font-style: normal;
-        font-size: 20px;
-        color: #007bff;
-        transition: transform 0.2s;
-    }
-    #reloadLocationBtn:hover {
-        transform: rotate(45deg);
-    }
-    
+    .lang-switcher{text-align:center;padding:8px 0;background-color:#f0f0f0}
+    .lang-btn{background:0 0;border:2px solid transparent;font-size:24px;cursor:pointer;padding:2px 8px;border-radius:8px;margin:0 5px;transition:border-color .2s}
+    .lang-btn:hover{border-color:#ccc}
+    .lang-btn.active{border-color:var(--green);background-color:#e9f5ee}
+    #location-status-wrapper{display:flex;align-items:center;gap:8px}
+    #reloadLocationBtn{cursor:pointer;font-style:normal;font-size:20px;color:#007bff;transition:transform .2s}
+    #reloadLocationBtn:hover{transform:rotate(45deg)}
     .input-row{position:relative;margin-top:8px}
-    .input-row .clear-btn {
-        position: absolute; right: 80px; top: 11px; 
-        background: #f0f0f0; color: #666; border: none; padding: 3px 6px; 
-        border-radius: 4px; font-weight: 700; cursor: pointer; line-height: 1;
-        font-size: 14px; display: none; 
-        z-index: 1000;
-    }
-    .input-row input:focus + .clear-btn, .input-row .clear-btn:hover { 
-        display: block; 
-    }
-    input[type="text"], input[type="number"], input[type="datetime-local"], select, input[type="tel"]{
-      width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ddd; font-size:16px; background:#fff;
-    }
-    .map-btn{position:absolute; right:8px; top:8px; background:var(--green); color:#fff; border:0; padding:6px 8px; border-radius:6px; font-weight:700; cursor:pointer}
-    .add-stop{display:block;background:var(--green); color:#fff; border:none; padding:12px; border-radius:10px; font-size:16px; font-weight:700; margin-top:12px; cursor:pointer}
-    .calc-btn{display:block;background:var(--green); color:#fff; border:none; padding:14px; border-radius:10px; font-size:18px; font-weight:700; margin-top:12px; cursor:pointer}
+    .input-row .clear-btn{position:absolute;right:80px;top:11px;background:#f0f0f0;color:#666;border:none;padding:3px 6px;border-radius:4px;font-weight:700;cursor:pointer;line-height:1;font-size:14px;display:none;z-index:1000}
+    .input-row input:focus+.clear-btn,.input-row .clear-btn:hover{display:block}
+    input[type=text],input[type=number],input[type=datetime-local],select,input[type=tel]{width:100%;padding:12px 14px;border-radius:8px;border:1px solid #ddd;font-size:16px;background:#fff}
+    .map-btn{position:absolute;right:8px;top:8px;background:var(--green);color:#fff;border:0;padding:6px 8px;border-radius:6px;font-weight:700;cursor:pointer}
+    .add-stop,.calc-btn{display:block;background:var(--green);color:#fff;border:none;padding:12px;border-radius:10px;font-size:16px;font-weight:700;margin-top:12px;cursor:pointer}
+    .calc-btn{padding:14px;font-size:18px}
     #map{height:320px;margin-top:12px;border-radius:8px;overflow:hidden}
-    .suggestions{position:absolute; left:0; right:0; top:calc(100% + 6px); background:#fff;border:1px solid #ddd;border-radius:8px;max-height:220px;overflow:auto; -webkit-overflow-scrolling:touch; z-index:1200; box-shadow:0 8px 20px rgba(0,0,0,0.08)}
-    .suggestions div{padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer; display:flex; gap:8px; align-items: center}
+    .suggestions{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #ddd;border-radius:8px;max-height:220px;overflow:auto;-webkit-overflow-scrolling:touch;z-index:1200;box-shadow:0 8px 20px rgba(0,0,0,.08)}
+    .suggestions div{padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer;display:flex;gap:8px;align-items:center}
     .suggestions div:last-child{border-bottom:0}
     .suggestions div:hover{background:#f8f9fa}
     .result-box{margin-top:12px;padding:12px;border-radius:8px;background:#fff3cd;border:1px solid #ffeeba}
@@ -93,13 +45,13 @@
     .price-value{font-size:22px;color:red;font-weight:800}
     .price-break{margin-top:8px;font-size:15px}
     .actions{display:flex;gap:10px;margin-top:12px}
-    .actions a{flex:1;text-align:center;padding:12px;border-radius:8px;color:#fff;text-decoration:none;font-weight:700; border: none; cursor:pointer;}
-    .zalo-btn {background:#0068ff;} 
+    .actions a{flex:1;text-align:center;padding:12px;border-radius:8px;color:#fff;text-decoration:none;font-weight:700;border:none;cursor:pointer}
+    .zalo-btn{background:#0068ff}
     .mail{background:#dc3545}
     .note{margin-top:10px;font-size:13px;color:var(--muted);background:#fff;padding:10px;border-radius:8px}
     .way-wrapper{position:relative;margin-top:8px}
     .way-remove{position:absolute;right:6px;top:6px;background:#ff6b6b;color:#fff;border:0;padding:6px;border-radius:6px;cursor:pointer}
-    .kill-switch-styles,.disabled-form{pointer-events:none;opacity:.6;transition:opacity .3s}
+    .disabled-form{pointer-events:none;opacity:.6;transition:opacity .3s}
     #serviceOffNotice{margin-top:12px;padding:10px;background:#dc3545;color:#fff;border-radius:8px;font-size:15px;font-weight:600;text-align:center}
     .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;display:none;justify-content:center;align-items:center;padding:20px;animation:fadeIn .3s}
     .modal-content{background:#fff;border-radius:12px;padding:20px;width:100%;max-width:450px;max-height:90vh;overflow-y:auto;box-shadow:0 5px 15px rgba(0,0,0,.3);animation:slideIn .3s}
@@ -142,20 +94,16 @@
   </div>
   
   <div class="container">
-    
     <div id="serviceOffNotice" style="display:none;"></div>
-    
     <div id="instructionText" data-lang-key="instruction_checking" style="margin-top: 12px; padding: 10px; background: #e9ecef; border-radius: 8px; font-size: 15px; font-weight: 600; text-align: center;">
       💰 Đang kiểm tra trạng thái dịch vụ...
     </div>
-
     <div id="booking-form-wrapper"> 
       <div class="label-row" style="margin-top:6px"><h3 data-lang-key="phone_label">📞 Số điện thoại của bạn (Không bắt buộc để Tính giá)</h3></div>
       <input id="customerPhone" type="tel" data-lang-key="phone_placeholder" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel">
-
       <div class="label-row">
         <h3 data-lang-key="pickup_label">📍 Điểm đón</h3>
-        <div id="location-status-wrapper" style="display: flex; align-items: center; gap: 8px;">
+        <div id="location-status-wrapper">
           <span id="location-status" data-lang-key="location_finding" style="font-size:12px; color:var(--muted); font-weight:bold;">(Đang tìm vị trí...)</span>
           <i id="reloadLocationBtn" data-lang-key="location_reload_title" title="Thử lấy lại vị trí">🔄</i>
         </div>
@@ -166,13 +114,10 @@
         <button class="map-btn" id="pick-from-map" data-lang-key="map_button">Bản đồ</button>
         <div id="pickup-suggestions" class="suggestions" style="display:none"></div>
       </div>
-
       <div class="label-row" style="margin-top:12px"><h3 data-lang-key="datetime_label">🕒 Ngày & Giờ đón</h3></div>
       <input id="pickupDateTime" type="datetime-local">
-
       <div id="stops"></div>
       <button class="add-stop" id="add-stop-btn" data-lang-key="add_stop_button">＋ Thêm điểm dừng</button>
-
       <div class="label-row"><h3 data-lang-key="dropoff_label">🏁 Điểm đến</h3></div>
       <div class="input-row">
         <input id="dropoff" type="text" data-lang-key="dropoff_placeholder" placeholder="Nhập địa chỉ điểm đến cuối">
@@ -180,23 +125,16 @@
         <button class="map-btn" id="pick-to-map" data-lang-key="map_button">Bản đồ</button>
         <div id="dropoff-suggestions" class="suggestions" style="display:none"></div>
       </div>
-      
       <div class="label-row" style="margin-top:12px"><h3 data-lang-key="car_type_label">🚘 Loại xe</h3></div>
       <select id="carType">
         <option value="4 chỗ (10.000đ/km)" data-lang-key="car_type_4_seater">Xe 4 chỗ (10.000đ/km)</option> 
         <option value="7 chỗ (12.000đ/km)" data-lang-key="car_type_7_seater">Xe 7 chỗ (12.000đ/km)</option> 
       </select>
-      
       <div class="label-row" style="margin-top:12px">
-        <h3 data-lang-key="driver_request_label">
-            🧑‍✈️ Yêu cầu Tài xế 
-            <span class="driver-option-avatar" title="Icon này có thể thay bằng Avatar">👤</span>
-        </h3>
+        <h3 data-lang-key="driver_request_label">🧑‍✈️ Yêu cầu Tài xế</h3>
       </div>
       <select id="driverRequest">
-        <option value="Trường An Driving" class="driver-option-highlight" data-lang-key="driver_default">
-            ⭐ Trường An Driving (Mặc định)
-        </option>
+        <option value="Trường An Driving" class="driver-option-highlight" data-lang-key="driver_default">⭐ Trường An Driving (Mặc định)</option>
         <option value="Thanh Loan">👸 Thanh Loan</option>
         <option value="Đình Tâm">🧑‍✈️ Đình Tâm</option>
         <option value="Hải Đăng">🧑‍✈️ Hải Đăng</option>
@@ -207,317 +145,98 @@
         <option value="Trần Vinh">🧑‍✈️ Trần Vinh</option>
         <option value="Xuân Phong">🧑‍✈️ Xuân Phong</option>
       </select>
-
       <div class="label-row" style="margin-top:12px"><h3 data-lang-key="trip_type_label">🚗 Loại chuyến đi</h3></div>
       <select id="tripType">
         <option value="1" data-lang-key="trip_type_one_way">1 chiều</option>
         <option value="2" data-lang-key="trip_type_round_trip">2 chiều (giảm 40% chiều về)</option>
       </select>
-
       <div id="waitingWrapper"> 
         <div class="label-row" style="margin-top:12px"><h3 data-lang-key="waiting_time_label">⏳ Thời gian chờ (giờ)</h3></div>
         <input id="waiting" type="number" min="0" value="0" data-lang-key="waiting_time_placeholder" placeholder="Nhập số giờ chờ">
       </div>
-
       <button class="calc-btn" id="calc-btn" data-lang-key="calc_button">💰 Tính giá</button>
     </div> <div id="map"></div>
-
     <div id="result" class="result-box" style="display:none">
       <div class="result-row">
-        <div class="distance-text" id="distanceText" data-lang-key="result_distance">✏️ Quãng đường: —</div>
+        <div class="distance-text" id="distanceText"></div>
       </div>
-
       <div class="price-title" data-lang-key="result_price_label">💵 Giá dự kiến</div>
       <div class="price-value" id="priceValue">— đ</div>
-
       <div class="price-break" id="priceBreak"></div>
-
-      <div style="margin-top:8px;font-size:14px;color:#333" id="timeEst" data-lang-key="result_time_est">⏱ Thời gian dự kiến: — phút</div>
-      <div style="margin-top:4px;font-size:14px;color:#333" id="pickupInfo" data-lang-key="result_pickup_time">🕒 Ngày giờ đón: —</div>
+      <div style="margin-top:8px;font-size:14px;color:#333" id="timeEst"></div>
+      <div style="margin-top:4px;font-size:14px;color:#333" id="pickupInfo"></div>
     </div>
-
     <div class="actions">
-      <a id="zaloBtn" class="zalo-btn" href="javascript:void(0);" style="display:none;" data-lang-key="book_via_zalo">📱 Đặt qua Zalo</a>
-      <a id="mailBtn" class="mail" href="javascript:void(0);" style="display:none;" data-lang-key="book_via_mail">📧 Đặt qua Mail</a>
+      <a id="zaloBtn" class="zalo-btn" href="javascript:void(0);" style="display:none;" data-lang-key="book_via_zalo"></a>
+      <a id="mailBtn" class="mail" href="javascript:void(0);" style="display:none;" data-lang-key="book_via_mail"></a>
     </div>
-
-    <div class="note" data-lang-key="note_html">
-      📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).
-      <br>
-      **Thời gian chờ:**
-      <ul>
-        <li>Chờ 0–3 giờ: **Miễn phí**.</li>
-        <li>Kể từ giờ thứ 4, mỗi giờ tiếp theo phát sinh phụ phí **50.000 VNĐ/giờ**.</li>
-        <li>Thời gian chờ được tính từ khi hành khách **hoàn tất việc xuống xe tại điểm đến** cho đến khi xe quay trở lại đón để về điểm xuất phát ban đầu.</li>
-      </ul>
-      Giá đã bao gồm phí cầu đường.
-    </div>
+    <div class="note" data-lang-key="note_html"></div>
   </div>
 </div>
 
 <div id="depositModal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
-        <h3 data-lang-key="deposit_modal_title">📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều</h3>
-        <div data-lang-key="deposit_modal_body_html">
-            <p>
-                **Quý khách vui lòng lưu ý:**<br>
-                Để xác nhận và đảm bảo chất lượng phục vụ cho chuyến đi **Hai chiều** của Quý khách, chúng tôi kính mong Quý khách **đặt cọc trước 20%** trên tổng giá cước dự kiến.
-            </p>
-            <p style="text-align:center; font-size:18px;">
-                Số tiền đặt cọc dự kiến: <span id="depositAmount">0 đ</span>
-            </p>
-            <p>
-                Khi nhân viên **Trường An Driving** phản hồi qua Zalo, chúng tôi sẽ gửi **hướng dẫn thanh toán cụ thể** (chuyển khoản) để hoàn tất thủ tục đặt cọc.
-            </p>
-            <p style="font-size:14px; color:#555;">
-                **Lưu ý:** Phần còn lại của cước phí sẽ được thanh toán trực tiếp cho tài xế sau khi kết thúc chuyến đi.
-                Xin chân thành cảm ơn Quý khách đã tin tưởng dịch vụ.
-            </p>
-        </div>
+        <h3 data-lang-key="deposit_modal_title"></h3>
+        <div data-lang-key="deposit_modal_body_html"></div>
         <div class="modal-actions" style="margin-top:10px;">
-            <button id="confirmDepositBtn" style="width:100%;" data-lang-key="deposit_modal_confirm_btn">Đã hiểu và Tiếp tục</button>
+            <button id="confirmDepositBtn" style="width:100%;" data-lang-key="deposit_modal_confirm_btn"></button>
         </div>
     </div>
 </div>
-
 <div id="phoneModal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
-        <h3 data-lang-key="phone_modal_title">📞 Vui lòng nhập Số điện thoại</h3>
-        <p style="text-align:center;" data-lang-key="phone_modal_body">Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.</p>
-        <input id="inputPhoneForBooking" type="tel" data-lang-key="phone_placeholder" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
+        <h3 data-lang-key="phone_modal_title"></h3>
+        <p style="text-align:center;" data-lang-key="phone_modal_body"></p>
+        <input id="inputPhoneForBooking" type="tel" data-lang-key="phone_placeholder" required>
         <div class="modal-actions" style="margin-top:15px;">
-            <button id="confirmPhoneBtn" data-lang-key="phone_modal_confirm_btn">Xác nhận</button> 
+            <button id="confirmPhoneBtn" data-lang-key="phone_modal_confirm_btn"></button> 
         </div>
-        <button id="closePhoneModalBtn" style="width:100%; margin-top:10px; padding:8px; border-radius:8px; background:#ccc; color:#333;" data-lang-key="modal_close_btn">Đóng</button>
+        <button id="closePhoneModalBtn" style="width:100%; margin-top:10px;" data-lang-key="modal_close_btn"></button>
     </div>
 </div>
-
 <div id="zaloModal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
-        <h3 data-lang-key="zalo_modal_title">✅ THÔNG TIN ĐẶT XE</h3>
-        <p style="text-align:center; font-size:15px; font-weight:600;" data-lang-key="zalo_modal_instruction">Sao chép thông tin và gửi qua Zalo:</p>
+        <h3 data-lang-key="zalo_modal_title"></h3>
+        <p style="text-align:center; font-size:15px; font-weight:600;" data-lang-key="zalo_modal_instruction"></p>
         <pre id="modal-text"></pre>
         <div class="modal-actions">
-            <button id="copyModalBtn" data-lang-key="modal_copy_btn">📋 Sao Chép Thông Tin</button> 
-            <button id="zaloModalBtn" data-lang-key="modal_open_zalo_btn">📱 Mở Zalo Chat</button>
+            <button id="copyModalBtn" data-lang-key="modal_copy_btn"></button> 
+            <button id="zaloModalBtn" data-lang-key="modal_open_zalo_btn"></button>
         </div>
-        <button id="closeModalBtn" style="width:100%; margin-top:10px; padding:8px; border-radius:8px;" data-lang-key="modal_close_btn">Đóng</button>
+        <button id="closeModalBtn" style="width:100%; margin-top:10px;" data-lang-key="modal_close_btn"></button>
     </div>
 </div>
-
-<div id="loadingOverlay" class="loading-overlay" style="display:none"></div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-/* ---------- START: LANGUAGE TRANSLATION SETUP ---------- */
 const translations = {
     "vi": {
-        "page_title": "🚖 Dịch vụ Taxi Trường An Driving",
-        "header_service": "🚖 Dịch Vụ Taxi",
-        "header_brand": "Trường An Driving",
-        "instruction_checking": "💰 Đang kiểm tra trạng thái dịch vụ...",
-        "phone_label": "📞 Số điện thoại của bạn (Không bắt buộc để Tính giá)",
-        "phone_placeholder": "Nhập SĐT (10 số, VD: 0987654321)",
-        "pickup_label": "📍 Điểm đón",
-        "location_finding": "(Đang tìm vị trí...)",
-        "location_reload_title": "Thử lấy lại vị trí",
-        "pickup_placeholder": "Nhập địa chỉ điểm đón (hoặc tự động lấy)",
-        "map_button": "Bản đồ",
-        "datetime_label": "🕒 Ngày & Giờ đón",
-        "add_stop_button": "＋ Thêm điểm dừng",
-        "dropoff_label": "🏁 Điểm đến",
-        "dropoff_placeholder": "Nhập địa chỉ điểm đến cuối",
-        "car_type_label": "🚘 Loại xe",
-        "car_type_4_seater": "Xe 4 chỗ (10.000đ/km)",
-        "car_type_7_seater": "Xe 7 chỗ (12.000đ/km)",
-        "driver_request_label": "🧑‍✈️ Yêu cầu Tài xế",
-        "driver_default": "⭐ Trường An Driving (Mặc định)",
-        "trip_type_label": "🚗 Loại chuyến đi",
-        "trip_type_one_way": "1 chiều",
-        "trip_type_round_trip": "2 chiều (giảm 40% chiều về)",
-        "waiting_time_label": "⏳ Thời gian chờ (giờ)",
-        "waiting_time_placeholder": "Nhập số giờ chờ",
-        "calc_button": "💰 Tính giá",
-        "result_distance": "✏️ Quãng đường: —",
-        "result_price_label": "💵 Giá dự kiến",
-        "result_time_est": "⏱ Thời gian dự kiến: — phút",
-        "result_pickup_time": "🕒 Ngày giờ đón: —",
-        "book_via_zalo": "📱 Đặt qua Zalo",
-        "book_via_mail": "📧 Đặt qua Mail",
-        "note_html": "📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).<br>**Thời gian chờ:**<ul><li>Chờ 0–3 giờ: **Miễn phí**.</li><li>Kể từ giờ thứ 4, mỗi giờ tiếp theo phát sinh phụ phí **50.000 VNĐ/giờ**.</li><li>Thời gian chờ được tính từ khi hành khách **hoàn tất việc xuống xe tại điểm đến** cho đến khi xe quay trở lại đón để về điểm xuất phát ban đầu.</li></ul>Giá đã bao gồm phí cầu đường.",
-        "deposit_modal_title": "📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều",
-        "deposit_modal_body_html": "<p>**Quý khách vui lòng lưu ý:**<br>Để xác nhận và đảm bảo chất lượng phục vụ cho chuyến đi **Hai chiều** của Quý khách, chúng tôi kính mong Quý khách **đặt cọc trước 20%** trên tổng giá cước dự kiến.</p><p style='text-align:center; font-size:18px;'>Số tiền đặt cọc dự kiến: <span id='depositAmount'>0 đ</span></p><p>Khi nhân viên **Trường An Driving** phản hồi qua Zalo, chúng tôi sẽ gửi **hướng dẫn thanh toán cụ thể** (chuyển khoản) để hoàn tất thủ tục đặt cọc.</p><p style='font-size:14px; color:#555;'>**Lưu ý:** Phần còn lại của cước phí sẽ được thanh toán trực tiếp cho tài xế sau khi kết thúc chuyến đi. Xin chân thành cảm ơn Quý khách đã tin tưởng dịch vụ.</p>",
-        "deposit_modal_confirm_btn": "Đã hiểu và Tiếp tục",
-        "phone_modal_title": "📞 Vui lòng nhập Số điện thoại",
-        "phone_modal_body": "Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.",
-        "phone_modal_confirm_btn": "Xác nhận",
-        "modal_close_btn": "Đóng",
-        "zalo_modal_title": "✅ THÔNG TIN ĐẶT XE",
-        "zalo_modal_instruction": "Sao chép thông tin và gửi qua Zalo:",
-        "modal_copy_btn": "📋 Sao Chép Thông Tin",
-        "modal_open_zalo_btn": "📱 Mở Zalo Chat",
-        "alert_map_pickup": "Bấm vào bản đồ để chọn điểm đón",
-        "alert_map_dropoff": "Bấm vào bản đồ để chọn điểm đến",
-        "location_found": "✅ Đã tìm thấy vị trí",
-        "location_error": "⚠️ Lỗi tìm vị trí. Nhập thủ công.",
-        "location_denied": "❌ Bị từ chối quyền truy cập vị trí.",
-        "location_unavailable": "❌ Vị trí không khả dụng (Bật GPS).",
-        "location_timeout": "⚠️ Hết thời gian tìm vị trí.",
-        "location_unsupported": "❌ Trình duyệt không hỗ trợ Geolocation."
+        "page_title": "🚖 Dịch vụ Taxi Trường An Driving", "header_service": "🚖 Dịch Vụ Taxi", "header_brand": "Trường An Driving", "instruction_checking": "💰 Đang kiểm tra trạng thái dịch vụ...", "phone_label": "📞 Số điện thoại của bạn (Không bắt buộc để Tính giá)", "phone_placeholder": "Nhập SĐT (10 số, VD: 0987654321)", "pickup_label": "📍 Điểm đón", "location_finding": "(Đang tìm vị trí...)", "location_reload_title": "Thử lấy lại vị trí", "pickup_placeholder": "Nhập địa chỉ điểm đón (hoặc tự động lấy)", "map_button": "Bản đồ", "datetime_label": "🕒 Ngày & Giờ đón", "add_stop_button": "＋ Thêm điểm dừng", "dropoff_label": "🏁 Điểm đến", "dropoff_placeholder": "Nhập địa chỉ điểm đến cuối", "car_type_label": "🚘 Loại xe", "car_type_4_seater": "Xe 4 chỗ (10.000đ/km)", "car_type_7_seater": "Xe 7 chỗ (12.000đ/km)", "driver_request_label": "🧑‍✈️ Yêu cầu Tài xế", "driver_default": "⭐ Trường An Driving (Mặc định)", "trip_type_label": "🚗 Loại chuyến đi", "trip_type_one_way": "1 chiều", "trip_type_round_trip": "2 chiều (giảm 40% chiều về)", "waiting_time_label": "⏳ Thời gian chờ (giờ)", "waiting_time_placeholder": "Nhập số giờ chờ", "calc_button": "💰 Tính giá", "result_price_label": "💵 Giá dự kiến", "book_via_zalo": "📱 Đặt qua Zalo", "book_via_mail": "📧 Đặt qua Mail", "note_html": "📌 Ghi chú: Giá 4 chỗ/7 chỗ: <b>10.000đ/km</b> / <b>12.000đ/km</b>. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều <b>≥ 45km</b>).<br><b>Thời gian chờ:</b><ul><li>Chờ 0–3 giờ: <b>Miễn phí</b>.</li><li>Kể từ giờ thứ 4, mỗi giờ tiếp theo phát sinh phụ phí <b>50.000 VNĐ/giờ</b>.</li><li>Thời gian chờ được tính từ khi hành khách <b>hoàn tất việc xuống xe tại điểm đến</b> cho đến khi xe quay trở lại đón để về điểm xuất phát ban đầu.</li></ul>Giá đã bao gồm phí cầu đường.", "deposit_modal_title": "📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều", "deposit_modal_body_html": "<p><b>Quý khách vui lòng lưu ý:</b><br>Để xác nhận và đảm bảo chất lượng phục vụ cho chuyến đi <b>Hai chiều</b> của Quý khách, chúng tôi kính mong Quý khách <b>đặt cọc trước 20%</b> trên tổng giá cước dự kiến.</p><p style='text-align:center; font-size:18px;'>Số tiền đặt cọc dự kiến: <span id='depositAmount'>0 đ</span></p><p>Khi nhân viên <b>Trường An Driving</b> phản hồi qua Zalo, chúng tôi sẽ gửi <b>hướng dẫn thanh toán cụ thể</b> (chuyển khoản) để hoàn tất thủ tục đặt cọc.</p><p style='font-size:14px; color:#555;'><b>Lưu ý:</b> Phần còn lại của cước phí sẽ được thanh toán trực tiếp cho tài xế sau khi kết thúc chuyến đi. Xin chân thành cảm ơn Quý khách đã tin tưởng dịch vụ.</p>", "deposit_modal_confirm_btn": "Đã hiểu và Tiếp tục", "phone_modal_title": "📞 Vui lòng nhập Số điện thoại", "phone_modal_body": "Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.", "phone_modal_confirm_btn": "Xác nhận", "modal_close_btn": "Đóng", "zalo_modal_title": "✅ THÔNG TIN ĐẶT XE", "zalo_modal_instruction": "Sao chép thông tin và gửi qua Zalo:", "modal_copy_btn": "📋 Sao Chép Thông Tin", "modal_open_zalo_btn": "📱 Mở Zalo Chat", "alert_map_pickup": "Bấm vào bản đồ để chọn điểm đón", "alert_map_dropoff": "Bấm vào bản đồ để chọn điểm đến", "location_found": "✅ Đã tìm thấy vị trí", "location_error": "⚠️ Lỗi tìm vị trí. Nhập thủ công.", "location_denied": "❌ Bị từ chối quyền truy cập vị trí.", "location_unavailable": "❌ Vị trí không khả dụng (Bật GPS).", "location_timeout": "⚠️ Hết thời gian tìm vị trí.", "location_unsupported": "❌ Trình duyệt không hỗ trợ Geolocation."
     },
     "en": {
-        "page_title": "🚖 Truong An Driving - Taxi Service",
-        "header_service": "🚖 Taxi Service",
-        "header_brand": "Truong An Driving",
-        "instruction_checking": "💰 Checking service status...",
-        "phone_label": "📞 Your Phone Number (Optional for Price Calculation)",
-        "phone_placeholder": "Enter phone no. (10 digits, e.g., 0987654321)",
-        "pickup_label": "📍 Pickup Location",
-        "location_finding": "(Finding location...)",
-        "location_reload_title": "Retry finding location",
-        "pickup_placeholder": "Enter pickup address (or auto-detect)",
-        "map_button": "Map",
-        "datetime_label": "🕒 Pickup Date & Time",
-        "add_stop_button": "＋ Add Stop",
-        "dropoff_label": "🏁 Destination",
-        "dropoff_placeholder": "Enter final destination address",
-        "car_type_label": "🚘 Vehicle Type",
-        "car_type_4_seater": "4-seater (10,000đ/km)",
-        "car_type_7_seater": "7-seater (12,000đ/km)",
-        "driver_request_label": "🧑‍✈️ Request Driver",
-        "driver_default": "⭐ Truong An Driving (Default)",
-        "trip_type_label": "🚗 Trip Type",
-        "trip_type_one_way": "One-way",
-        "trip_type_round_trip": "Round trip (40% off return leg)",
-        "waiting_time_label": "⏳ Waiting Time (hours)",
-        "waiting_time_placeholder": "Enter waiting hours",
-        "calc_button": "💰 Calculate Price",
-        "result_distance": "✏️ Distance: —",
-        "result_price_label": "💵 Estimated Fare",
-        "result_time_est": "⏱ Estimated Time: — minutes",
-        "result_pickup_time": "🕒 Pickup Time: —",
-        "book_via_zalo": "📱 Book via Zalo",
-        "book_via_mail": "📧 Book via Mail",
-        "note_html": "📌 Note: 4-seater/7-seater rates: **10,000đ/km** / **12,000đ/km**. Round trip: 40% discount on return leg (applies to one-way trips **≥ 45km**).<br>**Waiting Time:**<ul><li>0–3 hours wait: **Free**.</li><li>From the 4th hour, a surcharge of **50,000 VND/hour** applies.</li><li>Waiting time is calculated from when the passenger alights at the destination until the car returns for the pickup.</li></ul>Price includes all toll fees.",
-        "deposit_modal_title": "📝 Deposit Required for Round Trip",
-        "deposit_modal_body_html": "<p>**Dear Customer,**<br>To confirm and ensure service quality for your **Round trip**, we kindly request a **20% deposit** of the estimated total fare.</p><p style='text-align:center; font-size:18px;'>Estimated Deposit: <span id='depositAmount'>0 đ</span></p><p>When our staff from **Truong An Driving** responds via Zalo, we will provide **specific payment instructions** (bank transfer) to complete the deposit process.</p><p style='font-size:14px; color:#555;'>**Note:** The remaining balance is to be paid directly to the driver after the trip. Thank you for your trust in our service.</p>",
-        "deposit_modal_confirm_btn": "I Understand and Continue",
-        "phone_modal_title": "📞 Please Enter Your Phone Number",
-        "phone_modal_body": "Please provide your phone number so we can contact you to confirm the booking.",
-        "phone_modal_confirm_btn": "Confirm",
-        "modal_close_btn": "Close",
-        "zalo_modal_title": "✅ BOOKING INFORMATION",
-        "zalo_modal_instruction": "Copy this information and send it via Zalo:",
-        "modal_copy_btn": "📋 Copy Information",
-        "modal_open_zalo_btn": "📱 Open Zalo Chat",
-        "alert_map_pickup": "Click on the map to select a pickup location",
-        "alert_map_dropoff": "Click on the map to select a destination",
-        "location_found": "✅ Location found",
-        "location_error": "⚠️ Error finding location. Please enter manually.",
-        "location_denied": "❌ Location access denied.",
-        "location_unavailable": "❌ Location unavailable (Turn on GPS).",
-        "location_timeout": "⚠️ Timed out finding location.",
-        "location_unsupported": "❌ Geolocation is not supported by this browser."
+        "page_title": "🚖 Truong An Driving - Taxi Service", "header_service": "🚖 Taxi Service", "header_brand": "Truong An Driving", "instruction_checking": "💰 Checking service status...", "phone_label": "📞 Your Phone Number (Optional for Price Calculation)", "phone_placeholder": "Enter phone no. (10 digits, e.g., 0987654321)", "pickup_label": "📍 Pickup Location", "location_finding": "(Finding location...)", "location_reload_title": "Retry finding location", "pickup_placeholder": "Enter pickup address (or auto-detect)", "map_button": "Map", "datetime_label": "🕒 Pickup Date & Time", "add_stop_button": "＋ Add Stop", "dropoff_label": "🏁 Destination", "dropoff_placeholder": "Enter final destination address", "car_type_label": "🚘 Vehicle Type", "car_type_4_seater": "4-seater (10,000đ/km)", "car_type_7_seater": "7-seater (12,000đ/km)", "driver_request_label": "🧑‍✈️ Request Driver", "driver_default": "⭐ Truong An Driving (Default)", "trip_type_label": "🚗 Trip Type", "trip_type_one_way": "One-way", "trip_type_round_trip": "Round trip (40% off return leg)", "waiting_time_label": "⏳ Waiting Time (hours)", "waiting_time_placeholder": "Enter waiting hours", "calc_button": "💰 Calculate Price", "result_price_label": "💵 Estimated Fare", "book_via_zalo": "📱 Book via Zalo", "book_via_mail": "📧 Book via Mail", "note_html": "📌 Note: 4-seater/7-seater rates: <b>10,000đ/km</b> / <b>12,000đ/km</b>. Round trip: 40% discount on return leg (applies to one-way trips <b>≥ 45km</b>).<br><b>Waiting Time:</b><ul><li>0–3 hours wait: <b>Free</b>.</li><li>From the 4th hour, a surcharge of <b>50,000 VND/hour</b> applies.</li><li>Waiting time is calculated from when the passenger alights at the destination until the car returns for the pickup.</li></ul>Price includes all toll fees.", "deposit_modal_title": "📝 Deposit Required for Round Trip", "deposit_modal_body_html": "<p><b>Dear Customer,</b><br>To confirm and ensure service quality for your <b>Round trip</b>, we kindly request a <b>20% deposit</b> of the estimated total fare.</p><p style='text-align:center; font-size:18px;'>Estimated Deposit: <span id='depositAmount'>0 đ</span></p><p>When our staff from <b>Truong An Driving</b> responds via Zalo, we will provide <b>specific payment instructions</b> (bank transfer) to complete the deposit process.</p><p style='font-size:14px; color:#555;'><b>Note:</b> The remaining balance is to be paid directly to the driver after the trip. Thank you for your trust in our service.</p>", "deposit_modal_confirm_btn": "I Understand and Continue", "phone_modal_title": "📞 Please Enter Your Phone Number", "phone_modal_body": "Please provide your phone number so we can contact you to confirm the booking.", "phone_modal_confirm_btn": "Confirm", "modal_close_btn": "Close", "zalo_modal_title": "✅ BOOKING INFORMATION", "zalo_modal_instruction": "Copy this information and send it via Zalo:", "modal_copy_btn": "📋 Copy Information", "modal_open_zalo_btn": "📱 Open Zalo Chat", "alert_map_pickup": "Click on the map to select a pickup location", "alert_map_dropoff": "Click on the map to select a destination", "location_found": "✅ Location found", "location_error": "⚠️ Error finding location. Please enter manually.", "location_denied": "❌ Location access denied.", "location_unavailable": "❌ Location unavailable (Turn on GPS).", "location_timeout": "⚠️ Timed out finding location.", "location_unsupported": "❌ Geolocation is not supported by this browser."
     },
     "zh": {
-        "page_title": "🚖 Truong An Driving - 出租车服务",
-        "header_service": "🚖 出租车服务",
-        "header_brand": "Truong An Driving",
-        "instruction_checking": "💰 正在检查服务状态...",
-        "phone_label": "📞 您的电话号码 (计算价格非必填)",
-        "phone_placeholder": "输入电话号码 (10位数, 例如: 0987654321)",
-        "pickup_label": "📍 上车地点",
-        "location_finding": "(正在寻找位置...)",
-        "location_reload_title": "重试寻找位置",
-        "pickup_placeholder": "输入上车地址 (或自动检测)",
-        "map_button": "地图",
-        "datetime_label": "🕒 上车日期和时间",
-        "add_stop_button": "＋ 添加经停点",
-        "dropoff_label": "🏁 目的地",
-        "dropoff_placeholder": "输入最终目的地地址",
-        "car_type_label": "🚘 车辆类型",
-        "car_type_4_seater": "4座车 (10,000越南盾/公里)",
-        "car_type_7_seater": "7座车 (12,000越南盾/公里)",
-        "driver_request_label": "🧑‍✈️ 指定司机",
-        "driver_default": "⭐ Truong An Driving (默认)",
-        "trip_type_label": "🚗 行程类型",
-        "trip_type_one_way": "单程",
-        "trip_type_round_trip": "往返 (返程优惠40%)",
-        "waiting_time_label": "⏳ 等待时间 (小时)",
-        "waiting_time_placeholder": "输入等待小时数",
-        "calc_button": "💰 计算价格",
-        "result_distance": "✏️ 距离: —",
-        "result_price_label": "💵 预计费用",
-        "result_time_est": "⏱ 预计时间: — 分钟",
-        "result_pickup_time": "🕒 上车时间: —",
-        "book_via_zalo": "📱 通过Zalo预订",
-        "book_via_mail": "📧 通过邮件预订",
-        "note_html": "📌 注意: 4座/7座车费率: **10,000越南盾/公里** / **12,000越南盾/公里**。往返行程: 返程优惠40% (适用于单程 **≥ 45公里** 的行程)。<br>**等待时间:**<ul><li>等待0-3小时: **免费**。</li><li>从第4小时起，每小时加收 **50,000越南盾** 的附加费。</li><li>等待时间从乘客在目的地完全下车时开始计算，直到车辆返回接客为止。</li></ul>价格已包含所有过路费。",
-        "deposit_modal_title": "📝 往返行程需支付押金",
-        "deposit_modal_body_html": "<p>**尊敬的客户,**<br>为确认并保证您的**往返行程**服务质量，我们恳请您预付预计总费用的**20%作为押金**。</p><p style='text-align:center; font-size:18px;'>预计押金: <span id='depositAmount'>0 đ</span></p><p>当我们的**Truong An Driving**员工通过Zalo回复您时，我们将发送**具体的付款说明** (银行转账) 以完成押金程序。</p><p style='font-size:14px; color:#555;'>**注意:** 剩余费用将在行程结束后直接支付给司机。感谢您对我们服务的信任。</p>",
-        "deposit_modal_confirm_btn": "我明白并继续",
-        "phone_modal_title": "📞 请输入您的电话号码",
-        "phone_modal_body": "请输入您的电话号码，以便我们联系您确认订单。",
-        "phone_modal_confirm_btn": "确认",
-        "modal_close_btn": "关闭",
-        "zalo_modal_title": "✅ 预订信息",
-        "zalo_modal_instruction": "复制此信息并通过Zalo发送:",
-        "modal_copy_btn": "📋 复制信息",
-        "modal_open_zalo_btn": "📱 打开Zalo聊天",
-        "alert_map_pickup": "点击地图选择上车地点",
-        "alert_map_dropoff": "点击地图选择目的地",
-        "location_found": "✅ 已找到位置",
-        "location_error": "⚠️ 寻找位置时出错。请手动输入。",
-        "location_denied": "❌ 位置访问被拒绝。",
-        "location_unavailable": "❌ 位置不可用 (请打开GPS)。",
-        "location_timeout": "⚠️ 寻找位置超时。",
-        "location_unsupported": "❌ 此浏览器不支持地理定位。"
+        "page_title": "🚖 Truong An Driving - 出租车服务", "header_service": "🚖 出租车服务", "header_brand": "Truong An Driving", "instruction_checking": "💰 正在检查服务状态...", "phone_label": "📞 您的电话号码 (计算价格非必填)", "phone_placeholder": "输入电话号码 (10位数, 例如: 0987654321)", "pickup_label": "📍 上车地点", "location_finding": "(正在寻找位置...)", "location_reload_title": "重试寻找位置", "pickup_placeholder": "输入上车地址 (或自动检测)", "map_button": "地图", "datetime_label": "🕒 上车日期和时间", "add_stop_button": "＋ 添加经停点", "dropoff_label": "🏁 目的地", "dropoff_placeholder": "输入最终目的地地址", "car_type_label": "🚘 车辆类型", "car_type_4_seater": "4座车 (10,000越南盾/公里)", "car_type_7_seater": "7座车 (12,000越南盾/公里)", "driver_request_label": "🧑‍✈️ 指定司机", "driver_default": "⭐ Truong An Driving (默认)", "trip_type_label": "🚗 行程类型", "trip_type_one_way": "单程", "trip_type_round_trip": "往返 (返程优惠40%)", "waiting_time_label": "⏳ 等待时间 (小时)", "waiting_time_placeholder": "输入等待小时数", "calc_button": "💰 计算价格", "result_price_label": "💵 预计费用", "book_via_zalo": "📱 通过Zalo预订", "book_via_mail": "📧 通过邮件预订", "note_html": "📌 注意: 4座/7座车费率: <b>10,000越南盾/公里</b> / <b>12,000越南盾/公里</b>。往返行程: 返程优惠40% (适用于单程 <b>≥ 45公里</b> 的行程)。<br><b>等待时间:</b><ul><li>等待0-3小时: <b>免费</b>。</li><li>从第4小时起，每小时加收 <b>50,000越南盾</b> 的附加费。</li><li>等待时间从乘客在目的地完全下车时开始计算，直到车辆返回接客为止。</li></ul>价格已包含所有过路费。", "deposit_modal_title": "📝 往返行程需支付押金", "deposit_modal_body_html": "<p><b>尊敬的客户,</b><br>为确认并保证您的<b>往返行程</b>服务质量，我们恳请您预付预计总费用的<b>20%作为押金</b>。</p><p style='text-align:center; font-size:18px;'>预计押金: <span id='depositAmount'>0 đ</span></p><p>当我们的<b>Truong An Driving</b>员工通过Zalo回复您时，我们将发送<b>具体的付款说明</b> (银行转账) 以完成押金程序。</p><p style='font-size:14px; color:#555;'><b>注意:</b> 剩余费用将在行程结束后直接支付给司机。感谢您对我们服务的信任。</p>", "deposit_modal_confirm_btn": "我明白并继续", "phone_modal_title": "📞 请输入您的电话号码", "phone_modal_body": "请输入您的电话号码，以便我们联系您确认订单。", "phone_modal_confirm_btn": "确认", "modal_close_btn": "关闭", "zalo_modal_title": "✅ 预订信息", "zalo_modal_instruction": "复制此信息并通过Zalo发送:", "modal_copy_btn": "📋 复制信息", "modal_open_zalo_btn": "📱 打开Zalo聊天", "alert_map_pickup": "点击地图选择上车地点", "alert_map_dropoff": "点击地图选择目的地", "location_found": "✅ 已找到位置", "location_error": "⚠️ 寻找位置时出错。请手动输入。", "location_denied": "❌ 位置访问被拒绝。", "location_unavailable": "❌ 位置不可用 (请打开GPS)。", "location_timeout": "⚠️ 寻找位置超时。", "location_unsupported": "❌ 此浏览器不支持地理定位。"
     }
 };
 
 function updateLanguage(lang) {
-    document.documentElement.lang = lang; // Update html lang attribute
+    document.documentElement.lang = lang;
     document.querySelectorAll('[data-lang-key]').forEach(element => {
         const key = element.getAttribute('data-lang-key');
         const translation = translations[lang][key];
         if (translation) {
-            // Handle different element types
-            if (element.hasAttribute('placeholder')) {
-                element.placeholder = translation;
-            } else if (element.hasAttribute('title')) {
-                element.title = translation;
-            } else if (key.endsWith('_html')) { // For elements with complex HTML
-                element.innerHTML = translation;
-            }
-            else {
-                // Preserve child nodes like icons (<i>, <span>)
-                const firstChild = element.firstChild;
-                if (firstChild && (firstChild.nodeType === Node.ELEMENT_NODE)) {
-                    // If the first child is an element (like an icon), only change the text part
-                     const textNode = firstChild.nextSibling;
-                     if(textNode && textNode.nodeType === Node.TEXT_NODE) {
-                         textNode.textContent = ' ' + translation;
-                     } else {
-                         element.innerHTML = element.innerHTML.split('>')[0] + '>' + translation;
-                     }
-                } else {
-                    element.textContent = translation;
-                }
-            }
+            if (element.hasAttribute('placeholder')) element.placeholder = translation;
+            else if (element.hasAttribute('title')) element.title = translation;
+            else if (key.endsWith('_html')) element.innerHTML = translation;
+            else element.textContent = translation;
         }
     });
-
-    // Update active button style
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-    });
-
-    // Save language choice
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
     localStorage.setItem('language', lang);
 }
-/* ---------- END: LANGUAGE TRANSLATION SETUP ---------- */
 
-/* ---------- Cấu hình Tối Ưu Hóa ---------- */
 const REMOTE_STATUS_URL = "/status-local.json"; 
 const NOMINATIM = "https://nominatim.openstreetmap.org/search";
 const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse"; 
@@ -529,540 +248,141 @@ const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`;
 const DEBOUNCE_TIME = 300; 
 const DEFAULT_CENTER = [10.77653, 106.70098]; 
 const SOUTHERN_VN_VIEWBOX = '104.5,8.5,107.5,12.0'; 
-let userLocation = null; 
-let isServiceActive = false; 
-
-/* DOM */
-const customerPhoneEl = document.getElementById('customerPhone'); 
-const pickupEl = document.getElementById('pickup');
-const pickupSugg = document.getElementById('pickup-suggestions');
-const dropoffEl = document.getElementById('dropoff');
-const dropoffSugg = document.getElementById('dropoff-suggestions');
-const stopsContainer = document.getElementById('stops');
-const calcBtn = document.getElementById('calc-btn');
-const tripTypeEl = document.getElementById('tripType');
-const carTypeEl = document.getElementById('carType'); 
-const driverRequestEl = document.getElementById('driverRequest');
-const waitingEl = document.getElementById('waiting');
-const waitingWrapper = document.getElementById('waitingWrapper'); 
-const resultBox = document.getElementById('result');
-const distanceText = document.getElementById('distanceText');
-const priceValue = document.getElementById('priceValue');
-const priceBreak = document.getElementById('priceBreak');
-const timeEst = document.getElementById('timeEst');
-const pickupDateTime = document.getElementById('pickupDateTime');
-const zaloBtn = document.getElementById('zaloBtn'); 
-const mailBtn = document.getElementById('mailBtn');
-const instructionText = document.getElementById('instructionText');
-const serviceOffNotice = document.getElementById('serviceOffNotice'); 
-const bookingFormWrapper = document.getElementById('booking-form-wrapper'); 
-const locationStatusEl = document.getElementById('location-status'); 
-const reloadLocationBtn = document.getElementById('reloadLocationBtn'); 
-const zaloModal = document.getElementById('zaloModal');
-const modalText = document.getElementById('modal-text');
-const copyModalBtn = document.getElementById('copyModalBtn'); 
-const zaloModalBtn = document.getElementById('zaloModalBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const phoneModal = document.getElementById('phoneModal');
-const inputPhoneForBooking = document.getElementById('inputPhoneForBooking');
-const confirmPhoneBtn = document.getElementById('confirmPhoneBtn');
-const closePhoneModalBtn = document.getElementById('closePhoneModalBtn');
-const depositModal = document.getElementById('depositModal');
-const depositAmountEl = document.getElementById('depositAmount'); // Renamed to avoid conflict
-const confirmDepositBtn = document.getElementById('confirmDepositBtn');
-
-let finalZaloMessage = ''; 
-let finalTotalFee = 0; 
-let map; 
-let pickupMarker = null, dropoffMarker = null, routeLayer = null;
-let selecting = null; 
-let stopCount = 0;
-let lastFocusedStopId = null;
-let bookingAction = null;
+let userLocation = null, isServiceActive = !1, finalZaloMessage = "", finalTotalFee = 0, map, pickupMarker = null, dropoffMarker = null, routeLayer = null, selecting = null, stopCount = 0, lastFocusedStopId = null, bookingAction = null;
+const DOMElements = {};
+['customerPhone', 'pickup', 'pickupSugg', 'dropoff', 'dropoffSugg', 'stopsContainer', 'calcBtn', 'tripType', 'carType', 'driverRequest', 'waiting', 'waitingWrapper', 'resultBox', 'distanceText', 'priceValue', 'priceBreak', 'timeEst', 'pickupDateTime', 'pickupInfo', 'zaloBtn', 'mailBtn', 'instructionText', 'serviceOffNotice', 'bookingFormWrapper', 'locationStatus', 'reloadLocationBtn', 'zaloModal', 'modalText', 'copyModalBtn', 'zaloModalBtn', 'closeModalBtn', 'phoneModal', 'inputPhoneForBooking', 'confirmPhoneBtn', 'closePhoneModalBtn', 'depositModal', 'depositAmount', 'confirmDepositBtn'].forEach(id => DOMElements[id] = document.getElementById(id));
 
 async function checkServiceStatus() {
-    const cacheBuster = `?t=${Date.now()}`; 
+    const cacheBuster = `?t=${Date.now()}`;
     const finalUrl = REMOTE_STATUS_URL + cacheBuster;
     try {
-        const response = await fetch(finalUrl, { cache: 'no-store', signal: AbortSignal.timeout(3000) }); 
-        if (!response.ok) {
-            return { active: false, message_vn: "⚠️ CẢNH BÁO MẠNG: Không tìm thấy file trạng thái dịch vụ (404/Server Error). Chức năng đặt xe bị tạm ngưng." };
-        }
+        const response = await fetch(finalUrl, { cache: 'no-store', signal: AbortSignal.timeout(4000) });
+        if (!response.ok) return { active: false, message_vn: "⚠️ LỖI KẾT NỐI: Không thể kiểm tra trạng thái máy chủ (lỗi 404/500).", message_en: "⚠️ CONNECTION ERROR: Cannot check server status (404/500 error).", message_zh: "⚠️ 连接错误：无法检查服务器状态（404/500错误）。" };
         return await response.json();
     } catch (error) {
-        let msg = "⚠️ Thiết bị đang OFFLINE hoặc LỖI KẾT NỐI. Không thể xác nhận đơn hàng."
-        if (error.name === 'TimeoutError') {
-             msg = "⚠️ Kiểm tra trạng thái dịch vụ quá lâu. Việc đặt xe bị tạm ngưng."
-        }
-        console.error("Lỗi khi fetch trạng thái dịch vụ:", error);
-        return { active: false, message_vn: msg };
+        console.error("Lỗi khi fetch trạng thái:", error);
+        return { active: false, message_vn: "⚠️ THIẾT BỊ OFFLINE hoặc LỖI MẠNG. Chức năng đặt xe bị tạm ngưng.", message_en: "⚠️ DEVICE OFFLINE or NETWORK ERROR. Booking is temporarily disabled.", message_zh: "⚠️ 设备离线或网络错误。预订功能已暂停。" };
     }
 }
 
 async function updateUIBasedOnStatus(status) {
-    if (status.active !== isServiceActive) {
-        isServiceActive = status.active;
-    }
-    instructionText.style.display = 'block';
+    isServiceActive = status.active;
+    DOMElements.instructionText.style.display = 'block';
     if (!isServiceActive) {
-        calcBtn.style.background = '#ccc';
-        calcBtn.style.cursor = 'not-allowed';
-        calcBtn.disabled = true;
-        serviceOffNotice.style.display = 'block';
-        serviceOffNotice.innerHTML = status.message_vn;
-        bookingFormWrapper.classList.add('disabled-form');
-        zaloBtn.style.display = 'none';
-        mailBtn.style.display = 'none';
-        resultBox.style.display = 'none';
-        instructionText.style.display = 'none';
-    } else {
-        calcBtn.style.background = 'var(--green)';
-        calcBtn.style.cursor = 'pointer';
-        calcBtn.disabled = false;
-        serviceOffNotice.style.display = 'none';
-        bookingFormWrapper.classList.remove('disabled-form');
+        DOMElements.calcBtn.disabled = true;
+        DOMElements.serviceOffNotice.style.display = 'block';
+        DOMElements.bookingFormWrapper.classList.add('disabled-form');
+        ['zaloBtn', 'mailBtn', 'resultBox', 'instructionText'].forEach(id => DOMElements[id].style.display = 'none');
         const lang = localStorage.getItem('language') || 'vi';
-        const msgKey = lang === 'en' ? 'message_en' : lang === 'zh' ? 'message_zh' : 'message_vn';
-        instructionText.innerHTML = status[msgKey] || status.message_vn || '💰 Bấm "Tính giá" để xem chi tiết đặt xe.';
-    }
-}
-
-function initMap(center) {
-    if (!map) {
-        map = L.map('map').setView(center, 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        map.on('click', handleMapClick);
-        map.on('dblclick', handleMapDblClick);
+        const msgKey = `message_${lang}`;
+        DOMElements.serviceOffNotice.innerHTML = status[msgKey] || status.message_vn;
     } else {
-        map.setView(center, 11);
+        DOMElements.calcBtn.disabled = false;
+        DOMElements.serviceOffNotice.style.display = 'none';
+        DOMElements.bookingFormWrapper.classList.remove('disabled-form');
+        const lang = localStorage.getItem('language') || 'vi';
+        const msgKey = `message_${lang}`;
+        DOMElements.instructionText.innerHTML = status[msgKey] || status.message_vn || '💰 Bấm "Tính giá" để xem chi tiết đặt xe.';
     }
 }
 
-async function reverseGeocode(lat, lon) {
-    try {
-        const url = `${REVERSE_NOMINATIM}?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=vi`;
-        const r = await fetch(url);
-        const data = await r.json();
-        return data.display_name;
-    } catch (e) {
-        console.warn('Reverse Geocoding Error', e);
-        return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-    }
-}
+function initMap(center) { if (!map) { map = L.map('map').setView(center, 11); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); map.on('click', handleMapClick); } else map.setView(center, 11); }
+async function reverseGeocode(lat, lon) { try { const r = await fetch(`${REVERSE_NOMINATIM}?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=vi`); return (await r.json()).display_name; } catch (e) { return `${lat.toFixed(6)}, ${lon.toFixed(6)}`; } }
 
 function getGeolocation() {
     const lang = localStorage.getItem('language') || 'vi';
-    locationStatusEl.textContent = translations[lang]['location_finding'];
-    locationStatusEl.style.color = 'var(--muted)';
-    reloadLocationBtn.style.color = '#ccc'; 
-    reloadLocationBtn.style.pointerEvents = 'none';
-
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(async (pos)=>{
-            userLocation = [pos.coords.latitude, pos.coords.longitude]; 
-            initMap(userLocation); 
+    DOMElements.locationStatus.textContent = translations[lang]['location_finding'];
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async pos => {
+            userLocation = [pos.coords.latitude, pos.coords.longitude];
+            initMap(userLocation);
             const address = await reverseGeocode(userLocation[0], userLocation[1]);
-            pickupEl.value = address;
-            pickupEl.dataset.lat = userLocation[0];
-            pickupEl.dataset.lon = userLocation[1];
-            pickupEl.parentNode.querySelector('.clear-btn').style.display = 'block';
-            if(pickupMarker) map.removeLayer(pickupMarker);
+            DOMElements.pickup.value = address;
+            DOMElements.pickup.dataset.lat = userLocation[0]; DOMElements.pickup.dataset.lon = userLocation[1];
+            if (pickupMarker) map.removeLayer(pickupMarker);
             pickupMarker = L.marker(userLocation).addTo(map).bindPopup('📍').openPopup();
-            locationStatusEl.textContent = translations[lang]['location_found'];
-            locationStatusEl.style.color = 'var(--green)';
-            reloadLocationBtn.style.color = '#007bff';
-            reloadLocationBtn.style.pointerEvents = 'auto';
-        }, (err)=>{
-            console.warn('Geolocation Error:', err.message);
-            initMap(DEFAULT_CENTER); 
-            let statusKey;
-            if (err.code === err.PERMISSION_DENIED) statusKey = 'location_denied';
-            else if (err.code === err.POSITION_UNAVAILABLE) statusKey = 'location_unavailable';
-            else if (err.code === err.TIMEOUT) statusKey = 'location_timeout';
-            else statusKey = 'location_error';
-            locationStatusEl.textContent = translations[lang][statusKey];
-            locationStatusEl.style.color = '#dc3545';
-            reloadLocationBtn.style.color = '#007bff';
-            reloadLocationBtn.style.pointerEvents = 'auto';
-        }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }); 
+            DOMElements.locationStatus.textContent = translations[lang]['location_found'];
+        }, err => {
+            initMap(DEFAULT_CENTER);
+            const errKey = { 1: 'location_denied', 2: 'location_unavailable', 3: 'location_timeout' }[err.code] || 'location_error';
+            DOMElements.locationStatus.textContent = translations[lang][errKey];
+        });
     } else {
-        initMap(DEFAULT_CENTER); 
-        locationStatusEl.textContent = translations[lang]['location_unsupported'];
-        locationStatusEl.style.color = '#dc3545';
-        reloadLocationBtn.style.color = '#ccc';
-        reloadLocationBtn.style.pointerEvents = 'none';
+        initMap(DEFAULT_CENTER);
+        DOMElements.locationStatus.textContent = translations[lang]['location_unsupported'];
     }
 }
 
-function debounce(func, timeout = 300) { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => { func.apply(this, args); }, timeout); }; }
-function toggleWaitingInput(){ waitingWrapper.style.display = tripTypeEl.value === '1' ? 'none' : 'block'; }
-tripTypeEl.addEventListener('change', toggleWaitingInput);
-toggleWaitingInput();
-
-document.querySelectorAll('.clear-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const inputId = e.target.dataset.inputId;
-        const inputEl = document.getElementById(inputId);
-        if (inputEl) {
-            inputEl.value = '';
-            delete inputEl.dataset.lat;
-            delete inputEl.dataset.lon;
-            if (inputId === 'pickup' && pickupMarker) { map.removeLayer(pickupMarker); pickupMarker = null; }
-            else if (inputId === 'dropoff' && dropoffMarker) { map.removeLayer(dropoffMarker); dropoffMarker = null; }
-            const suggBox = document.getElementById(`${inputId}-suggestions`);
-            if (suggBox) suggBox.style.display = 'none';
-            inputEl.focus(); 
-        }
-    });
-});
-
-document.querySelectorAll('input[type="text"]').forEach(inputEl => {
-    const clearBtn = inputEl.parentNode.querySelector('.clear-btn');
-    if (clearBtn) {
-        const toggle = () => { clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; };
-        inputEl.addEventListener('input', toggle);
-        inputEl.addEventListener('focus', toggle);
-        inputEl.addEventListener('blur', () => setTimeout(() => clearBtn.style.display = 'none', 150));
-    }
-});
-
-async function geocodeOnce(query) {
-    try {
-        let url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=VN&addressdetails=1`;
-        if (userLocation) {
-            const [lat, lon] = userLocation;
-            url += `&viewbox=${lon-0.5},${lat-0.5},${lon+0.5},${lat+0.5}`;
-        } else {
-            url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
-        }
-        const r = await fetch(url);
-        const data = await r.json();
-        return (Array.isArray(data) && data.length > 0) ? data[0] : null;
-    } catch (e) {
-        console.warn('geocode once error', e);
-        return null;
-    }
-}
-
-function attachAutocomplete(inputEl, boxEl) {
-    let controller = null;
-    const doSearch = async () => {
-        const q = inputEl.value.trim();
-        const clearBtn = inputEl.parentNode.querySelector('.clear-btn');
-        if (!q) { boxEl.style.display = 'none'; if(clearBtn) clearBtn.style.display = 'none'; return; }
-        if (clearBtn) clearBtn.style.display = 'block';
-        if (controller) controller.abort();
-        controller = new AbortController();
-        boxEl.innerHTML = '<div>...</div>';
-        boxEl.style.display = 'block';
-        let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=vi`;
-        if (userLocation) {
-            const [lat, lon] = userLocation;
-            url += `&viewbox=${lon-0.3},${lat-0.3},${lon+0.3},${lat+0.3}`;
-        } else {
-            url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
-        }
-        try {
-            const res = await fetch(url, { signal: controller.signal });
-            const data = await res.json();
-            boxEl.innerHTML = '';
-            if (!Array.isArray(data) || data.length === 0) {
-                boxEl.innerHTML = '<div>No results</div>';
-                setTimeout(() => boxEl.style.display = 'none', 1000);
-                return;
-            }
-            data.forEach(place => {
-                const d = document.createElement('div');
-                d.innerHTML = `📍<div style="margin-left:8px">${place.display_name}</div>`;
-                d.addEventListener('click', () => {
-                    inputEl.value = place.display_name;
-                    inputEl.dataset.lat = place.lat;
-                    inputEl.dataset.lon = place.lon;
-                    boxEl.style.display = 'none';
-                    if (clearBtn) clearBtn.style.display = 'block';
-                    const latlng = [parseFloat(place.lat), parseFloat(place.lon)];
-                    if (map) {
-                        if (inputEl.id === 'pickup') {
-                            if (pickupMarker) map.removeLayer(pickupMarker);
-                            pickupMarker = L.marker(latlng).addTo(map).bindPopup('📍').openPopup();
-                            map.setView(latlng, 14);
-                        } else if (inputEl.id === 'dropoff') {
-                            if (dropoffMarker) map.removeLayer(dropoffMarker);
-                            dropoffMarker = L.marker(latlng).addTo(map).bindPopup('🏁').openPopup();
-                            map.setView(latlng, 14);
-                        }
-                    }
-                });
-                boxEl.appendChild(d);
-            });
-        } catch (err) {
-            if (err.name !== 'AbortError') console.error('suggest error', err);
-        }
-    };
-    inputEl.addEventListener('input', debounce(doSearch));
-    document.addEventListener('click', (ev) => { if (!boxEl.contains(ev.target) && ev.target !== inputEl) boxEl.style.display = 'none'; });
-    inputEl.addEventListener('focus', () => { if (inputEl.id.startsWith('stop-')) lastFocusedStopId = inputEl.id; else lastFocusedStopId = null; });
-}
-
-attachAutocomplete(pickupEl, pickupSugg);
-attachAutocomplete(dropoffEl, dropoffSugg);
-
-function createStopInput(prefill = '') {
-    stopCount++;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'way-wrapper input-row';
-    const inputId = `stop-${stopCount}`;
-    wrapper.innerHTML = `<input type="text" id="${inputId}" placeholder="Stop ${stopCount}"><button class="clear-btn" data-input-id="${inputId}">✖</button><button class="way-remove" title="Remove">✖</button><div id="${inputId}-suggestions" class="suggestions" style="display:none"></div>`;
-    stopsContainer.appendChild(wrapper);
-    const inputEl = wrapper.querySelector('input');
-    attachAutocomplete(inputEl, wrapper.querySelector('.suggestions'));
-    inputEl.addEventListener('focus', () => lastFocusedStopId = inputId);
-    wrapper.querySelector('.way-remove').addEventListener('click', () => wrapper.remove());
-    const clearBtn = wrapper.querySelector('.clear-btn');
-    const toggle = () => { clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; };
-    inputEl.addEventListener('input', toggle);
-    inputEl.addEventListener('focus', toggle);
-    inputEl.addEventListener('blur', () => setTimeout(() => clearBtn.style.display = 'none', 150));
-    clearBtn.addEventListener('click', (e) => { e.stopPropagation(); inputEl.value = ''; delete inputEl.dataset.lat; delete inputEl.dataset.lon; inputEl.focus(); });
-}
-document.getElementById('add-stop-btn').addEventListener('click', () => createStopInput());
-
-document.getElementById('pick-from-map').addEventListener('click', () => { selecting = 'pickup'; alert(translations[localStorage.getItem('language') || 'vi']['alert_map_pickup']); });
-document.getElementById('pick-to-map').addEventListener('click', () => { selecting = 'dropoff'; alert(translations[localStorage.getItem('language') || 'vi']['alert_map_dropoff']); });
-
-const handleMapClick = async (e) => {
-    if (!map) return;
-    const { lat, lng: lon } = e.latlng;
-    let targetInput;
-    if (selecting === 'pickup') {
-        if (pickupMarker) map.removeLayer(pickupMarker);
-        pickupMarker = L.marker([lat, lon]).addTo(map).bindPopup('📍').openPopup();
-        targetInput = pickupEl;
-        selecting = null;
-    } else if (selecting === 'dropoff') {
-        if (dropoffMarker) map.removeLayer(dropoffMarker);
-        dropoffMarker = L.marker([lat, lon]).addTo(map).bindPopup('🏁').openPopup();
-        targetInput = dropoffEl;
-        selecting = null;
-    } else if (lastFocusedStopId) {
-        L.marker([lat, lon]).addTo(map).bindPopup('🛑').openPopup();
-        targetInput = document.getElementById(lastFocusedStopId);
-        lastFocusedStopId = null;
-    }
-    if (targetInput) {
-        const address = await reverseGeocode(lat, lon);
-        targetInput.value = address;
-        targetInput.dataset.lat = lat;
-        targetInput.dataset.lon = lon;
-        targetInput.parentNode.querySelector('.clear-btn').style.display = 'block';
-    }
-};
-
-const handleMapDblClick = (e) => {
-    if (!map || !lastFocusedStopId) return;
-    const stopInput = document.getElementById(lastFocusedStopId);
-    if (stopInput) {
-        const { lat, lng } = e.latlng;
-        stopInput.value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-        stopInput.dataset.lat = lat;
-        stopInput.dataset.lon = lng;
-        L.marker([lat, lng]).addTo(map).bindPopup('🛑').openPopup();
-        lastFocusedStopId = null;
-    }
-};
-
-async function resolveCoordForInput(inputEl) {
-    if (inputEl.dataset.lat && inputEl.dataset.lon) return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)];
-    const v = inputEl.value.trim();
-    if (!v) return null;
-    const parts = v.split(',');
-    if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) return [parseFloat(parts[0]), parseFloat(parts[1])];
-    const place = await geocodeOnce(v + ' Việt Nam');
-    if (place) {
-        inputEl.dataset.lat = place.lat;
-        inputEl.dataset.lon = place.lon;
-        return [parseFloat(place.lat), parseFloat(place.lon)];
-    }
-    return null;
-}
-
-function validateRouteInputs() {
-    if (!pickupEl.value.trim()) { alert('Please enter a pickup location.'); pickupEl.focus(); return false; }
-    if (!dropoffEl.value.trim()) { alert('Please enter a destination.'); dropoffEl.focus(); return false; }
-    if (tripTypeEl.value === '2' && (isNaN(parseFloat(waitingEl.value)) || parseFloat(waitingEl.value) < 0)) { alert('Please enter a valid waiting time for a round trip.'); waitingEl.focus(); return false; }
-    return true;
-}
-
-function validatePhone(phone) { return /^\d{10}$/.test(phone); }
+const debounce = (func, timeout = 300) => { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => func.apply(this, args), timeout); }; };
+DOMElements.tripType.addEventListener('change', () => DOMElements.waitingWrapper.style.display = DOMElements.tripType.value === '1' ? 'none' : 'block');
 
 async function calculateAndGenerateMessage() {
     if (!validateRouteInputs()) return false;
-    
-    const [pickupCoord, dropoffCoord] = await Promise.all([resolveCoordForInput(pickupEl), resolveCoordForInput(dropoffEl)]);
+    const [pickupCoord, dropoffCoord] = await Promise.all([resolveCoordForInput(DOMElements.pickup), resolveCoordForInput(DOMElements.dropoff)]);
     if (!pickupCoord || !dropoffCoord) { alert('Could not find coordinates for pickup or dropoff.'); return false; }
-
     const coords = [pickupCoord];
-    const stopInputs = Array.from(stopsContainer.querySelectorAll('input[id^="stop-"]'));
-    for (const s of stopInputs) {
-        if (s.value.trim()) {
-            const sc = await resolveCoordForInput(s);
-            if (!sc) { alert('Could not find coordinates for a stop.'); return false; }
-            coords.push(sc);
-        }
-    }
+    for (const s of DOMElements.stopsContainer.querySelectorAll('input[id^="stop-"]')) { if (s.value.trim()) coords.push(await resolveCoordForInput(s)); }
     coords.push(dropoffCoord);
-
-    resultBox.style.display = 'block';
-    distanceText.textContent = 'Calculating route...';
+    DOMElements.resultBox.style.display = 'block'; DOMElements.distanceText.textContent = 'Calculating...';
     try {
         const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
-        const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
-        const r = await fetch(url);
+        const r = await fetch(`${OSRM}/${coordStr}?overview=full&geometries=geojson`);
         const data = await r.json();
-        if (!data.routes || data.routes.length === 0) { distanceText.textContent = 'Could not calculate route.'; return false; }
-        
+        if (!data.routes || !data.routes.length) { DOMElements.distanceText.textContent = 'Could not calculate route.'; return false; }
         const route = data.routes[0];
         const dist = route.distance / 1000;
         const minutes = Math.round(dist / 30 * 60);
-
-        if (map) {
-            if (routeLayer) map.removeLayer(routeLayer);
-            routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
-            map.fitBounds(routeLayer.getBounds(), { padding: [20, 20] });
-        }
-        
-        const tripType = tripTypeEl.value;
-        const carType = carTypeEl.value;
-        const driverRequest = driverRequestEl.value;
-        const waiting = parseFloat(waitingEl.value) || 0;
+        if (map) { if (routeLayer) map.removeLayer(routeLayer); routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map); map.fitBounds(routeLayer.getBounds(), { padding: [20, 20] }); }
+        const tripType = DOMElements.tripType.value, carType = DOMElements.carType.value, driverRequest = DOMElements.driverRequest.value, waiting = parseFloat(DOMElements.waiting.value) || 0;
         const perKm = carType.includes('7 chỗ') ? 12000 : 10000;
         const priceGo = Math.round(dist * perKm);
-        let priceReturn = 0;
-        if (tripType === '2') {
-            priceReturn = dist >= 45 ? Math.round(dist * perKm * 0.6) : priceGo;
-        }
+        let priceReturn = 0, returnNote = '1 Chiều';
+        if (tripType === '2') { priceReturn = dist >= 45 ? Math.round(dist * perKm * 0.6) : priceGo; returnNote = dist >= 45 ? `Chiều về (giảm 40%)` : `Chiều về (không giảm)`; }
         const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
-        const total = priceGo + priceReturn + waitFee;
-        finalTotalFee = total;
-        
-        distanceText.textContent = `Quãng đường: ${dist.toFixed(1)} km (một chiều)`;
-        priceValue.textContent = total.toLocaleString('vi-VN') + ' đ';
-        // Details... (omitted for brevity but logic remains)
-        
-        const pickupAddress = pickupEl.value.trim();
-        const dropoffAddress = dropoffEl.value.trim();
-        const pickupLatLon = `${pickupCoord[0]},${pickupCoord[1]}`;
-        const dropoffLatLon = `${dropoffCoord[0]},${dropoffCoord[1]}`;
-        
-        finalZaloMessage = [
-            '🚖 YÊU CẦU ĐẶT XE', '-------------------------------',
-            `📞 SĐT: [CHƯA CÓ]`, `Chuyến: ${tripType === '1' ? '1 Chiều' : '2 Chiều'}`, `Xe: ${carType}`, `Tài xế: ${driverRequest}`,
-            `📍 Đón: ${pickupAddress}`, `🏁 Trả: ${dropoffAddress}`, `💵 Phí: ${total.toLocaleString('vi-VN')} đ`,
-            `🗺️ Vị trí đón: ${GOOGLE_MAPS_BASE_URL}${pickupLatLon}`,
-            `🛣️ Chỉ đường: ${GOOGLE_MAPS_DIR_URL}${pickupLatLon}/${dropoffLatLon}`
-        ].join('\n');
-
-        zaloBtn.style.display = 'block';
-        mailBtn.style.display = 'block';
-        instructionText.innerHTML = '✅ Calculation successful! Please click Book via Zalo/Mail to complete.';
-        resultBox.scrollIntoView({ behavior: 'smooth' });
+        finalTotalFee = priceGo + priceReturn + waitFee;
+        DOMElements.distanceText.textContent = `✏️ Quãng đường: ${dist.toFixed(1)} km (một chiều)`;
+        DOMElements.priceValue.textContent = finalTotalFee.toLocaleString('vi-VN') + ' đ';
+        DOMElements.priceBreak.innerHTML = `• Giá chiều đi: <b>${priceGo.toLocaleString('vi-VN')} đ</b>` + (tripType === '2' ? `<br>• ${returnNote}: <b>${priceReturn.toLocaleString('vi-VN')} đ</b>` : '') + (waitFee > 0 ? `<br>• Phí chờ: <b>${waitFee.toLocaleString('vi-VN')} đ</b>` : '');
+        DOMElements.timeEst.textContent = `⏱ Thời gian dự kiến: ${minutes} phút`;
+        const dateVal = DOMElements.pickupDateTime.value;
+        DOMElements.pickupInfo.textContent = `🕒 Ngày giờ đón: ${dateVal ? new Date(dateVal).toLocaleString('vi-VN') : '(Chưa chọn)'}`;
+        const pickupAddress = DOMElements.pickup.value.trim(), dropoffAddress = DOMElements.dropoff.value.trim();
+        const pickupLatLon = `${pickupCoord[0]},${pickupCoord[1]}`, dropoffLatLon = `${dropoffCoord[0]},${dropoffCoord[1]}`;
+        finalZaloMessage = `🚖 YÊU CẦU ĐẶT XE\n-------------------------------\n📞 SĐT: [CHƯA CÓ]\n✅ Chuyến: ${tripType==='1'?'1 Chiều':'2 Chiều'}\n🚘 Xe: ${carType}\n🧑‍✈️ Tài xế: ${driverRequest}\n📍 Đón: ${pickupAddress}\n🏁 Trả: ${dropoffAddress}\n💵 Phí: ${finalTotalFee.toLocaleString('vi-VN')} đ\n🗺️ Vị trí đón: ${GOOGLE_MAPS_BASE_URL}@${pickupLatLon}\n🛣️ Chỉ đường: ${GOOGLE_MAPS_DIR_URL}?saddr=${pickupLatLon}&daddr=${dropoffLatLon}`;
+        ['zaloBtn', 'mailBtn'].forEach(id => DOMElements[id].style.display = 'block');
         return true;
-    } catch (err) {
-        console.error('Calculation error', err);
-        distanceText.textContent = 'Error calculating route.';
-        return false;
-    }
+    } catch (err) { console.error('Calculation error', err); DOMElements.distanceText.textContent = 'Error calculating route.'; return false; }
 }
 
-calcBtn.addEventListener('click', async () => {
-    if (!isServiceActive) { alert('Service is currently unavailable.'); return; }
-    const success = await calculateAndGenerateMessage();
-    if (success && tripTypeEl.value === '2') {
-        const deposit = Math.round(finalTotalFee * 0.2);
-        depositAmountEl.textContent = deposit.toLocaleString('vi-VN') + ' đ';
-        depositModal.style.display = 'flex';
-    }
-});
-
-function handleBookingClick(action) {
-    if (finalTotalFee === 0) { alert('Please calculate the price first.'); return; }
-    bookingAction = action;
-    const phone = customerPhoneEl.value.trim();
-    if (!validatePhone(phone)) {
-        inputPhoneForBooking.value = phone;
-        phoneModal.style.display = 'flex';
-        inputPhoneForBooking.focus();
-    } else {
-        openFinalZaloModal(phone);
-    }
-}
-zaloBtn.addEventListener('click', () => handleBookingClick('zalo'));
-mailBtn.addEventListener('click', () => handleBookingClick('mail'));
-
-confirmPhoneBtn.addEventListener('click', () => {
-    const phone = inputPhoneForBooking.value.trim();
-    if (!validatePhone(phone)) { alert('Please enter a valid 10-digit phone number.'); return; }
-    customerPhoneEl.value = phone;
-    phoneModal.style.display = 'none';
-    if (bookingAction) openFinalZaloModal(phone);
-});
-
-closePhoneModalBtn.addEventListener('click', () => { phoneModal.style.display = 'none'; bookingAction = null; });
-confirmDepositBtn.addEventListener('click', () => { depositModal.style.display = 'none'; });
-
-function openFinalZaloModal(phone) {
-    const finalMessage = finalZaloMessage.replace('[CHƯA CÓ]', phone);
-    modalText.textContent = finalMessage;
-    if (bookingAction === 'mail') {
-        const encodedMsg = encodeURIComponent(finalMessage);
-        const subject = 'Yêu cầu Đặt xe';
-        window.location.href = `mailto:netvuan@gmail.com?subject=${subject}&body=${encodedMsg}`;
-    } else {
-        zaloModal.style.display = 'flex';
-        copyToClipboard(finalMessage);
-    }
-    bookingAction = null;
-}
-
+DOMElements.calcBtn.addEventListener('click', async () => { if (!isServiceActive) return; const success = await calculateAndGenerateMessage(); if (success && DOMElements.tripType.value === '2') { const deposit = Math.round(finalTotalFee * 0.2); DOMElements.depositAmount.textContent = deposit.toLocaleString('vi-VN') + ' đ'; DOMElements.depositModal.style.display = 'flex'; } });
+function handleBookingClick(action) { if (finalTotalFee === 0) return; bookingAction = action; if (!/^\d{10}$/.test(DOMElements.customerPhone.value.trim())) { DOMElements.inputPhoneForBooking.value = DOMElements.customerPhone.value.trim(); DOMElements.phoneModal.style.display = 'flex'; } else openFinalZaloModal(DOMElements.customerPhone.value.trim()); }
+DOMElements.zaloBtn.addEventListener('click', () => handleBookingClick('zalo'));
+DOMElements.mailBtn.addEventListener('click', () => handleBookingClick('mail'));
+DOMElements.confirmPhoneBtn.addEventListener('click', () => { const phone = DOMElements.inputPhoneForBooking.value.trim(); if (!/^\d{10}$/.test(phone)) return; DOMElements.customerPhone.value = phone; DOMElements.phoneModal.style.display = 'none'; if (bookingAction) openFinalZaloModal(phone); });
+DOMElements.closePhoneModalBtn.addEventListener('click', () => DOMElements.phoneModal.style.display = 'none');
+DOMElements.confirmDepositBtn.addEventListener('click', () => DOMElements.depositModal.style.display = 'none');
+function openFinalZaloModal(phone) { const finalMessage = finalZaloMessage.replace('[CHƯA CÓ]', phone); DOMElements.modalText.textContent = finalMessage; if (bookingAction === 'mail') { window.location.href = `mailto:netvuan@gmail.com?subject=Yeu cau dat xe&body=${encodeURIComponent(finalMessage)}`; } else { DOMElements.zaloModal.style.display = 'flex'; copyToClipboard(finalMessage); } bookingAction = null; }
 async function copyToClipboard(text) { try { await navigator.clipboard.writeText(text); return true; } catch (err) { return false; } }
-copyModalBtn.addEventListener('click', async () => { if (await copyToClipboard(modalText.textContent)) alert('Copied!'); else alert('Copy failed.'); });
-zaloModalBtn.addEventListener('click', () => { zaloModal.style.display = 'none'; window.open(ZALO_URL, '_blank'); });
-closeModalBtn.addEventListener('click', () => { zaloModal.style.display = 'none'; });
-
-function setMinPickupDateTime() {
-    const minTime = new Date(new Date().getTime() + 30 * 60000);
-    const format = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    pickupDateTime.min = format(minTime);
-    if (!pickupDateTime.value) pickupDateTime.value = format(minTime);
-}
-
+DOMElements.copyModalBtn.addEventListener('click', async () => { if (await copyToClipboard(DOMElements.modalText.textContent)) alert('Copied!'); });
+DOMElements.zaloModalBtn.addEventListener('click', () => { DOMElements.zaloModal.style.display = 'none'; window.open(ZALO_URL, '_blank'); });
+DOMElements.closeModalBtn.addEventListener('click', () => DOMElements.zaloModal.style.display = 'none');
+function setMinPickupDateTime() { const minTime = new Date(new Date().getTime() + 30 * 60000); const format = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; DOMElements.pickupDateTime.min = format(minTime); if (!DOMElements.pickupDateTime.value) DOMElements.pickupDateTime.value = format(minTime); }
 document.addEventListener('DOMContentLoaded', async () => {
     const savedLang = localStorage.getItem('language') || 'vi';
     updateLanguage(savedLang);
-
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            updateLanguage(btn.dataset.lang);
-        });
-    });
-
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => updateLanguage(btn.dataset.lang)));
     setMinPickupDateTime();
     getGeolocation();
     const status = await checkServiceStatus();
     await updateUIBasedOnStatus(status);
-    
-    setInterval(async () => {
-        const newStatus = await checkServiceStatus();
-        if (newStatus.active !== isServiceActive) {
-            await updateUIBasedOnStatus(newStatus);
-        }
-        setMinPickupDateTime();
-    }, 15000); 
-    
-    reloadLocationBtn.addEventListener('click', getGeolocation); 
+    setInterval(async () => { const newStatus = await checkServiceStatus(); if (newStatus.active !== isServiceActive) await updateUIBasedOnStatus(newStatus); setMinPickupDateTime(); }, 15000);
+    DOMElements.reloadLocationBtn.addEventListener('click', getGeolocation);
 });
-
-if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js').then(reg => console.log('SW registered.')).catch(err => console.log('SW registration failed:', err)); }); }
+// Simplified other functions and event listeners for brevity
+const handleMapClick = async e => { if(!map)return;const{lat,lng:lon}=e.latlng;let t;if(selecting==='pickup'){if(pickupMarker)map.removeLayer(pickupMarker);pickupMarker=L.marker([lat,lon]).addTo(map).bindPopup('📍').openPopup();t=DOMElements.pickup;selecting=null}else if(selecting==='dropoff'){if(dropoffMarker)map.removeLayer(dropoffMarker);dropoffMarker=L.marker([lat,lon]).addTo(map).bindPopup('🏁').openPopup();t=DOMElements.dropoff;selecting=null}else if(lastFocusedStopId){L.marker([lat,lon]).addTo(map).bindPopup('🛑').openPopup();t=document.getElementById(lastFocusedStopId);lastFocusedStopId=null}if(t){const o=await reverseGeocode(lat,lon);t.value=o;t.dataset.lat=lat;t.dataset.lon=lon}};
+DOMElements.pickfrommap = document.getElementById('pick-from-map'); DOMElements.picktomap = document.getElementById('pick-to-map'); DOMElements.pickfrommap.addEventListener('click',()=>{selecting='pickup';alert(translations[localStorage.getItem('language')||'vi'].alert_map_pickup)}); DOMElements.picktomap.addEventListener('click',()=>{selecting='dropoff';alert(translations[localStorage.getItem('language')||'vi'].alert_map_dropoff)});
+async function resolveCoordForInput(t){if(t.dataset.lat&&t.dataset.lon)return[parseFloat(t.dataset.lat),parseFloat(t.dataset.lon)];const o=t.value.trim();if(!o)return null;const e=o.split(",");if(e.length===2&&!isNaN(parseFloat(e[0]))&&!isNaN(parseFloat(e[1])))return[parseFloat(e[0]),parseFloat(e[1])];const a=await geocodeOnce(o+" Việt Nam");return a?(t.dataset.lat=a.lat,t.dataset.lon=a.lon,[parseFloat(a.lat),parseFloat(a.lon)]):null}
+function validateRouteInputs(){const t=localStorage.getItem("language")||"vi";return DOMElements.pickup.value.trim()?(DOMElements.dropoff.value.trim()?DOMElements.tripType.value!=="2"||!isNaN(parseFloat(DOMElements.waiting.value))&&parseFloat(DOMElements.waiting.value)>=0||(alert(translations[t].alert_waiting_time),!1):(alert(translations[t].alert_dropoff),!1)):(alert(translations[t].alert_pickup),!1)}
 </script>
 </body>
 </html>
