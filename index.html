@@ -100,6 +100,8 @@
     
     .add-stop{display:block;background:var(--green); color:#fff; border:none; padding:12px; border-radius:10px; font-size:16px; font-weight:700; margin-top:12px; cursor:pointer}
     .calc-btn{display:block;background:var(--green); color:#fff; border:none; padding:14px; border-radius:10px; font-size:18px; font-weight:700; margin-top:12px; cursor:pointer}
+    .calc-btn:disabled { background-color: #6c757d !important; cursor: not-allowed !important; opacity: 0.7; } /* THÊM FIX NÚT DISABLED */
+
     
     /* KHẮC PHỤC LỖI MINI MAP MẤT: Đảm bảo chiều cao được thiết lập */
     #map{
@@ -250,7 +252,7 @@
         <input id="waiting" type="number" min="0" value="0" placeholder="Nhập số giờ chờ">
       </div>
 
-      <button class="calc-btn" id="calc-btn">💰 Tính giá</button>
+      <button class="calc-btn" id="calc-btn" disabled>💰 Tính giá</button>
     </div> 
     
     <div id="map"></div>
@@ -593,7 +595,9 @@ async function updateUIBasedOnStatus(status) {
     } else {
         calcBtn.style.background = 'var(--green)';
         calcBtn.style.cursor = 'pointer';
-        calcBtn.disabled = false;
+        
+        // Luôn gọi hàm kiểm tra trạng thái input cuối cùng
+        updateCalcButtonState(); 
         
         serviceOffNotice.style.display = 'none';
         
@@ -667,6 +671,9 @@ function getGeolocation() {
             locationStatusEl.style.color = 'var(--green)';
             reloadLocationBtn.style.color = '#007bff';
             reloadLocationBtn.style.pointerEvents = 'auto';
+
+            // KÍCH HOẠT LẠI NÚT TÍNH GIÁ
+            updateCalcButtonState();
 
 
         }, (err)=>{
@@ -800,6 +807,8 @@ function attachAutocomplete(inputEl, boxEl){
               map.setView(latlng, 14);
             } 
           }
+          // KÍCH HOẠT LẠI NÚT TÍNH GIÁ SAU KHI CHỌN ĐỊA CHỈ
+          updateCalcButtonState(); 
         });
         fragment.appendChild(d);
       });
@@ -835,6 +844,33 @@ function attachAutocomplete(inputEl, boxEl){
 attachAutocomplete(pickupEl, pickupSugg);
 attachAutocomplete(dropoffEl, dropoffSugg);
 
+// =========================================================================
+// !!! CODE KHẮC PHỤC LỖI TÍNH LỘ TRÌNH START !!!
+// =========================================================================
+
+/**
+ * Kiểm tra xem cả Điểm đón và Điểm đến đã có giá trị chưa.
+ * Dùng để Bật/Tắt nút Tính giá.
+ */
+function updateCalcButtonState() {
+    const isPickupReady = pickupEl.value.trim() !== '';
+    const isDropoffReady = dropoffEl.value.trim() !== '';
+    
+    // Nút Tính giá chỉ được bật nếu dịch vụ đang hoạt động VÀ có đủ Điểm đón & Điểm đến.
+    calcBtn.disabled = !(isServiceActive && isPickupReady && isDropoffReady);
+    return isServiceActive && isPickupReady && isDropoffReady;
+}
+
+// Gắn sự kiện để kiểm tra và kích hoạt nút ngay lập tức khi người dùng nhập liệu
+pickupEl.addEventListener('input', updateCalcButtonState);
+dropoffEl.addEventListener('input', updateCalcButtonState);
+
+
+// =========================================================================
+// !!! CODE KHẮC PHỤC LỖI TÍNH LỘ TRÌNH END !!!
+// =========================================================================
+
+
 function createStopInput(prefill=''){
   stopCount++;
   const wrapper = document.createElement('div');
@@ -854,9 +890,15 @@ function createStopInput(prefill=''){
   attachAutocomplete(inputEl, boxEl);
   
   const clearBtn = wrapper.querySelector('.clear-btn');
-  inputEl.addEventListener('input', () => { clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; });
-  inputEl.addEventListener('focus', () => { clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; });
-  inputEl.addEventListener('blur', () => { setTimeout(() => clearBtn.style.display = 'none', 150); });
+  inputEl.addEventListener('input', () => { 
+    clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; 
+  });
+  inputEl.addEventListener('focus', () => { 
+    clearBtn.style.display = inputEl.value.trim() ? 'block' : 'none'; 
+  });
+  inputEl.addEventListener('blur', () => { 
+    setTimeout(() => clearBtn.style.display = 'none', 150); 
+  });
   clearBtn.addEventListener('click', (e) => {
     e.stopPropagation(); 
     inputEl.value = ''; 
@@ -912,6 +954,9 @@ const handleMapClick = async (e) => {
     targetInput.parentNode.querySelector('.clear-btn').style.display = 'block';
     
     if(targetInput === pickupEl || targetInput === dropoffEl) map.setView([lat,lon], 14);
+    
+    // KÍCH HOẠT LẠI NÚT TÍNH GIÁ SAU KHI CHỌN TRÊN MAP
+    updateCalcButtonState(); 
   }
 };
 
@@ -952,6 +997,8 @@ async function resolveCoordForInput(inputEl){
 
 function validateRouteInputs() {
     const L = LANGUAGES[currentLang];
+    // Kiểm tra này đã được cover bởi updateCalcButtonState và nút disabled
+    // Nhưng vẫn giữ lại cho tính năng báo lỗi chi tiết khi người dùng cố tình bypass
     if (pickupEl.value.trim() === '') {
         alert(L.alert_pickup_empty);
         pickupEl.focus();
@@ -987,6 +1034,7 @@ async function calculateAndGenerateMessage() {
         return false; 
     }
     
+    // Bắt đầu tính toán, nếu thiếu tọa độ sẽ báo lỗi chi tiết
     const pickupCoord = await resolveCoordForInput(pickupEl);
     if(!pickupCoord){ alert(L.alert_pickup_coord_fail); return false; }
     const dropoffCoord = await resolveCoordForInput(dropoffEl);
@@ -1165,6 +1213,12 @@ calcBtn.addEventListener('click', async () => {
   if (!isServiceActive) {
       alert(LANGUAGES[currentLang].alert_service_off);
       return;
+  }
+  
+  // Kiểm tra lần cuối (dù nút đã disabled, nhưng để catch trường hợp bypass)
+  if(!updateCalcButtonState()) {
+    alert(LANGUAGES[currentLang].alert_pickup_empty + ' & ' + LANGUAGES[currentLang].alert_dropoff_empty);
+    return;
   }
   
   const success = await calculateAndGenerateMessage();
@@ -1347,6 +1401,8 @@ document.querySelectorAll('.clear-btn').forEach(btn => {
             const suggBox = document.getElementById(`${inputId}-suggestions`);
             if (suggBox) suggBox.style.display = 'none';
             inputEl.focus(); 
+            // CẬP NHẬT TRẠNG THÁI NÚT KHI CLEAR
+            updateCalcButtonState(); 
         }
     });
 });
@@ -1393,6 +1449,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const status = await checkServiceStatus();
     await updateUIBasedOnStatus(status);
     
+    // GỌI HÀM KIỂM TRA LẠI TRẠNG THÁI NÚT SAU KHI XÁC ĐỊNH TRẠNG THÁI DỊCH VỤ
+    updateCalcButtonState(); 
+
     setInterval(async () => {
         const newStatus = await checkServiceStatus();
         if (newStatus.active !== isServiceActive) {
