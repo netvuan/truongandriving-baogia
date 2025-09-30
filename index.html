@@ -1,452 +1,700 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title data-i18n="appTitle">🚖 Dịch vụ Taxi Trường An Driving</title>
-  
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#28a745"> 
-  
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>
-    :root{--green:#28a745;--muted:#6c757d;--light-gray:#f4f6f8;}
-    *{box-sizing:border-box}
-    #main-content {
-      background:var(--light-gray);
-      padding: 0;
-    }
-    body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#111}
-    header{background:var(--green);color:#fff;padding:12px 10px;text-align:center;font-size:20px;font-weight:700;line-height:1.5}
-    .phone-number{font-size:18px;font-weight:700;margin-top:4px}
-    .container{padding:12px}
-    .label-row{display:flex;align-items:center;gap:8px;margin-top:12px} /* Tăng khoảng cách trên */
-    .label-row:first-of-type { margin-top: 6px; } /* Giữ khoảng cách trên cho SĐT */
-    .label-row h3{margin:0;font-size:16px} 
-
-    #location-status-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-left: auto; /* Đẩy sang phải */
-    }
-    #reloadLocationBtn {
-        cursor: pointer;
-        font-style: normal;
-        font-size: 20px;
-        color: #007bff;
-        transition: transform 0.2s;
-    }
-    #reloadLocationBtn:hover {
-        transform: rotate(45deg);
-    }
-    
-    .input-row{position:relative;margin-top:8px}
-    /* SỬA LỖI GIAO DIỆN: Điều chỉnh vị trí nút xóa để không bị che bởi nút Bản đồ */
-    /* Nút xóa sẽ nằm cách nút Bản đồ 8px */
-    .input-row .clear-btn {
-        position: absolute; 
-        right: 80px; /* Cách nút Bản đồ (width 60px + padding + margin) */
-        top: 1px; /* Căn chỉnh lại để khớp với padding của input */
-        height: calc(100% - 2px); /* Chiều cao gần bằng input */
-        background: #e9ecef; /* Màu nền nhẹ để nổi bật */
-        color: #6c757d; 
-        border: none; 
-        padding: 0 8px; /* Giảm padding */
-        border-radius: 0 8px 8px 0; /* Bo tròn chỉ bên phải */
-        font-weight: 700; 
-        cursor: pointer; 
-        line-height: 1;
-        font-size: 14px; 
-        display: none; 
-        z-index: 1000;
-        transition: background 0.1s;
-        display: flex; /* Dùng flex để căn giữa chữ X */
-        align-items: center;
-        justify-content: center;
-    }
-    /* Giữ nguyên logic hiển thị nút clear-btn khi focus */
-    .input-row input:focus + .clear-btn, .input-row .clear-btn:hover { 
-        display: flex; /* Đảm bảo nút được hiển thị */
-    }
-    .input-row .clear-btn:hover { background: #dee2e6; color: #495057; }
-    /* Điều chỉnh input để chừa chỗ cho clear-btn và map-btn */
-    input[type="text"]{
-        padding-right: 140px; /* Chừa chỗ cho clear-btn (~60px) + map-btn (~70px) */
-    }
-    input[type="text"], input[type="number"], input[type="datetime-local"], select, input[type="tel"]{
-      width:100%; padding:12px 14px; border-radius:8px; border:1px solid #ddd; font-size:16px; background:#fff;
-    }
-    /* SỬA LỖI GIAO DIỆN: Điều chỉnh vị trí và kích thước nút Bản đồ */
-    .map-btn{
-        position:absolute; 
-        right:8px; 
-        top:8px; 
-        background:var(--green); 
-        color:#fff; 
-        border:0; 
-        padding:6px 8px; 
-        border-radius:6px; 
-        font-weight:700; 
-        cursor:pointer;
-        line-height: 1.5; /* Căn chỉnh lại */
-    }
-    .add-stop{display:block;background:var(--green); color:#fff; border:none; padding:12px; border-radius:10px; font-size:16px; font-weight:700; margin-top:12px; cursor:pointer}
-    .calc-btn{display:block;background:var(--green); color:#fff; border:none; padding:14px; border-radius:10px; font-size:18px; font-weight:700; margin-top:12px; cursor:pointer}
-    #map{height:320px;margin-top:12px;border-radius:8px;overflow:hidden}
-    /* SỬA LỖI GIAO DIỆN: Đảm bảo suggestions hiển thị trên mọi thứ */
-    .suggestions{
-        position:absolute; 
-        left:0; 
-        right:0; 
-        top:100%; /* Đặt ngay dưới input */
-        margin-top: 4px; /* Thêm khoảng cách */
-        background:#fff;
-        border:1px solid #ddd;
-        border-radius:8px;
-        max-height:220px;
-        overflow:auto; 
-        -webkit-overflow-scrolling:touch; 
-        z-index:2000; /* Tăng z-index để không bị modal hoặc map che */
-        box-shadow:0 8px 20px rgba(0,0,0,0.15);
-    }
-    .suggestions div{padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer; display:flex; gap:8px; align-items: center}
-    .suggestions div:last-child{border-bottom:0}
-    .suggestions div:hover{background:#f8f9fa}
-    .result-box{margin-top:12px;padding:12px;border-radius:8px;background:#fff3cd;border:1px solid #ffeeba}
-    .result-row{display:flex;align-items:center;gap:8px}
-    .distance-text{font-size:16px}
-    .price-title{font-weight:700;margin-top:6px}
-    .price-value{font-size:22px;color:red;font-weight:800}
-    .price-break{margin-top:8px;font-size:15px}
-    .actions{display:flex;gap:10px;margin-top:12px}
-    .actions a{flex:1;text-align:center;padding:12px;border-radius:8px;color:#fff;text-decoration:none;font-weight:700; border: none; cursor:pointer;}
-    .zalo-btn {background:#0068ff;} 
-    .mail{background:#dc3545}
-    .note{margin-top:12px;font-size:13px;color:var(--muted);background:#fff;padding:10px;border-radius:8px}
-    .way-wrapper{position:relative;margin-top:12px}
-    /* Điều chỉnh input trong way-wrapper */
-    .way-wrapper input[type="text"] {
-        padding-right: 50px; /* Chừa chỗ cho nút xóa stop */
-    }
-    .way-remove{
-        position:absolute;
-        right:8px;
-        top:8px;
-        background:#ff6b6b;
-        color:#fff;
-        border:0;
-        padding:6px 10px;
-        border-radius:6px;
-        cursor:pointer;
-        font-weight: 700;
-    } 
-    /* Ẩn nút clear-btn cho Stop Input vì đã có way-remove */
-    .way-wrapper .clear-btn { display: none !important; }
-
-
-    /* KILL SWITCH STYLES */
-    .disabled-form {
-        pointer-events: none;
-        opacity: 0.6; 
-        transition: opacity 0.3s;
-    }
-    #serviceOffNotice {
-      margin-top: 12px; 
-      padding: 10px; 
-      background: #dc3545; 
-      color: white; 
-      border-radius: 8px; 
-      font-size: 15px; 
-      font-weight: 600; 
-      text-align: center;
-    }
-
-
-    /* Modal Styling */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(0,0,0,0.7); z-index: 9999; display: none;
-      justify-content: center; align-items: center; padding: 20px;
-      animation: fadeIn 0.3s;
-    }
-    .modal-content {
-      background: #fff; border-radius: 12px; padding: 20px;
-      width: 100%; max-width: 450px; 
-      max-height: 90vh; 
-      overflow-y: auto; 
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      animation: slideIn 0.3s;
-    }
-    .modal-content h3 {
-      margin-top: 0; color: var(--green); font-size: 20px; text-align: center;
-    }
-    #modal-text {
-      white-space: pre-wrap; 
-      font-family: monospace;
-      font-size: 14px;
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-      margin-bottom: 15px;
-      overflow-x: auto; /* Thêm scroll ngang nếu nội dung quá dài */
-    }
-    .modal-actions {
-      display: flex; gap: 10px;
-    }
-    .modal-actions button {
-      flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer;
-    }
-    #copyModalBtn { background: #ffc107; color: #333; } 
-    #zaloModalBtn { background: #0068ff; color: #fff; }
-    #closeModalBtn { background: #ccc; color: #333; }
-    
-    /* Phone Modal Styles */
-    #phoneModal .modal-content { background: #f8d7da; border: 1px solid #f5c6cb; }
-    #phoneModal h3 { color: #721c24; }
-    #phoneModal #inputPhoneForBooking { margin-top: 15px; }
-    #phoneModal #confirmPhoneBtn { background: #007bff; color: white; } 
-
-    /* Deposit Modal Styles */
-    #depositModal .modal-content { background: #d4edda; border: 1px solid #c3e6cb; }
-    #depositModal h3 { color: #155724; }
-    #depositModal p { margin-bottom: 15px; }
-    #depositModal #depositAmount { 
-        font-weight: 800; 
-        font-size: 20px; 
-        color: #007bff; 
-        background: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        display: inline-block;
-    }
-    #depositModal #confirmDepositBtn { background: var(--green); color: white; }
-    
-    /* NEW: Driver Select Styling */
-    #driverRequest {
-        font-size: 18px; /* Tăng cỡ chữ */
-        font-weight: 600;
-        border: 2px solid var(--green); /* Viền nổi bật */
-    }
-    .driver-option-highlight {
-        color: red; /* Màu đỏ nổi bật cho Trường An Driving */
-        font-weight: 900 !important; /* Đảm bảo nổi bật */
-        background-color: #f7f7f7;
-    }
-    .driver-option-avatar {
-        margin-right: 5px; 
-        font-size: 1.1em;
-        vertical-align: middle;
-    } 
-
-    #language-switcher {
-        margin-top: 8px;
-        padding: 5px 8px;
-        border-radius: 6px;
-        border: 1px solid white;
-        background: #34c759;
-        color: white;
-        font-weight: 600;
-        font-size: 14px;
-    }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title data-i18n="appTitle">🚖 Dịch vụ Taxi Trường An Driving</title>
     
-    /* Loading Overlay Style */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.8);
-        z-index: 10000; /* Cao nhất */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#28a745"> 
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* COLOR PALETTE & VARIABLES */
+        :root{
+            --green: #28a745; /* Màu thương hiệu chính */
+            --green-dark: #1e7e34; /* Màu hover */
+            --muted: #6c757d;
+            --light-gray: #f4f6f8;
+            --white: #ffffff;
+            --primary: var(--green);
+        }
 
+        /* RESET & BASE */
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family: 'Roboto', Arial, Helvetica, sans-serif; /* Áp dụng font mới */
+            color:#111;
+            background: var(--light-gray);
+        }
+        #main-content {
+            background:var(--light-gray);
+            padding: 0;
+        }
 
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } } 
+        /* HEADER */
+        header{
+            background:var(--green);
+            color:var(--white);
+            padding:12px 16px;
+            text-align:center;
+            font-weight:700;
+            line-height:1.4;
+            display: flex; /* Dùng flex cho bố cục hiện đại */
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 720px; /* Giữ giới hạn cho màn hình lớn */
+        }
+        .header-title {
+            font-size:22px;
+            text-align: left;
+            flex-grow: 1;
+        }
+        .header-info {
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .phone-number{
+            font-size:18px;
+            font-weight:900;
+            margin-top:4px;
+        }
+        #language-switcher {
+            /* Vị trí ban đầu: Tách khỏi SĐT, sang phải */
+            margin-left: 10px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: #34c759;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        /* Cải tiến bố cục header - căn giữa cho màn hình nhỏ */
+        header .header-top {
+            flex-direction: column;
+            align-items: center;
+        }
+        header .header-title {
+            text-align: center;
+            font-size: 20px;
+        }
+        header .phone-number {
+            margin-top: 8px;
+        }
+        header .header-info {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+        header #language-switcher {
+            margin-left: 15px; /* Thêm khoảng cách nếu không phải là phần của title */
+        }
 
-    @media(min-width:700px){.container{max-width:720px;margin:0 auto}}
-  </style>
+        /* CONTAINER & LAYOUT */
+        .container{
+            padding:16px 12px; /* Tăng padding tổng thể */
+        }
+        .label-row{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            margin-top:18px; /* Tăng khoảng cách giữa các phần chính */
+        }
+        .label-row:first-of-type { margin-top: 6px; } 
+        .label-row h3{
+            margin:0;
+            font-size:17px; /* Tăng cỡ chữ label */
+            font-weight: 700;
+            color: #333;
+        } 
+        #location-status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto; 
+        }
+        #reloadLocationBtn {
+            cursor: pointer;
+            font-style: normal;
+            font-size: 20px;
+            color: #007bff;
+            transition: transform 0.2s;
+        }
+        #reloadLocationBtn:hover {
+            transform: rotate(45deg);
+        }
+
+        /* INPUTS & CONTROLS */
+        .input-row{position:relative;margin-top:8px}
+        input[type="text"], input[type="number"], input[type="datetime-local"], select, input[type="tel"]{
+            width:100%; 
+            padding:14px 16px; /* Tăng padding input */
+            border-radius:12px; /* Bo tròn hơn */
+            border:1px solid #ddd; 
+            font-size:16px; 
+            background:var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2); /* Thêm box shadow nổi bật */
+            outline: none;
+        }
+
+        /* Clear Button (X) - Đã tối ưu */
+        .input-row .clear-btn {
+            position: absolute; 
+            right: 80px; 
+            top: 50%; 
+            transform: translateY(-50%); /* Căn giữa dọc */
+            height: 36px; /* Chiều cao cố định */
+            width: 36px;
+            background: #e9ecef;
+            color: #6c757d; 
+            border: none; 
+            padding: 0; 
+            border-radius: 8px; /* Bo tròn hình vuông */
+            font-weight: 700; 
+            cursor: pointer; 
+            line-height: 1;
+            font-size: 16px; 
+            display: none; 
+            z-index: 1000;
+            transition: background 0.1s;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.8;
+        }
+        .input-row input:focus + .clear-btn, .input-row .clear-btn:hover { 
+            display: flex;
+            opacity: 1;
+        }
+        .input-row .clear-btn:hover { background: #dee2e6; color: #495057; }
+        input[type="text"]{
+            padding-right: 140px; 
+        }
+
+        /* Map Button - Đã tối ưu */
+        .map-btn{
+            position:absolute; 
+            right:8px; 
+            top: 50%; 
+            transform: translateY(-50%); /* Căn giữa dọc */
+            background:var(--primary); 
+            color:var(--white); 
+            border:0; 
+            padding:8px 10px; /* Tăng padding nút bản đồ */
+            border-radius:10px; /* Bo tròn hơn */
+            font-weight:700; 
+            cursor:pointer;
+            line-height: 1.2; 
+            transition: background 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .map-btn:hover {
+            background: var(--green-dark);
+        }
+        
+        /* Stop Input/Remove */
+        .way-wrapper input[type="text"] {
+            padding-right: 50px; 
+        }
+        .way-remove{
+            position:absolute;
+            right:8px;
+            top:50%;
+            transform: translateY(-50%);
+            background:#ff4d4d; /* Màu đỏ nổi bật hơn */
+            color:var(--white);
+            border:0;
+            padding:6px 10px;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight: 700;
+            line-height: 1.5;
+            transition: background 0.2s;
+        } 
+        .way-remove:hover { background: #cc0000; }
+        .way-wrapper .clear-btn { display: none !important; }
+
+        /* General Buttons */
+        .add-stop, .calc-btn {
+            display:block;
+            background:var(--primary); 
+            color:var(--white); 
+            border:none; 
+            border-radius:12px; 
+            font-weight:700; 
+            cursor:pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+            width: 100%;
+        }
+        .add-stop {
+            padding:14px; 
+            font-size:16px; 
+            margin-top:16px;
+        }
+        .calc-btn {
+            padding:16px; 
+            font-size:20px; 
+            margin-top:20px; /* Tăng khoảng cách */
+        }
+        .add-stop:hover, .calc-btn:hover {
+            background: var(--green-dark);
+            transform: translateY(-1px);
+        }
+        .calc-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* MAP & SUGGESTIONS */
+        #map{
+            height:320px;
+            margin-top:16px; /* Tăng margin */
+            border-radius:12px;
+            overflow:hidden;
+            border: 1px solid #ddd;
+        }
+        .suggestions{
+            position:absolute; 
+            left:0; 
+            right:0; 
+            top: calc(100% + 4px); 
+            background:var(--white);
+            border:1px solid #ddd;
+            border-radius:12px;
+            max-height:240px; /* Tăng chiều cao tối đa */
+            overflow:auto; 
+            -webkit-overflow-scrolling:touch; 
+            z-index:2000; 
+            box-shadow:0 8px 20px rgba(0,0,0,0.15);
+        }
+        .suggestions div{
+            padding:12px;
+            border-bottom:1px solid #f0f0f0;
+            cursor:pointer; 
+            display:flex; 
+            gap:10px; 
+            align-items: center;
+        }
+        .suggestions div:last-child{border-bottom:0}
+        .suggestions div:hover{background:#e9ecef}
+
+        /* RESULT BOX - Đã Tối Ưu */
+        .result-box{
+            margin-top:20px;
+            padding:16px; /* Tăng padding */
+            border-radius:12px;
+            background:#e6f3e6; /* Màu xanh nhạt hơn, phù hợp với brand green */
+            border:1px solid #c8e6c9;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .result-row{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            margin-bottom: 8px;
+        }
+        .distance-text{font-size:16px; font-weight: 500;}
+        .price-title{
+            font-weight:800;
+            font-size: 18px;
+            margin-top:10px;
+            color: #333;
+        }
+        .price-value{
+            font-size:30px; /* Tăng cỡ chữ giá */
+            color: var(--primary); /* Đổi màu thương hiệu */
+            font-weight:900;
+            display: block;
+            margin-top: 4px;
+        }
+        .price-break{
+            margin-top:10px;
+            font-size:14px;
+            line-height: 1.6;
+            color: #555;
+            border-top: 1px solid #c8e6c9;
+            padding-top: 8px;
+        }
+
+        /* ACTIONS (Booking Buttons) */
+        .actions{display:flex;gap:12px;margin-top:20px}
+        .actions a{
+            flex:1;
+            text-align:center;
+            padding:14px;
+            border-radius:10px;
+            color:var(--white);
+            text-decoration:none;
+            font-weight:700; 
+            border: none; 
+            cursor:pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .actions a:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .zalo-btn {background:#007bff; box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);} /* Màu xanh Zalo */
+        .mail{background:#dc3545; box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);} /* Màu đỏ Email */
+
+        /* NOTE & STATUS */
+        .note{
+            margin-top:20px;
+            font-size:14px;
+            color:#333;
+            background:var(--white);
+            padding:15px;
+            border-radius:12px;
+            border: 1px solid #ddd;
+        }
+        .note ul {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+        #instructionText {
+            margin-top: 16px !important;
+            padding: 12px !important;
+            background: #d1ecf1; /* Màu xanh nhạt cho thông báo */
+            border-radius: 10px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            color: #0c5460;
+            text-align: center;
+        }
+        #serviceOffNotice {
+            margin-top: 16px; 
+            padding: 12px; 
+            background: #f8d7da; /* Màu đỏ nhạt cho cảnh báo tắt dịch vụ */
+            color: #721c24; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            text-align: center;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* NEW: Driver Select Styling - Cải tiến nhẹ */
+        #driverRequest {
+            font-size: 16px; 
+            font-weight: 500;
+            border: 1px solid var(--primary); /* Viền màu thương hiệu */
+        }
+        .driver-option-highlight {
+            color: var(--primary); 
+            font-weight: 900 !important;
+            background-color: #f7fcf7;
+        }
+        .driver-option-avatar {
+            margin-right: 5px; 
+            font-size: 1.1em;
+            vertical-align: middle;
+        } 
+
+        /* Modal Styling - Đã giữ nguyên và bổ sung hover/focus */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); z-index: 9999; display: none;
+            justify-content: center; align-items: center; padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            background: #fff; border-radius: 16px; padding: 25px; /* Tăng padding */
+            width: 100%; max-width: 450px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s;
+        }
+        .modal-content h3 {
+            margin-top: 0; color: var(--green); font-size: 24px; text-align: center;
+            font-weight: 800;
+        }
+        #modal-text {
+            white-space: pre-wrap; 
+            font-family: monospace;
+            font-size: 14px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            overflow-x: auto; 
+        }
+        .modal-actions {
+            display: flex; gap: 10px;
+        }
+        .modal-actions button {
+            flex: 1; padding: 12px; border-radius: 10px; font-weight: 700; border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .modal-actions button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        #copyModalBtn { background: #ffc107; color: #333; } 
+        #zaloModalBtn { background: #007bff; color: #fff; }
+        #closeModalBtn { background: #ccc; color: #333; }
+        
+        /* Deposit Modal Styles */
+        #depositModal .modal-content { background: #e6f3e6; border: 1px solid #c8e6c9; }
+        #depositModal h3 { color: #155724; }
+        #depositModal #depositAmount { 
+            font-weight: 900; 
+            font-size: 22px; 
+            color: #007bff; 
+            background: #fff;
+            padding: 5px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        #depositModal #confirmDepositBtn { background: var(--green); color: white; }
+        
+        /* Loading Overlay Style - Căn giữa với icon loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 10000; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px; 
+            color: var(--primary);
+        }
+        .loading-overlay::after {
+            content: '⚙️'; /* Biểu tượng loading */
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(-50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } } 
+
+        @media(min-width:700px){
+            .container{max-width:720px;margin:0 auto}
+            header .header-top {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 0 16px;
+            }
+            header .header-title {
+                text-align: left;
+                font-size: 22px;
+                flex-grow: 0;
+            }
+            header .header-info {
+                margin-top: 0;
+            }
+            header #language-switcher {
+                margin-left: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
 <div id="main-content">
-  <header>
-    <span data-i18n="headerService">🚖 Dịch Vụ Taxi</span><br>
-    Trường An Driving<br>
-    <a href="tel:0847526893" class="phone-number" style="color:white; text-decoration: none;">☎️ 0847526893</a>
-    <select id="language-switcher">
-        <option value="vi">🇻🇳 Tiếng Việt</option>
-        <option value="en">🇬🇧 English</option>
-        <option value="zh">🇨🇳 中文</option>
-    </select>
-  </header> 
+    <header>
+        <div class="header-top">
+            <div class="header-title" data-i18n="headerService">🚖 Dịch Vụ Taxi</div>
+            <div class="header-info">
+                <a href="tel:0847526893" class="phone-number" style="color:white; text-decoration: none;">☎️ 0847526893</a>
+                <select id="language-switcher">
+                    <option value="vi">🇻🇳 Tiếng Việt</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="zh">🇨🇳 中文</option>
+                </select>
+            </div>
+        </div>
+        <div style="font-size: 16px;">Trường An Driving</div>
+    </header> 
 
-  <div class="container">
-    
-    <div id="serviceOffNotice" style="display:none;">
-      </div>
-    
-    <div id="instructionText" style="margin-top: 12px; padding: 10px; background: #e9ecef; border-radius: 8px; font-size: 15px; font-weight: 600; text-align: center;" data-i18n="statusChecking">
-      💰 Đang kiểm tra trạng thái dịch vụ...
-    </div> 
+    <div class="container">
+        
+        <div id="serviceOffNotice" style="display:none;"></div>
+        
+        <div id="instructionText" data-i18n="statusChecking">
+            💰 Đang kiểm tra trạng thái dịch vụ...
+        </div> 
 
-    <div id="booking-form-wrapper"> 
-      <div class="label-row" style="margin-top:6px"><h3 data-i18n="labelPhone">📞 Số điện thoại của bạn (Không bắt buộc để Tính giá)</h3></div>
-      <input id="customerPhone" type="tel" data-i18n-placeholder="placeholderPhone" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel"> 
+        <div id="booking-form-wrapper"> 
+            
+            <div class="label-row" style="margin-top:6px"><h3 data-i18n="labelPhone">📞 Số điện thoại của bạn (Không bắt buộc để Tính giá)</h3></div>
+            <input id="customerPhone" type="tel" data-i18n-placeholder="placeholderPhone" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel"> 
 
-      <div class="label-row">
-        <h3 data-i18n="labelPickup">📍 Điểm đón</h3>
-        <div id="location-status-wrapper">
-          <span id="location-status" style="font-size:12px; color:var(--muted); font-weight:bold;" data-i18n="statusLocating">(Đang tìm vị trí...)</span>
-          <i id="reloadLocationBtn" data-i18n-title="titleReloadLocation" title="Thử lấy lại vị trí">🔄</i>
-        </div>
-      </div>
-      <div class="input-row">
-        <input id="pickup" type="text" data-i18n-placeholder="placeholderPickup" placeholder="Nhập địa chỉ điểm đón (hoặc tự động lấy)">
-        <button class="clear-btn" data-input-id="pickup">✖</button> 
-        <button class="map-btn" id="pick-from-map" data-i18n="btnMap">Bản đồ</button>
-        <div id="pickup-suggestions" class="suggestions" style="display:none"></div>
-      </div> 
+            <div class="label-row">
+                <h3 data-i18n="labelPickup">📍 Điểm đón</h3>
+                <div id="location-status-wrapper">
+                    <span id="location-status" style="font-size:12px; color:var(--muted); font-weight:bold;" data-i18n="statusLocating">(Đang tìm vị trí...)</span>
+                    <i id="reloadLocationBtn" data-i18n-title="titleReloadLocation" title="Thử lấy lại vị trí">🔄</i>
+                </div>
+            </div>
+            <div class="input-row">
+                <input id="pickup" type="text" data-i18n-placeholder="placeholderPickup" placeholder="Nhập địa chỉ điểm đón (hoặc tự động lấy)">
+                <button class="clear-btn" data-input-id="pickup">✖</button> 
+                <button class="map-btn" id="pick-from-map" data-i18n="btnMap">Bản đồ</button>
+                <div id="pickup-suggestions" class="suggestions" style="display:none"></div>
+            </div> 
 
-      <div class="label-row"><h3 data-i18n="labelTime">🕒 Ngày & Giờ đón</h3></div>
-      <input id="pickupDateTime" type="datetime-local"> 
+            <div class="label-row"><h3 data-i18n="labelTime">🕒 Ngày & Giờ đón</h3></div>
+            <input id="pickupDateTime" type="datetime-local"> 
 
-      <div id="stops"></div>
-      <button class="add-stop" id="add-stop-btn" data-i18n="btnAddStop">＋ Thêm điểm dừng</button> 
+            <div id="stops"></div>
+            <button class="add-stop" id="add-stop-btn" data-i18n="btnAddStop">＋ Thêm điểm dừng</button> 
 
-      <div class="label-row"><h3 data-i18n="labelDropoff">🏁 Điểm đến</h3></div>
-      <div class="input-row">
-        <input id="dropoff" type="text" data-i18n-placeholder="placeholderDropoff" placeholder="Nhập địa chỉ điểm đến cuối">
-        <button class="clear-btn" data-input-id="dropoff">✖</button> 
-        <button class="map-btn" id="pick-to-map" data-i18n="btnMap">Bản đồ</button>
-        <div id="dropoff-suggestions" class="suggestions" style="display:none"></div>
-      </div>
-      
-      <div class="label-row"><h3 data-i18n="labelCarType">🚘 Loại xe</h3></div>
-      <select id="carType">
-        <option value="4 chỗ (10.000đ/km)" data-i18n="car4seater">Xe 4 chỗ (10.000đ/km)</option> 
-        <option value="7 chỗ (12.000đ/km)" data-i18n="car7seater">Xe 7 chỗ (12.000đ/km)</option> 
-      </select>
-      
-      <div class="label-row">
-        <h3 data-i18n="labelDriverRequest">
-            🧑‍✈️ Yêu cầu Tài xế 
-            <span class="driver-option-avatar" data-i18n-title="titleDriverIcon" title="Icon này có thể thay bằng Avatar">👤</span>
-        </h3>
-      </div>
-      <select id="driverRequest">
-        <option value="Trường An Driving" class="driver-option-highlight" data-i18n="driverDefault">
-            ⭐ Trường An Driving (Mặc định)
-        </option>
-        <option value="Thanh Loan">👸 Thanh Loan</option>
-        <option value="Đình Tâm">🧑‍✈️ Đình Tâm</option>
-        <option value="Hải Đăng">🧑‍✈️ Hải Đăng</option>
-        <option value="Lê Tâm">🧑‍✈️ Lê Tâm</option>
-        <option value="Nguyễn Thảo">👸 Nguyễn Thảo</option>
-        <option value="Quốc Dũng">🧑‍✈️ Quốc Dũng</option>
-        <option value="Tân Hồ">🧑‍✈️ Tân Hồ</option>
-        <option value="Trần Vinh">🧑‍✈️ Trần Vinh</option>
-        <option value="Xuân Phong">🧑‍✈️ Xuân Phong</option>
-      </select>
-      <div class="label-row"><h3 data-i18n="labelTripType">🚗 Loại chuyến đi</h3></div>
-      <select id="tripType">
-        <option value="1" data-i18n="tripOneWay">1 chiều</option>
-        <option value="2" data-i18n="tripTwoWay">2 chiều (giảm 40% chiều về)</option>
-      </select> 
+            <div class="label-row"><h3 data-i18n="labelDropoff">🏁 Điểm đến</h3></div>
+            <div class="input-row">
+                <input id="dropoff" type="text" data-i18n-placeholder="placeholderDropoff" placeholder="Nhập địa chỉ điểm đến cuối">
+                <button class="clear-btn" data-input-id="dropoff">✖</button> 
+                <button class="map-btn" id="pick-to-map" data-i18n="btnMap">Bản đồ</button>
+                <div id="dropoff-suggestions" class="suggestions" style="display:none"></div>
+            </div>
+            
+            <div class="label-row"><h3 data-i18n="labelCarType">🚘 Loại xe</h3></div>
+            <select id="carType">
+                <option value="4 chỗ (10.000đ/km)" data-i18n="car4seater">Xe 4 chỗ (10.000đ/km)</option> 
+                <option value="7 chỗ (12.000đ/km)" data-i18n="car7seater">Xe 7 chỗ (12.000đ/km)</option> 
+            </select>
+            
+            <div class="label-row">
+                <h3 data-i18n="labelDriverRequest">
+                    🧑‍✈️ Yêu cầu Tài xế 
+                    <span class="driver-option-avatar" data-i18n-title="titleDriverIcon" title="Icon này có thể thay bằng Avatar">👤</span>
+                </h3>
+            </div>
+            <select id="driverRequest">
+                <option value="Trường An Driving" class="driver-option-highlight" data-i18n="driverDefault">
+                    ⭐ Trường An Driving (Mặc định)
+                </option>
+                <option value="Thanh Loan">👸 Thanh Loan</option>
+                <option value="Đình Tâm">🧑‍✈️ Đình Tâm</option>
+                <option value="Hải Đăng">🧑‍✈️ Hải Đăng</option>
+                <option value="Lê Tâm">🧑‍✈️ Lê Tâm</option>
+                <option value="Nguyễn Thảo">👸 Nguyễn Thảo</option>
+                <option value="Quốc Dũng">🧑‍✈️ Quốc Dũng</option>
+                <option value="Tân Hồ">🧑‍✈️ Tân Hồ</option>
+                <option value="Trần Vinh">🧑‍✈️ Trần Vinh</option>
+                <option value="Xuân Phong">🧑‍✈️ Xuân Phong</option>
+            </select>
+            <div class="label-row"><h3 data-i18n="labelTripType">🚗 Loại chuyến đi</h3></div>
+            <select id="tripType">
+                <option value="1" data-i18n="tripOneWay">1 chiều</option>
+                <option value="2" data-i18n="tripTwoWay">2 chiều (giảm 40% chiều về)</option>
+            </select> 
 
-      <div id="waitingWrapper"> 
-        <div class="label-row"><h3 data-i18n="labelWaiting">⏳ Thời gian chờ (giờ)</h3></div>
-        <input id="waiting" type="number" min="0" value="0" data-i18n-placeholder="placeholderWaiting" placeholder="Nhập số giờ chờ">
-      </div> 
+            <div id="waitingWrapper"> 
+                <div class="label-row"><h3 data-i18n="labelWaiting">⏳ Thời gian chờ (giờ)</h3></div>
+                <input id="waiting" type="number" min="0" value="0" data-i18n-placeholder="placeholderWaiting" placeholder="Nhập số giờ chờ">
+            </div> 
 
-      <button class="calc-btn" id="calc-btn" data-i18n="btnCalculate">💰 Tính giá</button>
-    </div> 
-    
-    <div id="map"></div> 
+            <button class="calc-btn" id="calc-btn" data-i18n="btnCalculate">💰 Tính giá</button>
+        </div> 
+        
+        <div id="map"></div> 
 
-    <div id="result" class="result-box" style="display:none">
-      <div class="result-row">
-        <div class="distance-text" id="distanceText"></div>
-      </div> 
+        <div id="result" class="result-box" style="display:none">
+            <div class="result-row">
+                <div class="distance-text" id="distanceText"></div>
+            </div> 
 
-      <div class="price-title" data-i18n="resultPriceTitle">💵 Giá dự kiến</div>
-      <div class="price-value" id="priceValue">— đ</div> 
+            <div class="price-title" data-i18n="resultPriceTitle">💵 Giá dự kiến</div>
+            <div class="price-value" id="priceValue">— đ</div> 
 
-      <div class="price-break" id="priceBreak"></div> 
+            <div class="price-break" id="priceBreak"></div> 
 
-      <div style="margin-top:8px;font-size:14px;color:#333" id="timeEst"></div>
-      <div style="margin-top:4px;font-size:14px;color:#333" id="pickupInfo"></div>
-    </div> 
+            <div style="margin-top:8px;font-size:14px;color:#333" id="timeEst"></div>
+            <div style="margin-top:4px;font-size:14px;color:#333" id="pickupInfo"></div>
+        </div> 
 
-    <div class="actions">
-      <a id="zaloBtn" class="zalo-btn" href="javascript:void(0);" style="display:none;" data-i18n="btnBookZalo">📱 Đặt qua Zalo</a>
-      <a id="mailBtn" class="mail" href="javascript:void(0);" style="display:none;" data-i18n="btnBookMail">📧 Đặt qua Mail</a>
-    </div> 
+        <div class="actions">
+            <a id="zaloBtn" class="zalo-btn" href="javascript:void(0);" style="display:none;" data-i18n="btnBookZalo">📱 Đặt qua Zalo</a>
+            <a id="mailBtn" class="mail" href="javascript:void(0);" style="display:none;" data-i18n="btnBookMail">📧 Đặt qua Mail</a>
+        </div> 
 
-    <div class="note" data-i18n="noteMain">
-      📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).
-      <br>
-      **Thời gian chờ:**
-      <ul>
-        <li>Chờ 0–3 giờ: **Miễn phí**.</li>
-        <li>Kể từ giờ thứ 4, mỗi giờ tiếp theo phát sinh phụ phí **50.000 VNĐ/giờ**.</li>
-        <li>Thời gian chờ được tính từ khi hành khách **hoàn tất việc xuống xe tại điểm đến** cho đến khi xe quay trở lại đón để về điểm xuất phát ban đầu.</li>
-      </ul>
-      Giá đã bao gồm phí cầu đường.
-    </div>
-  </div>
+        <div class="note" data-i18n="noteMain">
+            📌 Ghi chú: Giá 4 chỗ/7 chỗ: **10.000đ/km** / **12.000đ/km**. 2 chiều: chiều về giảm 40% (áp dụng cho chuyến 1 chiều **≥ 45km**).
+            <br>
+            **Thời gian chờ:**
+            <ul>
+                <li>Chờ 0–3 giờ: **Miễn phí**.</li>
+                <li>Kể từ giờ thứ 4, mỗi giờ tiếp theo phát sinh phụ phí **50.000 VNĐ/giờ**.</li>
+                <li>Thời gian chờ được tính từ khi hành khách **hoàn tất việc xuống xe tại điểm đến** cho đến khi xe quay trở lại đón để về điểm xuất phát ban đầu.</li>
+            </ul>
+            Giá đã bao gồm phí cầu đường.
+        </div>
+    </div>
 </div> 
 
 <div id="depositModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <h3 data-i18n="modalDepositTitle">📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều</h3>
-        <p data-i18n="modalDepositNotice1">
-            **Quý khách vui lòng lưu ý:**<br>
-            Để xác nhận và đảm bảo chất lượng phục vụ cho chuyến đi **Hai chiều** của Quý khách, chúng tôi kính mong Quý khách **đặt cọc trước 20%** trên tổng giá cước dự kiến.
-        </p>
-        <p style="text-align:center; font-size:18px;">
-            <span data-i18n="modalDepositAmountText">Số tiền đặt cọc dự kiến:</span> <span id="depositAmount">0 đ</span>
-        </p>
-        <p data-i18n="modalDepositNotice2">
-            Khi nhân viên **Trường An Driving** phản hồi qua Zalo, chúng tôi sẽ gửi **hướng dẫn thanh toán cụ thể** (chuyển khoản) để hoàn tất thủ tục đặt cọc.
-        </p>
-        <p style="font-size:14px; color:#555;" data-i18n="modalDepositNote">
-            **Lưu ý:** Phần còn lại của cước phí sẽ được thanh toán trực tiếp cho tài xế sau khi kết thúc chuyến đi.
-            Xin chân thành cảm ơn Quý khách đã tin tưởng dịch vụ.
-        </p>
-        <div class="modal-actions" style="margin-top:10px;">
-            <button id="confirmDepositBtn" style="width:100%;" data-i18n="modalDepositConfirm">Đã hiểu và Tiếp tục</button>
-        </div>
-    </div>
+    <div class="modal-content">
+        <h3 data-i18n="modalDepositTitle">📝 Yêu cầu Đặt cọc cho Chuyến 2 Chiều</h3>
+        <p data-i18n="modalDepositNotice1">
+            **Quý khách vui lòng lưu ý:**<br>
+            Để xác nhận và đảm bảo chất lượng phục vụ cho chuyến đi **Hai chiều** của Quý khách, chúng tôi kính mong Quý khách **đặt cọc trước 20%** trên tổng giá cước dự kiến.
+        </p>
+        <p style="text-align:center; font-size:18px;">
+            <span data-i18n="modalDepositAmountText">Số tiền đặt cọc dự kiến:</span> <span id="depositAmount">0 đ</span>
+        </p>
+        <p data-i18n="modalDepositNotice2">
+            Khi nhân viên **Trường An Driving** phản hồi qua Zalo, chúng tôi sẽ gửi **hướng dẫn thanh toán cụ thể** (chuyển khoản) để hoàn tất thủ tục đặt cọc.
+        </p>
+        <p style="font-size:14px; color:#555;" data-i18n="modalDepositNote">
+            **Lưu ý:** Phần còn lại của cước phí sẽ được thanh toán trực tiếp cho tài xế sau khi kết thúc chuyến đi.
+            Xin chân thành cảm ơn Quý khách đã tin tưởng dịch vụ.
+        </p>
+        <div class="modal-actions" style="margin-top:10px;">
+            <button id="confirmDepositBtn" style="width:100%;" data-i18n="modalDepositConfirm">Đã hiểu và Tiếp tục</button>
+        </div>
+    </div>
 </div> 
 
 <div id="phoneModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <h3 data-i18n="modalPhoneTitle">📞 Vui lòng nhập Số điện thoại</h3>
-        <p style="text-align:center;" data-i18n="modalPhoneNotice">Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.</p>
-        <input id="inputPhoneForBooking" type="tel" data-i18n-placeholder="placeholderPhone" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
-        <div class="modal-actions" style="margin-top:15px;">
-            <button id="confirmPhoneBtn" data-i18n="modalPhoneConfirm">Xác nhận</button> 
-        </div>
-        <button id="closePhoneModalBtn" style="width:100%; margin-top:10px; padding:8px; border-radius:8px; background:#ccc; color:#333;" data-i18n="modalClose">Đóng</button>
-    </div>
+    <div class="modal-content">
+        <h3 data-i18n="modalPhoneTitle">📞 Vui lòng nhập Số điện thoại</h3>
+        <p style="text-align:center;" data-i18n="modalPhoneNotice">Quý khách vui lòng nhập SĐT để chúng tôi tiện liên hệ xác nhận đơn hàng.</p>
+        <input id="inputPhoneForBooking" type="tel" data-i18n-placeholder="placeholderPhone" placeholder="Nhập SĐT (10 số, VD: 0987654321)" inputmode="tel" required>
+        <div class="modal-actions" style="margin-top:15px;">
+            <button id="confirmPhoneBtn" data-i18n="modalPhoneConfirm">Xác nhận</button> 
+        </div>
+        <button id="closePhoneModalBtn" style="width:100%; margin-top:10px; padding:12px; border-radius:10px; background:#ccc; color:#333;" data-i18n="modalClose">Đóng</button>
+    </div>
 </div> 
 
 <div id="zaloModal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <h3 data-i18n="modalBookingTitle">✅ THÔNG TIN ĐẶT XE</h3>
-        <p style="text-align:center; font-size:15px; font-weight:600;" data-i18n="modalBookingNotice">Sao chép thông tin và gửi qua Zalo:</p>
-        <pre id="modal-text"></pre>
-        <div class="modal-actions">
-            <button id="copyModalBtn" data-i18n="modalBtnCopy">📋 Sao Chép Thông Tin</button> 
-            <button id="zaloModalBtn" data-i18n="modalBtnZalo">📱 Mở Zalo Chat</button>
-        </div>
-        <button id="closeModalBtn" style="width:100%; margin-top:10px; padding:8px; border-radius:8px;" data-i18n="modalClose">Đóng</button>
-    </div>
+    <div class="modal-content">
+        <h3 data-i18n="modalBookingTitle">✅ THÔNG TIN ĐẶT XE</h3>
+        <p style="text-align:center; font-size:15px; font-weight:600;" data-i18n="modalBookingNotice">Sao chép thông tin và gửi qua Zalo:</p>
+        <pre id="modal-text"></pre>
+        <div class="modal-actions">
+            <button id="copyModalBtn" data-i18n="modalBtnCopy">📋 Sao Chép Thông Tin</button> 
+            <button id="zaloModalBtn" data-i18n="modalBtnZalo">📱 Mở Zalo Chat</button>
+        </div>
+        <button id="closeModalBtn" style="width:100%; margin-top:10px; padding:12px; border-radius:10px;" data-i18n="modalClose">Đóng</button>
+    </div>
 </div> 
 
 <div id="loadingOverlay" class="loading-overlay" style="display:none"></div> 
@@ -1624,6 +1872,7 @@ confirmDepositBtn.addEventListener('click', () => {
     const phone = customerPhoneEl.value.trim();
     
     if (phone && validatePhone(phone)) {
+        customerPhoneEl.value = phone; // Update the main phone field
         if (bookingAction === 'zalo') showZaloModal();
         else if (bookingAction === 'mail') showZaloModal(true);
     } else {
@@ -1677,7 +1926,7 @@ function showZaloModal(isMail = false) {
         titleEl.textContent = translations.modalBookingTitle;
         noticeEl.textContent = translations.modalBookingNotice;
         zaloBtn.textContent = translations.modalBtnZalo;
-        zaloBtn.style.background = '#0068ff';
+        zaloBtn.style.background = '#007bff';
         zaloBtn.onclick = () => window.open(ZALO_URL, '_blank');
     }
     
