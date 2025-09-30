@@ -662,15 +662,17 @@ async function reverseGeocode(lat, lon) {
     }
 }
 
+// BỘ CODE SỬA LỖI ĐIỂM ĐÓN ĐƯỢC TÍCH HỢP Ở ĐÂY
 function getGeolocation() {
     const L = LANGUAGES[currentLang];
     locationStatusEl.textContent = L.pickup_status_loading;
     locationStatusEl.style.color = 'var(--muted)';
     reloadLocationBtn.style.color = '#ccc'; 
-    reloadLocationBtn.style.pointerEvents = 'none';
+    reloadLocationBtn.style.pointerEvents = 'none'; // Tắt nút khi đang tìm kiếm
 
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(async (pos)=>{
+            // --- LOGIC THÀNH CÔNG ---
             userLocation = [pos.coords.latitude, pos.coords.longitude]; 
             initMap(userLocation); // Khởi tạo map bằng vị trí người dùng
             
@@ -686,6 +688,8 @@ function getGeolocation() {
 
             locationStatusEl.textContent = L.pickup_status_success;
             locationStatusEl.style.color = 'var(--green)';
+            
+            // KÍCH HOẠT LẠI NÚT TẢI LẠI
             reloadLocationBtn.style.color = '#007bff';
             reloadLocationBtn.style.pointerEvents = 'auto';
 
@@ -694,6 +698,7 @@ function getGeolocation() {
 
 
         }, (err)=>{
+            // --- LOGIC THẤT BẠI ---
             console.warn('Geolocation Error:', err.message);
             initMap(DEFAULT_CENTER); // Khởi tạo map bằng vị trí mặc định
             
@@ -708,19 +713,25 @@ function getGeolocation() {
             
             locationStatusEl.textContent = statusText;
             locationStatusEl.style.color = '#dc3545';
+            
+            // KÍCH HOẠT LẠI NÚT TẢI LẠI KHI THẤT BẠI
             reloadLocationBtn.style.color = '#007bff';
             reloadLocationBtn.style.pointerEvents = 'auto';
 
 
         }, { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }); 
     } else {
+        // --- LOGIC TRÌNH DUYỆT KHÔNG HỖ TRỢ ---
         initMap(DEFAULT_CENTER); // Khởi tạo map bằng vị trí mặc định
         locationStatusEl.textContent = L.pickup_status_notsup;
         locationStatusEl.style.color = '#dc3545';
+        
+        // Tắt nút vĩnh viễn nếu trình duyệt không hỗ trợ
         reloadLocationBtn.style.color = '#ccc';
         reloadLocationBtn.style.pointerEvents = 'none';
     }
 }
+// KẾT THÚC BỘ CODE SỬA LỖI ĐIỂM ĐÓN
 
 function debounce(func, timeout = DEBOUNCE_TIME) {
   let timer;
