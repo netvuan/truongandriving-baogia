@@ -213,23 +213,19 @@
         .map-btn:hover {
             background: var(--green-dark);
         }
-        
+
         /* Stop Input/Remove */
-        /* === START: SỬA ĐỔI CSS CHO ĐIỂM DỪNG === */
-        .way-wrapper { margin-top: 8px; } /* Thêm margin-top cho điểm dừng */
         .way-wrapper input[type="text"] {
-            padding-right: 125px; /* Tăng padding để có chỗ cho 2 nút */
+            /* Tăng padding để chứa cả nút Xóa và Bản đồ */
+            padding-right: 125px; 
         }
         .way-wrapper .map-btn {
-            right: 50px; /* Vị trí nút bản đồ */
+            /* Vị trí nút bản đồ trong điểm dừng */
+            right: 52px; 
         }
-        .way-wrapper .way-remove {
-            right: 8px; /* Vị trí nút xóa */
-        }
-        /* === END: SỬA ĐỔI CSS CHO ĐIỂM DỪNG === */
-
         .way-remove{
             position:absolute;
+            right:8px;
             top:50%;
             transform: translateY(-50%);
             background:#ff4d4d; /* Màu đỏ nổi bật hơn */
@@ -518,6 +514,31 @@
         }
         #depositModal #confirmDepositBtn { background: var(--green); color: white; }
 
+        /* === NEW: MAP MODAL STYLES === */
+        #mapModal .modal-content {
+            max-width: 800px; /* Rộng hơn cho bản đồ */
+            padding: 15px;
+        }
+        #mapModal h3 {
+             font-size: 20px;
+             margin-bottom: 10px;
+        }
+        #map-modal-container {
+            height: 65vh; /* Chiều cao tương đối */
+            max-height: 500px;
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+        }
+        #mapModal .modal-actions button {
+            width: 100%; /* Nút chiếm toàn bộ chiều rộng */
+        }
+        #confirmMapSelectionBtn {
+            background: var(--green);
+            color: white;
+        }
+        
         /* Loading Overlay Style */
         .loading-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -582,7 +603,7 @@
             <div class="input-row">
                 <input id="pickup" type="text" data-i18n-placeholder="placeholderPickup" placeholder="Nhập địa chỉ điểm đón (hoặc tự động lấy)">
                 <button class="clear-btn" data-input-id="pickup">✖</button>
-                <button class="map-btn" id="pick-from-map" data-i18n="btnMap">Bản đồ</button>
+                <button class="map-btn" data-target-input="pickup" data-i18n="btnMap">Bản đồ</button>
                 <div id="pickup-suggestions" class="suggestions" style="display:none"></div>
             </div>
 
@@ -600,7 +621,7 @@
             <div class="input-row">
                 <input id="dropoff" type="text" data-i18n-placeholder="placeholderDropoff" placeholder="Nhập địa chỉ điểm đến cuối">
                 <button class="clear-btn" data-input-id="dropoff">✖</button>
-                <button class="map-btn" id="pick-to-map" data-i18n="btnMap">Bản đồ</button>
+                <button class="map-btn" data-target-input="dropoff" data-i18n="btnMap">Bản đồ</button>
                 <div id="dropoff-suggestions" class="suggestions" style="display:none"></div>
             </div>
 
@@ -670,6 +691,16 @@
 
         <div class="note" id="note-container">
             </div>
+    </div>
+</div>
+
+<div id="mapModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 id="mapModalTitle">Chọn Vị Trí</h3>
+        <div id="map-modal-container"></div>
+        <div class="modal-actions" style="margin-top:10px;">
+            <button id="confirmMapSelectionBtn">Xác nhận vị trí</button>
+        </div>
     </div>
 </div>
 
@@ -826,12 +857,9 @@ const i18n = {
         alertNoStopCoord: 'Không tìm thấy tọa độ cho một Điểm dừng.',
         alertNoSuggestions: 'Không tìm thấy địa điểm',
         alertSearching: 'Đang tìm kiếm...',
-        alertMapPickPickup: 'Bấm vào bản đồ để chọn điểm đón',
-        alertMapPickDropoff: 'Bấm vào bản đồ để chọn điểm đến',
-        // === START: THÊM MỤC DỊCH MỚI ===
-        alertMapPickStop: 'Bấm vào bản đồ để chọn điểm dừng',
-        // === END: THÊM MỤC DỊCH MỚI ===
-
+        mapModalTitlePickup: 'Chọn điểm đón',
+        mapModalTitleDropoff: 'Chọn điểm đến',
+        mapModalTitleStop: 'Chọn điểm dừng',
     },
     en: {
         appTitle: "🚖 Truong An Driving Taxi Service",
@@ -923,9 +951,9 @@ const i18n = {
         alertNoStopCoord: 'Coordinates not found for a Stopover.',
         alertNoSuggestions: 'No locations found',
         alertSearching: 'Searching...',
-        alertMapPickPickup: 'Click on the map to select the pickup point',
-        alertMapPickDropoff: 'Click on the map to select the drop-off point',
-        alertMapPickStop: 'Click on the map to select a stopover point',
+        mapModalTitlePickup: 'Select Pickup Location',
+        mapModalTitleDropoff: 'Select Drop-off Location',
+        mapModalTitleStop: 'Select Stopover Location',
     },
     zh: {
         appTitle: "🚖 长安驾驶出租车服务",
@@ -1017,9 +1045,9 @@ const i18n = {
         alertNoStopCoord: '找不到某个经停点的坐标。',
         alertNoSuggestions: '未找到地点',
         alertSearching: '正在搜索...',
-        alertMapPickPickup: '点击地图选择上车点',
-        alertMapPickDropoff: '点击地图选择下车点',
-        alertMapPickStop: '点击地图选择经停点',
+        mapModalTitlePickup: '选择上车地点',
+        mapModalTitleDropoff: '选择下车地点',
+        mapModalTitleStop: '选择经停点',
     }
 };
 
@@ -1032,7 +1060,6 @@ function updateContent() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (translations[key]) {
-            // Sửa lại: Dùng innerHTML cho noteMain, còn lại dùng textContent
              if (key === 'noteMain' || key.includes('modalDeposit')) {
                 element.innerHTML = translations[key];
             } else {
@@ -1097,11 +1124,11 @@ const GOOGLE_MAPS_BASE_URL = "https://www.google.com/maps/search/?api=1&query=";
 const TAXI_PHONE = "0847526893";
 const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`;
 const DEBOUNCE_TIME = 300;
-const DEFAULT_CENTER = [10.77653, 106.70098];
+const DEFAULT_CENTER = [10.9833, 106.6667]; // Tọa độ Bình Dương
 const SOUTHERN_VN_VIEWBOX = '104.5,8.5,107.5,12.0';
 let userLocation = null;
 let isServiceActive = false;
-let lastBookingAction = null; // 'zalo' hoặc 'mail' để gọi lại sau khi nhập SĐT
+let lastBookingAction = null; 
 
 /* DOM */
 const customerPhoneEl = document.getElementById('customerPhone');
@@ -1130,80 +1157,81 @@ const bookingFormWrapper = document.getElementById('booking-form-wrapper');
 const locationStatusEl = document.getElementById('location-status');
 const reloadLocationBtn = document.getElementById('reloadLocationBtn');
 
-// Modal DOM
+// Modal DOMs
 const zaloModal = document.getElementById('zaloModal');
 const modalText = document.getElementById('modal-text');
 const copyModalBtn = document.getElementById('copyModalBtn');
 const zaloModalBtn = document.getElementById('zaloModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
-
-// Phone Modal DOM (MỚI)
 const phoneModal = document.getElementById('phoneModal');
 const phoneModalInput = document.getElementById('phoneModalInput');
 const phoneModalError = document.getElementById('phoneModalError');
 const phoneModalConfirmBtn = document.getElementById('phoneModalConfirmBtn');
-
-// Deposit Modal DOM
 const depositModal = document.getElementById('depositModal');
 const depositAmount = document.getElementById('depositAmount');
 const confirmDepositBtn = document.getElementById('confirmDepositBtn');
 
+// === NEW MAP MODAL DOM ===
+const mapModal = document.getElementById('mapModal');
+const mapModalTitle = document.getElementById('mapModalTitle');
+const confirmMapSelectionBtn = document.getElementById('confirmMapSelectionBtn');
+const mapModalContainer = document.getElementById('map-modal-container');
+
 let finalZaloMessage = '';
 let finalTotalFee = 0;
-let map;
-let pickupMarker = null, dropoffMarker = null, routeLayer = null;
-let selecting = null;
+let map, modalMap;
+let pickupMarker = null, dropoffMarker = null, routeLayer = null, modalMarker = null;
+let currentTargetInputId = null; // ID của input đang được chọn bằng bản đồ popup
 let stopCount = 0;
-let lastFocusedStopId = null;
 let bookingAction = null;
 
 /* ---------- TÍN HIỆU KILL SWITCH (Polling) ---------- */
 
 async function checkServiceStatus() {
-    const cacheBuster = `?t=${Date.now()}`;
-    const finalUrl = REMOTE_STATUS_URL + cacheBuster;
+    const cacheBuster = `?t=${Date.now()}`;
+    const finalUrl = REMOTE_STATUS_URL + cacheBuster;
 
-    try {
-        const response = await fetch(finalUrl, { cache: 'no-store', signal: AbortSignal.timeout(3000) });
-        if (!response.ok) {
-            return { active: false, message_vn: i18n[currentLang].errorServiceFetch };
-        }
-        const data = await response.json();
+    try {
+        const response = await fetch(finalUrl, { cache: 'no-store', signal: AbortSignal.timeout(3000) });
+        if (!response.ok) {
+            return { active: false, message_vn: i18n[currentLang].errorServiceFetch };
+        }
+        const data = await response.json();
         let statusMessage = data[`message_${currentLang}`] || data.message_vn;
-        return { active: data.active, message_vn: statusMessage };
-    } catch (error) {
-        let msg = i18n[currentLang].errorNetwork;
-        if (error.name === 'TimeoutError') msg = i18n[currentLang].errorTimeout;
-        console.error("Lỗi khi fetch trạng thái dịch vụ:", error);
-        return { active: false, message_vn: msg };
-    }
+        return { active: data.active, message_vn: statusMessage };
+    } catch (error) {
+        let msg = i18n[currentLang].errorNetwork;
+        if (error.name === 'TimeoutError') msg = i18n[currentLang].errorTimeout;
+        console.error("Lỗi khi fetch trạng thái dịch vụ:", error);
+        return { active: false, message_vn: msg };
+    }
 }
 
 async function updateUIBasedOnStatus(status) {
-    isServiceActive = status.active;
-    instructionText.style.display = 'block';
+    isServiceActive = status.active;
+    instructionText.style.display = 'block';
 
-    if (!isServiceActive) {
-        calcBtn.disabled = true;
-        serviceOffNotice.style.display = 'block';
-        serviceOffNotice.innerHTML = status.message_vn;
-        zaloBtn.style.display = 'none';
-        mailBtn.style.display = 'none';
-        resultBox.style.display = 'none';
-        instructionText.style.display = 'none';
+    if (!isServiceActive) {
+        calcBtn.disabled = true;
+        serviceOffNotice.style.display = 'block';
+        serviceOffNotice.innerHTML = status.message_vn;
+        zaloBtn.style.display = 'none';
+        mailBtn.style.display = 'none';
+        resultBox.style.display = 'none';
+        instructionText.style.display = 'none';
 
-    } else {
-        calcBtn.disabled = false;
-        serviceOffNotice.style.display = 'none';
-        instructionText.innerHTML = status.message_vn || i18n[currentLang].statusActive;
+    } else {
+        calcBtn.disabled = false;
+        serviceOffNotice.style.display = 'none';
+        instructionText.innerHTML = status.message_vn || i18n[currentLang].statusActive;
         zaloBtn.style.display = 'block';
         mailBtn.style.display = 'block';
-    }
+    }
     checkPhoneStatus();
 }
 
 function validatePhone(phone) {
-    return /^0\d{9}$/.test(phone);
+    return /^0\d{9}$/.test(phone);
 }
 
 function checkPhoneStatus() {
@@ -1222,117 +1250,112 @@ function checkPhoneStatus() {
 
 customerPhoneEl.addEventListener('input', checkPhoneStatus);
 
-// CÁC HÀM KHÁC (GIỮ NGUYÊN HOẶC CHỈNH SỬA NHỎ)
-// ... (Phần lớn JS từ đây xuống đến hàm calculateAndGenerateMessage giữ nguyên)
 function initMap(center) {
-    if (!map) {
-        map = L.map('map').setView(center, 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        map.on('click', handleMapClick);
-    } else {
-        map.setView(center, 11);
-    }
+    if (!map) {
+        map = L.map('map').setView(center, 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    } else {
+        map.setView(center, 11);
+    }
 }
 async function reverseGeocode(lat, lon) {
-    try {
-        const url = `${REVERSE_NOMINATIM}?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=${currentLang},en`;
-        const r = await fetch(url);
-        const data = await r.json();
-        return data.display_name;
-    } catch (e) {
-        return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-    }
+    try {
+        const url = `${REVERSE_NOMINATIM}?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=${currentLang},en`;
+        const r = await fetch(url);
+        const data = await r.json();
+        return data.display_name;
+    } catch (e) {
+        return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    }
 }
 function getGeolocation() {
     const translations = i18n[currentLang];
-    locationStatusEl.textContent = translations.statusLocating;
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(async (pos)=>{
-            userLocation = [pos.coords.latitude, pos.coords.longitude];
-            initMap(userLocation);
-            const address = await reverseGeocode(userLocation[0], userLocation[1]);
-            pickupEl.value = address;
-            pickupEl.dataset.lat = userLocation[0];
-            pickupEl.dataset.lon = userLocation[1];
-            if(pickupMarker) map.removeLayer(pickupMarker);
-            pickupMarker = L.marker(userLocation).addTo(map).bindPopup(translations.statusPopup).openPopup();
-            locationStatusEl.textContent = translations.statusLocated;
-            locationStatusEl.style.color = 'var(--green)';
-        }, (err)=>{
-            initMap(DEFAULT_CENTER);
-            let statusText = translations.errorLocating;
-            if (err.code === err.PERMISSION_DENIED) statusText = translations.errorDenied;
+    locationStatusEl.textContent = translations.statusLocating;
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(async (pos)=>{
+            userLocation = [pos.coords.latitude, pos.coords.longitude];
+            initMap(userLocation);
+            const address = await reverseGeocode(userLocation[0], userLocation[1]);
+            pickupEl.value = address;
+            pickupEl.dataset.lat = userLocation[0];
+            pickupEl.dataset.lon = userLocation[1];
+            if(pickupMarker) map.removeLayer(pickupMarker);
+            pickupMarker = L.marker(userLocation).addTo(map).bindPopup(translations.statusPopup).openPopup();
+            locationStatusEl.textContent = translations.statusLocated;
+            locationStatusEl.style.color = 'var(--green)';
+        }, (err)=>{
+            initMap(DEFAULT_CENTER);
+            let statusText = translations.errorLocating;
+            if (err.code === err.PERMISSION_DENIED) statusText = translations.errorDenied;
             else if (err.code === err.POSITION_UNAVAILABLE) statusText = translations.errorUnavailable;
             else if (err.code === err.TIMEOUT) statusText = translations.errorTimeoutLoc;
-            locationStatusEl.textContent = statusText;
-            locationStatusEl.style.color = 'var(--danger)';
-        });
-    } else {
-        initMap(DEFAULT_CENTER);
-        locationStatusEl.textContent = translations.errorNotSupported;
-    }
+            locationStatusEl.textContent = statusText;
+            locationStatusEl.style.color = 'var(--danger)';
+        });
+    } else {
+        initMap(DEFAULT_CENTER);
+        locationStatusEl.textContent = translations.errorNotSupported;
+    }
 }
 function debounce(func, timeout = DEBOUNCE_TIME) { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => { func.apply(this, args); }, timeout); }; }
 function toggleWaitingInput(){ waitingWrapper.style.display = (tripTypeEl.value === '1') ? 'none' : 'block'; }
 tripTypeEl.addEventListener('change', toggleWaitingInput);
 toggleWaitingInput();
 async function geocodeOnce(query){
-  try{
-    let url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=VN&addressdetails=1&accept-language=${currentLang},en`;
+  try{
+    let url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=VN&addressdetails=1&accept-language=${currentLang},en`;
     if(userLocation) url += `&viewbox=${userLocation[1]-0.5},${userLocation[0]-0.5},${userLocation[1]+0.5},${userLocation[0]+0.5}`;
     else url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
-    const r = await fetch(url);
-    const data = await r.json();
-    if(Array.isArray(data) && data.length>0) return data[0];
-  }catch(e){ console.warn('geocode once error', e); }
-  return null;
+    const r = await fetch(url);
+    const data = await r.json();
+    if(Array.isArray(data) && data.length>0) return data[0];
+  }catch(e){ console.warn('geocode once error', e); }
+  return null;
 }
 function attachAutocomplete(inputEl, boxEl){
-  let controller = null;
+  let controller = null;
   const translations = i18n[currentLang];
-  const doSearch = async ()=>{
-    const q = inputEl.value.trim();
-    if(!q){ boxEl.style.display = 'none'; return; }
-    if(controller) controller.abort();
-    controller = new AbortController();
-    boxEl.innerHTML = `<div>${translations.alertSearching}</div>`;
-    boxEl.style.display = 'block';
-    let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=${currentLang},en`;
+  const doSearch = async ()=>{
+    const q = inputEl.value.trim();
+    if(!q){ boxEl.style.display = 'none'; return; }
+    if(controller) controller.abort();
+    controller = new AbortController();
+    boxEl.innerHTML = `<div>${translations.alertSearching}</div>`;
+    boxEl.style.display = 'block';
+    let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=${currentLang},en`;
     if(userLocation) url += `&viewbox=${userLocation[1]-0.3},${userLocation[0]-0.3},${userLocation[1]+0.3},${userLocation[0]+0.3}`;
     else url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
-    try{
-      const res = await fetch(url, { signal: controller.signal });
-      const data = await res.json();
-      if(!Array.isArray(data) || data.length === 0){
-        boxEl.innerHTML = `<div>${translations.alertNoSuggestions}</div>`;
-        setTimeout(() => boxEl.style.display = 'none', 1000); return;
-      }
+    try{
+      const res = await fetch(url, { signal: controller.signal });
+      const data = await res.json();
+      if(!Array.isArray(data) || data.length === 0){
+        boxEl.innerHTML = `<div>${translations.alertNoSuggestions}</div>`;
+        setTimeout(() => boxEl.style.display = 'none', 1000); return;
+      }
       boxEl.innerHTML = '';
-      data.forEach(place => {
-        const d = document.createElement('div');
-        d.innerHTML = `<span>📍</span><div>${place.display_name}</div>`;
-        d.addEventListener('click', ()=>{
-          inputEl.value = place.display_name;
-          inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon;
-          boxEl.style.display = 'none';
-          const latlng = [parseFloat(place.lat), parseFloat(place.lon)];
-          if(map) {
-            if(inputEl.id === 'pickup'){ if(pickupMarker) map.removeLayer(pickupMarker); pickupMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupPickup).openPopup(); map.setView(latlng, 14); }
+      data.forEach(place => {
+        const d = document.createElement('div');
+        d.innerHTML = `<span>📍</span><div>${place.display_name}</div>`;
+        d.addEventListener('click', ()=>{
+          inputEl.value = place.display_name;
+          inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon;
+          boxEl.style.display = 'none';
+          const latlng = [parseFloat(place.lat), parseFloat(place.lon)];
+          if(map) {
+            if(inputEl.id === 'pickup'){ if(pickupMarker) map.removeLayer(pickupMarker); pickupMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupPickup).openPopup(); map.setView(latlng, 14); }
             else if(inputEl.id === 'dropoff'){ if(dropoffMarker) map.removeLayer(dropoffMarker); dropoffMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupDropoff).openPopup(); map.setView(latlng, 14); }
-          }
-        });
-        boxEl.appendChild(d);
-      });
-    }catch(err){ if(err.name !== 'AbortError') console.error('suggest error', err); }
-  };
-  inputEl.addEventListener('input', debounce(doSearch));
-  document.addEventListener('click', (ev)=>{ if(!boxEl.contains(ev.target) && ev.target !== inputEl) boxEl.style.display = 'none'; });
-  inputEl.addEventListener('focus', ()=> { if(inputEl.id.startsWith('stop-')) lastFocusedStopId = inputEl.id; else lastFocusedStopId = null; });
+          }
+        });
+        boxEl.appendChild(d);
+      });
+    }catch(err){ if(err.name !== 'AbortError') console.error('suggest error', err); }
+  };
+  inputEl.addEventListener('input', debounce(doSearch));
+  document.addEventListener('click', (ev)=>{ if(!boxEl.contains(ev.target) && ev.target !== inputEl) boxEl.style.display = 'none'; });
 }
 attachAutocomplete(pickupEl, pickupSugg);
 attachAutocomplete(dropoffEl, dropoffSugg);
 
-// === START: THAY THẾ TOÀN BỘ HÀM createStopInput ===
 function createStopInput(prefill=''){
     stopCount++;
     const translations = i18n[currentLang];
@@ -1340,166 +1363,221 @@ function createStopInput(prefill=''){
     wrapper.className = 'way-wrapper input-row';
     const inputId = `stop-${stopCount}`;
     
-    // Tạo nội dung HTML cho điểm dừng, bao gồm nút Bản đồ
-    const mapAlertText = translations.alertMapPickStop.replace(/'/g, "\\'"); // Escape single quotes for use in onclick
-    wrapper.innerHTML = `
-        <input 
-            type="text" 
-            id="${inputId}" 
-            placeholder="${translations.placeholderPickup.replace(translations.labelPickup.split(' ')[1], 'điểm dừng ' + stopCount)}" 
-            value="${prefill}"
-        >
-        <button 
-            class="map-btn" 
-            onclick="selecting=null; lastFocusedStopId='${inputId}'; alert('${mapAlertText}');" 
-            title="Chọn điểm dừng ${stopCount} trên bản đồ"
-        >
-            ${translations.btnMap}
-        </button>
-        <button 
-            class="way-remove" 
-            title="Xóa điểm dừng ${stopCount}"
-        >
-            ✖
-        </button>
-        <div id="${inputId}-suggestions" class="suggestions" style="display:none"></div>
-    `;
-    
+    // === MODIFIED: Add map button to the template ===
+    wrapper.innerHTML = `<input type="text" id="${inputId}" placeholder="Nhập địa chỉ điểm dừng ${stopCount}">
+                         <button class="map-btn" data-target-input="${inputId}" data-i18n="btnMap">Bản đồ</button>
+                         <button class="way-remove" title="Xóa">✖</button>
+                         <div id="${inputId}-suggestions" class="suggestions" style="display:none"></div>`;
+                         
     stopsContainer.appendChild(wrapper);
-    
     const inputEl = wrapper.querySelector('input');
     const boxEl = wrapper.querySelector('.suggestions');
     
-    // Gắn chức năng gợi ý địa điểm và xóa như cũ
+    // === NEW: Add event listener to the new map button ===
+    wrapper.querySelector('.map-btn').addEventListener('click', (e) => {
+        const targetId = e.currentTarget.getAttribute('data-target-input');
+        openMapModal(targetId);
+    });
+
     attachAutocomplete(inputEl, boxEl);
-    wrapper.querySelector('.way-remove').addEventListener('click', () => wrapper.remove());
-    
-    // Gắn listener để khi focus vào ô input, nó sẽ trở thành mục tiêu cho việc chọn trên bản đồ
-    inputEl.addEventListener('focus', () => lastFocusedStopId = inputId);
-    
+    wrapper.querySelector('.way-remove').addEventListener('click', ()=> wrapper.remove());
     return inputEl;
 }
-// === END: THAY THẾ TOÀN BỘ HÀM createStopInput ===
 
 document.getElementById('add-stop-btn').addEventListener('click', ()=> createStopInput());
-document.getElementById('pick-from-map').addEventListener('click', ()=> { selecting = 'pickup'; lastFocusedStopId = null; alert(i18n[currentLang].alertMapPickPickup); });
-document.getElementById('pick-to-map').addEventListener('click', ()=> { selecting = 'dropoff'; lastFocusedStopId = null; alert(i18n[currentLang].alertMapPickDropoff); });
-const handleMapClick = async (e) => {
-  if (!map || (!selecting && !lastFocusedStopId)) return;
-  const {lat, lng} = e.latlng;
-  const translations = i18n[currentLang];
-  let targetInput, popupText;
-  if(selecting === 'pickup'){ targetInput = pickupEl; popupText = translations.mapPopupPickup; if(pickupMarker) map.removeLayer(pickupMarker); pickupMarker = L.marker([lat,lng]).addTo(map).bindPopup(popupText).openPopup(); }
-  else if(selecting === 'dropoff'){ targetInput = dropoffEl; popupText = translations.mapPopupDropoff; if(dropoffMarker) map.removeLayer(dropoffMarker); dropoffMarker = L.marker([lat,lng]).addTo(map).bindPopup(popupText).openPopup(); }
-  else if(lastFocusedStopId){ targetInput = document.getElementById(lastFocusedStopId); popupText = translations.mapPopupStop; L.marker([lat,lng]).addTo(map).bindPopup(popupText).openPopup(); }
-  
-  if(targetInput){
-    const address = await reverseGeocode(lat, lng);
-    targetInput.value = address;
-    targetInput.dataset.lat = lat; targetInput.dataset.lon = lng;
-  }
-  selecting = null; // Reset cả hai để tránh nhầm lẫn
-  lastFocusedStopId = null; 
-};
+
+
 async function resolveCoordForInput(inputEl){
-  if(inputEl.dataset && inputEl.dataset.lat && inputEl.dataset.lon) return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)];
-  const v = inputEl.value.trim();
-  if(!v) return null;
-  const place = await geocodeOnce(v + ' Việt Nam');
-  if(place){ inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon; return [parseFloat(place.lat), parseFloat(place.lon)]; }
-  return null;
+    if(inputEl.dataset && inputEl.dataset.lat && inputEl.dataset.lon) return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)];
+    const v = inputEl.value.trim();
+    if(!v) return null;
+    const place = await geocodeOnce(v + ' Việt Nam');
+    if(place){ inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon; return [parseFloat(place.lat), parseFloat(place.lon)]; }
+    return null;
 }
 function validateRouteInputs() {
     const translations = i18n[currentLang];
-    if (!pickupEl.value.trim()) { alert(translations.alertPickup); pickupEl.focus(); return false; }
-    if (!dropoffEl.value.trim()) { alert(translations.alertDropoff); dropoffEl.focus(); return false; }
-    if (tripTypeEl.value === '2' && (isNaN(parseFloat(waitingEl.value)) || parseFloat(waitingEl.value) < 0)) {
+    if (!pickupEl.value.trim()) { alert(translations.alertPickup); pickupEl.focus(); return false; }
+    if (!dropoffEl.value.trim()) { alert(translations.alertDropoff); dropoffEl.focus(); return false; }
+    if (tripTypeEl.value === '2' && (isNaN(parseFloat(waitingEl.value)) || parseFloat(waitingEl.value) < 0)) {
         alert(translations.alertWaiting); waitingEl.focus(); return false;
     }
-    return true;
+    return true;
 }
 
-// Hàm chính tính giá
+// === NEW: MAP MODAL LOGIC ===
+function initModalMap(center) {
+    if (!modalMap) {
+        modalMap = L.map(mapModalContainer).setView(center, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(modalMap);
+        modalMap.on('click', (e) => {
+            if (modalMarker) {
+                modalMarker.setLatLng(e.latlng);
+            }
+        });
+    } else {
+        modalMap.setView(center, 13);
+    }
+}
+
+function openMapModal(targetInputId) {
+    currentTargetInputId = targetInputId;
+    const targetInput = document.getElementById(targetInputId);
+    const translations = i18n[currentLang];
+    
+    // Set modal title based on the input
+    if (targetInputId === 'pickup') {
+        mapModalTitle.textContent = translations.mapModalTitlePickup;
+    } else if (targetInputId === 'dropoff') {
+        mapModalTitle.textContent = translations.mapModalTitleDropoff;
+    } else {
+        mapModalTitle.textContent = translations.mapModalTitleStop;
+    }
+
+    let initialCenter = userLocation || DEFAULT_CENTER;
+    // If the input already has coordinates, use them
+    if (targetInput.dataset.lat && targetInput.dataset.lon) {
+        initialCenter = [parseFloat(targetInput.dataset.lat), parseFloat(targetInput.dataset.lon)];
+    }
+
+    openModal(mapModal);
+    initModalMap(initialCenter);
+
+    if (modalMarker) {
+        modalMarker.setLatLng(initialCenter);
+    } else {
+        modalMarker = L.marker(initialCenter, { draggable: true }).addTo(modalMap);
+    }
+    
+    // This is crucial to fix map rendering inside a modal
+    setTimeout(() => {
+        modalMap.invalidateSize();
+    }, 10); 
+}
+
+confirmMapSelectionBtn.addEventListener('click', async () => {
+    if (!modalMarker || !currentTargetInputId) return;
+
+    const { lat, lng } = modalMarker.getLatLng();
+    const targetInput = document.getElementById(currentTargetInputId);
+
+    // Show a temporary loading state on the input
+    const originalPlaceholder = targetInput.placeholder;
+    targetInput.value = '';
+    targetInput.placeholder = 'Đang lấy địa chỉ...';
+
+    const address = await reverseGeocode(lat, lng);
+
+    targetInput.value = address;
+    targetInput.dataset.lat = lat;
+    targetInput.dataset.lon = lng;
+    targetInput.placeholder = originalPlaceholder;
+    
+    // Update main map marker for visual consistency
+    if(map) {
+        if(currentTargetInputId === 'pickup'){ 
+            if(pickupMarker) map.removeLayer(pickupMarker); 
+            pickupMarker = L.marker([lat, lng]).addTo(map).bindPopup(i18n[currentLang].mapPopupPickup).openPopup(); 
+            map.setView([lat, lng], 14); 
+        } else if(currentTargetInputId === 'dropoff'){ 
+            if(dropoffMarker) map.removeLayer(dropoffMarker); 
+            dropoffMarker = L.marker([lat, lng]).addTo(map).bindPopup(i18n[currentLang].mapPopupDropoff).openPopup(); 
+            map.setView([lat, lng], 14); 
+        } else {
+             L.marker([lat, lng]).addTo(map).bindPopup(i18n[currentLang].mapPopupStop).openPopup();
+        }
+    }
+
+    closeModal(mapModal);
+    currentTargetInputId = null;
+});
+
+// Add listeners to existing map buttons
+document.querySelectorAll('.map-btn[data-target-input]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const targetId = e.currentTarget.getAttribute('data-target-input');
+        openMapModal(targetId);
+    });
+});
+// =============================
+
 async function calculateAndGenerateMessage() {
     const translations = i18n[currentLang];
-    if (!validateRouteInputs()) return false;
+    if (!validateRouteInputs()) return false;
 
-    resultBox.style.display = 'block';
+    resultBox.style.display = 'block';
     resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    distanceText.textContent = translations.statusCalculatingRoute;
-    priceValue.textContent = '...'; priceBreak.innerHTML = ''; timeEst.textContent = '';
-    instructionText.innerHTML = translations.statusCalculating;
+    distanceText.textContent = translations.statusCalculatingRoute;
+    priceValue.textContent = '...'; priceBreak.innerHTML = ''; timeEst.textContent = '';
+    instructionText.innerHTML = translations.statusCalculating;
     zaloBtn.classList.add('inactive-booking'); mailBtn.classList.add('inactive-booking');
 
-    const pickupCoord = await resolveCoordForInput(pickupEl);
-    if(!pickupCoord){ alert(translations.alertNoCoord); return false; }
-    const dropoffCoord = await resolveCoordForInput(dropoffEl);
-    if(!dropoffCoord){ alert(translations.alertNoCoord); return false; }
+    const pickupCoord = await resolveCoordForInput(pickupEl);
+    if(!pickupCoord){ alert(translations.alertNoCoord); return false; }
+    const dropoffCoord = await resolveCoordForInput(dropoffEl);
+    if(!dropoffCoord){ alert(translations.alertNoCoord); return false; }
 
-    const coords = [pickupCoord];
+    const coords = [pickupCoord];
     const stopCoords = [];
-    for(const s of stopsContainer.querySelectorAll('input[id^="stop-"]')){
-        if(s.value.trim()){
-            const sc = await resolveCoordForInput(s);
-            if(!sc){ alert(translations.alertNoStopCoord); return false; }
-            coords.push(sc); stopCoords.push({input: s, coord: sc});
-        }
-    }
-    coords.push(dropoffCoord);
+    for(const s of stopsContainer.querySelectorAll('input[id^="stop-"]')){
+        if(s.value.trim()){
+            const sc = await resolveCoordForInput(s);
+            if(!sc){ alert(translations.alertNoStopCoord); return false; }
+            coords.push(sc); stopCoords.push({input: s, coord: sc});
+        }
+    }
+    coords.push(dropoffCoord);
 
-    const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
-    const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
+    const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
+    const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
 
-    try{
-        const r = await fetch(url);
-        const data = await r.json();
-        if(!data.routes || data.routes.length === 0){ distanceText.textContent = translations.statusNoRoute; return false; }
-        const route = data.routes[0];
-        const dist = route.distance / 1000;
-        const minutes = Math.round(route.duration / 60);
+    try{
+        const r = await fetch(url);
+        const data = await r.json();
+        if(!data.routes || data.routes.length === 0){ distanceText.textContent = translations.statusNoRoute; return false; }
+        const route = data.routes[0];
+        const dist = route.distance / 1000;
+        const minutes = Math.round(route.duration / 60);
 
-        if(map) {
-            if(routeLayer) map.removeLayer(routeLayer);
-            routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
-            map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
-        }
+        if(map) {
+            if(routeLayer) map.removeLayer(routeLayer);
+            routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
+            map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
+        }
 
-        const tripType = tripTypeEl.value;
-        const carType = carTypeEl.value;
-        const driverRequest = driverRequestEl.value;
-        const waiting = parseFloat(waitingEl.value) || 0;
+        const tripType = tripTypeEl.value;
+        const carType = carTypeEl.value;
+        const driverRequest = driverRequestEl.value;
+        const waiting = parseFloat(waitingEl.value) || 0;
 
         let perKm = carType.includes('7 chỗ') ? 12000 : 10000;
         let carName = carType.split(' (')[0];
-        const priceGo = Math.round(dist * perKm);
+        const priceGo = Math.round(dist * perKm);
         let priceReturn = (tripType === '2') ? (dist >= 45 ? Math.round(dist * perKm * 0.6) : priceGo) : 0;
-        const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
-        const total = priceGo + priceReturn + waitFee;
-        finalTotalFee = total;
+        const waitFee = waiting > 3 ? Math.round((waiting - 3) * 50000) : 0;
+        const total = priceGo + priceReturn + waitFee;
+        finalTotalFee = total;
 
-        distanceText.textContent = `${translations.resultDistance} ${dist.toFixed(1)} km`;
-        priceValue.textContent = `${total.toLocaleString('vi-VN')} đ`;
+        distanceText.textContent = `${translations.resultDistance} ${dist.toFixed(1)} km`;
+        priceValue.textContent = `${total.toLocaleString('vi-VN')} đ`;
         priceBreak.innerHTML = `<span>Chiều đi: ${priceGo.toLocaleString('vi-VN')} đ</span><br>
             ${tripType === '2' ? `<span>Chiều về${dist < 45 ? ' (Không giảm giá)' : ' (Giảm 40%)'}: ${priceReturn.toLocaleString('vi-VN')} đ</span><br>` : ''}
             ${waitFee > 0 ? `<span>Phí chờ (${waiting}h): ${waitFee.toLocaleString('vi-VN')} đ</span>` : ''}`;
-        timeEst.textContent = `${translations.resultTimeEst} ${minutes} phút`;
+        timeEst.textContent = `${translations.resultTimeEst} ${minutes} phút`;
         
         const dtValue = pickupDateTime.value;
         let pickupDt = 'Không có';
         if (dtValue) {
             const date = new Date(dtValue);
-            const time = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit'}); // VD: "16:24"
-            const day = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric'}); // VD: "02/10/2025"
+            const time = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit'});
+            const day = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric'});
             pickupDt = `${time} ${day}`;
         }
-        pickupInfo.textContent = `${translations.resultPickupTime} ${pickupDt}`;
+        pickupInfo.textContent = `${translations.resultPickupTime} ${pickupDt}`;
 
         const getMapLink = (lat, lon, name) => `${GOOGLE_MAPS_BASE_URL}${lat},${lon}`;
-        const stopAddresses = stopCoords.map((item, i) => `📍 Điểm dừng ${i+1}: ${item.input.value}\n   [🔗 Vị Trí: ${getMapLink(item.coord[0], item.coord[1], item.input.value)}]`).join('\n');
+        const stopAddresses = stopCoords.map((item, i) => `📍 Điểm dừng ${i+1}: ${item.input.value}\n  [🔗 Vị Trí: ${getMapLink(item.coord[0], item.coord[1], item.input.value)}]`).join('\n');
         
-        // ==========================================================
-        // == THAY ĐỔI: SẮP XẾP LẠI NỘI DUNG GỬI ZALO/MAIL ==
-        // ==========================================================
         finalZaloMessage = [
             `**✅ THÔNG TIN ĐẶT XE ✅**`,
             `--------------------------------`,
@@ -1511,9 +1589,9 @@ async function calculateAndGenerateMessage() {
             (tripType === '2' && waiting > 0) ? `⏳ Thời gian chờ: ${waiting} giờ` : '',
             `🧑‍✈️ Yêu cầu Tài xế: ${driverRequest}`,
             `---`,
-            `📍 Điểm đón: ${pickupEl.value}\n   [🔗 Vị Trí: ${getMapLink(pickupCoord[0], pickupCoord[1], pickupEl.value)}]`,
+            `📍 Điểm đón: ${pickupEl.value}\n  [🔗 Vị Trí: ${getMapLink(pickupCoord[0], pickupCoord[1], pickupEl.value)}]`,
             stopAddresses,
-            `🏁 Điểm đến: ${dropoffEl.value}\n   [🔗 Vị Trí: ${getMapLink(dropoffCoord[0], dropoffCoord[1], dropoffEl.value)}]`,
+            `🏁 Điểm đến: ${dropoffEl.value}\n  [🔗 Vị Trí: ${getMapLink(dropoffCoord[0], dropoffCoord[1], dropoffEl.value)}]`,
             `---`,
             `💵 **Giá dự kiến: ${total.toLocaleString('vi-VN')} đ**`,
             tripType === '2' ? `💰 Đặt cọc (20%): ${Math.round(total * 0.2).toLocaleString('vi-VN')} đ` : '',
@@ -1522,30 +1600,23 @@ async function calculateAndGenerateMessage() {
         ].filter(Boolean).join('\n');
 
 
-        checkPhoneStatus();
-        instructionText.innerHTML = translations.statusActive;
-        return true;
-    }catch(e){
-        distanceText.textContent = translations.statusNoRoute; priceValue.textContent = 'LỖI'; return false;
-    }
+        checkPhoneStatus();
+        instructionText.innerHTML = translations.statusActive;
+        return true;
+    }catch(e){
+        distanceText.textContent = translations.statusNoRoute; priceValue.textContent = 'LỖI'; return false;
+    }
 }
 
-// Bắt đầu
 document.addEventListener('DOMContentLoaded', ()=> {
-    getGeolocation();
-    checkServiceStatus().then(updateUIBasedOnStatus);
+    getGeolocation();
+    checkServiceStatus().then(updateUIBasedOnStatus);
     
-    // ================================================================
-    // == THAY ĐỔI: SET THỜI GIAN ĐÓN TỐI THIỂU SAU 30 PHÚT ==
-    // ================================================================
     const now = new Date();
-    // Thêm 30 phút (30 * 60 * 1000 milliseconds)
     const minPickupTime = new Date(now.getTime() + 30 * 60000);
-    // Chuyển đổi sang múi giờ địa phương để hiển thị đúng
     minPickupTime.setMinutes(minPickupTime.getMinutes() - minPickupTime.getTimezoneOffset());
     const minDateTimeString = minPickupTime.toISOString().slice(0, 16);
     
-    // Đặt giá trị tối thiểu và giá trị mặc định cho ô input
     pickupDateTime.min = minDateTimeString;
     pickupDateTime.value = minDateTimeString;
 });
@@ -1553,7 +1624,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
 reloadLocationBtn.addEventListener('click', getGeolocation);
 calcBtn.addEventListener('click', calculateAndGenerateMessage);
 
-// Logic Modals
 function openModal(modalEl){ modalEl.style.display = 'flex'; }
 function closeModal(modalEl){ modalEl.style.display = 'none'; }
 
@@ -1564,7 +1634,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 });
 
 function handleBookingClick(type) {
-    lastBookingAction = type; // Lưu lại hành động
+    lastBookingAction = type;
     if (!validatePhone(customerPhoneEl.value)) {
         phoneModalError.textContent = '';
         phoneModalInput.value = '';
@@ -1573,7 +1643,6 @@ function handleBookingClick(type) {
         return;
     }
     
-    // Nếu SĐT hợp lệ, tiếp tục xử lý
     proceedWithBooking(type);
 }
 
@@ -1601,7 +1670,6 @@ phoneModalConfirmBtn.addEventListener('click', () => {
     if (validatePhone(phone)) {
         customerPhoneEl.value = phone;
         closeModal(phoneModal);
-        // Sau khi nhập SĐT thành công, gọi lại hành động đặt xe
         if (lastBookingAction) {
             proceedWithBooking(lastBookingAction);
         }
@@ -1611,35 +1679,35 @@ phoneModalConfirmBtn.addEventListener('click', () => {
 });
 
 confirmDepositBtn.addEventListener('click', () => {
-    closeModal(depositModal);
-    if (bookingAction) showZaloModal(bookingAction === 'mail');
+    closeModal(depositModal);
+    if (bookingAction) showZaloModal(bookingAction === 'mail');
 });
 
 closeModalBtn.addEventListener('click', () => closeModal(zaloModal));
 
 function showZaloModal(isMail = false) {
     const translations = i18n[currentLang];
-    modalText.textContent = finalZaloMessage;
-    const titleEl = zaloModal.querySelector('h3');
-    if (isMail) {
-        titleEl.textContent = "THÔNG TIN ĐẶT MAIL";
-        zaloModalBtn.textContent = "📧 Gửi qua Email";
-        zaloModalBtn.onclick = () => {
-            window.location.href = `mailto:truongan.driving@gmail.com?subject=Đặt xe Trường An Driving&body=${encodeURIComponent(finalZaloMessage)}`;
-        };
-    } else {
-        titleEl.textContent = translations.modalBookingTitle;
-        zaloModalBtn.textContent = translations.modalBtnZalo;
-        zaloModalBtn.onclick = () => window.open(ZALO_URL, '_blank');
-    }
-    openModal(zaloModal);
+    modalText.textContent = finalZaloMessage;
+    const titleEl = zaloModal.querySelector('h3');
+    if (isMail) {
+        titleEl.textContent = "THÔNG TIN ĐẶT MAIL";
+        zaloModalBtn.textContent = "📧 Gửi qua Email";
+        zaloModalBtn.onclick = () => {
+            window.location.href = `mailto:truongan.driving@gmail.com?subject=Đặt xe Trường An Driving&body=${encodeURIComponent(finalZaloMessage)}`;
+        };
+    } else {
+        titleEl.textContent = translations.modalBookingTitle;
+        zaloModalBtn.textContent = translations.modalBtnZalo;
+        zaloModalBtn.onclick = () => window.open(ZALO_URL, '_blank');
+    }
+    openModal(zaloModal);
 }
 
 copyModalBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(modalText.textContent).then(() => {
-        copyModalBtn.textContent = '✅ Đã Sao Chép!';
-        setTimeout(() => copyModalBtn.textContent = i18n[currentLang].modalBtnCopy, 1500);
-    }).catch(err => alert('Sao chép thất bại.'));
+    navigator.clipboard.writeText(modalText.textContent).then(() => {
+        copyModalBtn.textContent = '✅ Đã Sao Chép!';
+        setTimeout(() => copyModalBtn.textContent = i18n[currentLang].modalBtnCopy, 1500);
+    }).catch(err => alert('Sao chép thất bại.'));
 });
 
 </script>
