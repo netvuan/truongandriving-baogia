@@ -213,14 +213,23 @@
         .map-btn:hover {
             background: var(--green-dark);
         }
-
+        
         /* Stop Input/Remove */
+        /* === START: SỬA ĐỔI CSS CHO ĐIỂM DỪNG === */
+        .way-wrapper { margin-top: 8px; } /* Thêm margin-top cho điểm dừng */
         .way-wrapper input[type="text"] {
-            padding-right: 50px;
+            padding-right: 125px; /* Tăng padding để có chỗ cho 2 nút */
         }
+        .way-wrapper .map-btn {
+            right: 50px; /* Vị trí nút bản đồ */
+        }
+        .way-wrapper .way-remove {
+            right: 8px; /* Vị trí nút xóa */
+        }
+        /* === END: SỬA ĐỔI CSS CHO ĐIỂM DỪNG === */
+
         .way-remove{
             position:absolute;
-            right:8px;
             top:50%;
             transform: translateY(-50%);
             background:#ff4d4d; /* Màu đỏ nổi bật hơn */
@@ -819,6 +828,9 @@ const i18n = {
         alertSearching: 'Đang tìm kiếm...',
         alertMapPickPickup: 'Bấm vào bản đồ để chọn điểm đón',
         alertMapPickDropoff: 'Bấm vào bản đồ để chọn điểm đến',
+        // === START: THÊM MỤC DỊCH MỚI ===
+        alertMapPickStop: 'Bấm vào bản đồ để chọn điểm dừng',
+        // === END: THÊM MỤC DỊCH MỚI ===
 
     },
     en: {
@@ -913,6 +925,7 @@ const i18n = {
         alertSearching: 'Searching...',
         alertMapPickPickup: 'Click on the map to select the pickup point',
         alertMapPickDropoff: 'Click on the map to select the drop-off point',
+        alertMapPickStop: 'Click on the map to select a stopover point',
     },
     zh: {
         appTitle: "🚖 长安驾驶出租车服务",
@@ -1006,6 +1019,7 @@ const i18n = {
         alertSearching: '正在搜索...',
         alertMapPickPickup: '点击地图选择上车点',
         alertMapPickDropoff: '点击地图选择下车点',
+        alertMapPickStop: '点击地图选择经停点',
     }
 };
 
@@ -1317,26 +1331,61 @@ function attachAutocomplete(inputEl, boxEl){
 }
 attachAutocomplete(pickupEl, pickupSugg);
 attachAutocomplete(dropoffEl, dropoffSugg);
+
+// === START: THAY THẾ TOÀN BỘ HÀM createStopInput ===
 function createStopInput(prefill=''){
-  stopCount++;
-  const translations = i18n[currentLang];
-  const wrapper = document.createElement('div');
-  wrapper.className = 'way-wrapper input-row';
-  const inputId = `stop-${stopCount}`;
-  wrapper.innerHTML = `<input type="text" id="${inputId}" placeholder="${translations.placeholderPickup.replace('điểm đón', 'điểm dừng ' + stopCount)}"><button class="way-remove" title="Xóa">✖</button><div id="${inputId}-suggestions" class="suggestions" style="display:none"></div>`;
-  stopsContainer.appendChild(wrapper);
-  const inputEl = wrapper.querySelector('input');
-  const boxEl = wrapper.querySelector('.suggestions');
-  attachAutocomplete(inputEl, boxEl);
-  wrapper.querySelector('.way-remove').addEventListener('click', ()=> wrapper.remove());
-  inputEl.addEventListener('focus', ()=> lastFocusedStopId = inputId);
-  return inputEl;
+    stopCount++;
+    const translations = i18n[currentLang];
+    const wrapper = document.createElement('div');
+    wrapper.className = 'way-wrapper input-row';
+    const inputId = `stop-${stopCount}`;
+    
+    // Tạo nội dung HTML cho điểm dừng, bao gồm nút Bản đồ
+    const mapAlertText = translations.alertMapPickStop.replace(/'/g, "\\'"); // Escape single quotes for use in onclick
+    wrapper.innerHTML = `
+        <input 
+            type="text" 
+            id="${inputId}" 
+            placeholder="${translations.placeholderPickup.replace(translations.labelPickup.split(' ')[1], 'điểm dừng ' + stopCount)}" 
+            value="${prefill}"
+        >
+        <button 
+            class="map-btn" 
+            onclick="selecting=null; lastFocusedStopId='${inputId}'; alert('${mapAlertText}');" 
+            title="Chọn điểm dừng ${stopCount} trên bản đồ"
+        >
+            ${translations.btnMap}
+        </button>
+        <button 
+            class="way-remove" 
+            title="Xóa điểm dừng ${stopCount}"
+        >
+            ✖
+        </button>
+        <div id="${inputId}-suggestions" class="suggestions" style="display:none"></div>
+    `;
+    
+    stopsContainer.appendChild(wrapper);
+    
+    const inputEl = wrapper.querySelector('input');
+    const boxEl = wrapper.querySelector('.suggestions');
+    
+    // Gắn chức năng gợi ý địa điểm và xóa như cũ
+    attachAutocomplete(inputEl, boxEl);
+    wrapper.querySelector('.way-remove').addEventListener('click', () => wrapper.remove());
+    
+    // Gắn listener để khi focus vào ô input, nó sẽ trở thành mục tiêu cho việc chọn trên bản đồ
+    inputEl.addEventListener('focus', () => lastFocusedStopId = inputId);
+    
+    return inputEl;
 }
+// === END: THAY THẾ TOÀN BỘ HÀM createStopInput ===
+
 document.getElementById('add-stop-btn').addEventListener('click', ()=> createStopInput());
-document.getElementById('pick-from-map').addEventListener('click', ()=> { selecting = 'pickup'; alert(i18n[currentLang].alertMapPickPickup); });
-document.getElementById('pick-to-map').addEventListener('click', ()=> { selecting = 'dropoff'; alert(i18n[currentLang].alertMapPickDropoff); });
+document.getElementById('pick-from-map').addEventListener('click', ()=> { selecting = 'pickup'; lastFocusedStopId = null; alert(i18n[currentLang].alertMapPickPickup); });
+document.getElementById('pick-to-map').addEventListener('click', ()=> { selecting = 'dropoff'; lastFocusedStopId = null; alert(i18n[currentLang].alertMapPickDropoff); });
 const handleMapClick = async (e) => {
-  if (!map || !selecting && !lastFocusedStopId) return;
+  if (!map || (!selecting && !lastFocusedStopId)) return;
   const {lat, lng} = e.latlng;
   const translations = i18n[currentLang];
   let targetInput, popupText;
@@ -1349,7 +1398,8 @@ const handleMapClick = async (e) => {
     targetInput.value = address;
     targetInput.dataset.lat = lat; targetInput.dataset.lon = lng;
   }
-  selecting = null; lastFocusedStopId = null;
+  selecting = null; // Reset cả hai để tránh nhầm lẫn
+  lastFocusedStopId = null; 
 };
 async function resolveCoordForInput(inputEl){
   if(inputEl.dataset && inputEl.dataset.lat && inputEl.dataset.lon) return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)];
