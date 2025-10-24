@@ -8,7 +8,9 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#28a745">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/> 
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* COLOR PALETTE & VARIABLES */
@@ -488,7 +490,7 @@
         }
 
         #copyModalBtn { background: #ffc107; color: #333; }
-        #zaloModalBtn { background: #007bff; color: #fff; }
+        .zalo-color-btn { background: #007bff; color: #fff; } /* Dùng class chung cho Zalo/Mail tùy ngữ cảnh */
         #closeModalBtn { background: #ccc; color: #333; }
         
         /* Phone Input Modal - MỚI */
@@ -747,7 +749,7 @@
         <pre id="modal-text"></pre>
         <div class="modal-actions">
             <button id="copyModalBtn" data-i18n="modalBtnCopy">📋 Sao Chép Thông Tin</button>
-            <button id="zaloModalBtn" data-i18n="modalBtnZalo">📱 Mở Zalo Chat</button>
+            <button id="zaloModalBtn" class="zalo-color-btn" data-i18n="modalBtnZalo">📱 Mở Zalo Chat</button>
         </div>
         <button id="closeModalBtn" style="width:100%; margin-top:10px; padding:12px; border-radius:10px;" data-i18n="modalClose">Đóng</button>
     </div>
@@ -755,6 +757,7 @@
 
 <div id="loadingOverlay" class="loading-overlay" style="display:none"></div>
 
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js'></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 /* ---------- I18N CONFIGURATION START ---------- */
@@ -1115,17 +1118,18 @@ updateContent();
 /* ---------- I18N CONFIGURATION END ---------- */
 
 
-/* ---------- Cấu hình Tối Ưu Hóa ---------- */
+/* ---------- Cấu hình Tối Ưu Hóa (Dùng Mapbox) ---------- */
+
+// Mã khóa Mapbox được lấy từ cuối đoạn mã bạn gửi
+const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibmV0dnVhbiIsImEiOiJjbWgza2Q0dWQwN293MmxxM2xyMGR6eGp2In0.XkW6LiiWNJXiD_8FcpTPnw"; 
+
 const REMOTE_STATUS_URL = "/status-local.json";
-const NOMINATIM = "https://nominatim.openstreetmap.org/search";
-const REVERSE_NOMINATIM = "https://nominatim.openstreetmap.org/reverse";
-const OSRM = "https://router.project-osrm.org/route/v1/driving";
-const GOOGLE_MAPS_BASE_URL = "https://www.google.com/maps/search/?api=1&query=";
 const TAXI_PHONE = "0847526893";
 const ZALO_URL = `https://zalo.me/${TAXI_PHONE}`;
 const DEBOUNCE_TIME = 300;
-const DEFAULT_CENTER = [10.9833, 106.6667]; // Tọa độ Bình Dương
-const SOUTHERN_VN_VIEWBOX = '104.5,8.5,107.5,12.0';
+// Tọa độ Bình Dương
+const DEFAULT_CENTER = [10.9833, 106.6667]; 
+
 let userLocation = null;
 let isServiceActive = false;
 let lastBookingAction = null; 
@@ -1252,28 +1256,65 @@ customerPhoneEl.addEventListener('input', checkPhoneStatus);
 
 function initMap(center) {
     if (!map) {
-        map = L.map('map').setView(center, 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        map = L.map('map').setView(center, 13);
+        // Sử dụng Mapbox Streets Tile Layer
+        L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`).addTo(map);
     } else {
-        map.setView(center, 11);
+        map.setView(center, 13);
     }
 }
+
+/* ---------- Mapbox Geocoding & Routing Functions ---------- */
+
+// Hàm đảo ngược Geocode (tọa độ -> địa chỉ) - Dùng Mapbox
 async function reverseGeocode(lat, lon) {
     try {
-        const url = `${REVERSE_NOMINATIM}?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=${currentLang},en`;
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lon},${lat}.json?access_token=${MAPBOX_ACCESS_TOKEN}&language=${currentLang},en`;
         const r = await fetch(url);
         const data = await r.json();
-        return data.display_name;
+        return data.features.length > 0 ? data.features[0].place_name : `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
     } catch (e) {
+        console.warn('Mapbox reverse geocode error', e);
         return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
     }
 }
+
+// Hàm Geocode một lần (địa chỉ -> tọa độ) - Dùng Mapbox
+async function geocodeOnce(query){
+  try{
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=1&country=vn&language=${currentLang},en`;
+    const r = await fetch(url);
+    const data = await r.json();
+    if(data.features && data.features.length > 0) {
+        const feat = data.features[0];
+        // Mapbox trả về [lon, lat]
+        return { lat: feat.center[1], lon: feat.center[0], name: feat.place_name };
+    }
+  }catch(e){ console.warn('Mapbox geocode once error', e); }
+  return null;
+}
+
+// Hàm tìm gợi ý (Autocomplete) - Dùng Mapbox
+async function fetchSuggestions(query){
+    if (!query) return [];
+    try {
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&limit=5&country=vn&language=${currentLang},en&autocomplete=true`;
+        const r = await fetch(url);
+        const data = await r.json();
+        return data.features || [];
+    } catch (e) {
+        console.warn('Mapbox suggestions error', e);
+        return [];
+    }
+}
+
+// Hàm lấy vị trí người dùng
 function getGeolocation() {
     const translations = i18n[currentLang];
     locationStatusEl.textContent = translations.statusLocating;
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(async (pos)=>{
-            userLocation = [pos.coords.latitude, pos.coords.longitude];
+            userLocation = [pos.coords.latitude, pos.coords.longitude]; // [lat, lon]
             initMap(userLocation);
             const address = await reverseGeocode(userLocation[0], userLocation[1]);
             pickupEl.value = address;
@@ -1301,17 +1342,7 @@ function debounce(func, timeout = DEBOUNCE_TIME) { let timer; return (...args) =
 function toggleWaitingInput(){ waitingWrapper.style.display = (tripTypeEl.value === '1') ? 'none' : 'block'; }
 tripTypeEl.addEventListener('change', toggleWaitingInput);
 toggleWaitingInput();
-async function geocodeOnce(query){
-  try{
-    let url = `${NOMINATIM}?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=VN&addressdetails=1&accept-language=${currentLang},en`;
-    if(userLocation) url += `&viewbox=${userLocation[1]-0.5},${userLocation[0]-0.5},${userLocation[1]+0.5},${userLocation[0]+0.5}`;
-    else url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
-    const r = await fetch(url);
-    const data = await r.json();
-    if(Array.isArray(data) && data.length>0) return data[0];
-  }catch(e){ console.warn('geocode once error', e); }
-  return null;
-}
+
 function attachAutocomplete(inputEl, boxEl){
   let controller = null;
   const translations = i18n[currentLang];
@@ -1322,33 +1353,41 @@ function attachAutocomplete(inputEl, boxEl){
     controller = new AbortController();
     boxEl.innerHTML = `<div>${translations.alertSearching}</div>`;
     boxEl.style.display = 'block';
-    let url = `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&limit=5&countrycodes=VN&addressdetails=1&extratags=1&accept-language=${currentLang},en`;
-    if(userLocation) url += `&viewbox=${userLocation[1]-0.3},${userLocation[0]-0.3},${userLocation[1]+0.3},${userLocation[0]+0.3}`;
-    else url += `&viewbox=${SOUTHERN_VN_VIEWBOX}`;
+
     try{
-      const res = await fetch(url, { signal: controller.signal });
-      const data = await res.json();
-      if(!Array.isArray(data) || data.length === 0){
+      const data = await fetchSuggestions(q);
+      if(data.length === 0){
         boxEl.innerHTML = `<div>${translations.alertNoSuggestions}</div>`;
         setTimeout(() => boxEl.style.display = 'none', 1000); return;
       }
       boxEl.innerHTML = '';
       data.forEach(place => {
         const d = document.createElement('div');
-        d.innerHTML = `<span>📍</span><div>${place.display_name}</div>`;
+        d.innerHTML = `<span>📍</span><div>${place.place_name}</div>`;
         d.addEventListener('click', ()=>{
-          inputEl.value = place.display_name;
-          inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon;
+          inputEl.value = place.place_name;
+          // Mapbox trả về [lon, lat]
+          inputEl.dataset.lat = place.center[1]; 
+          inputEl.dataset.lon = place.center[0];
           boxEl.style.display = 'none';
-          const latlng = [parseFloat(place.lat), parseFloat(place.lon)];
+          const latlng = [parseFloat(place.center[1]), parseFloat(place.center[0])];
           if(map) {
-            if(inputEl.id === 'pickup'){ if(pickupMarker) map.removeLayer(pickupMarker); pickupMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupPickup).openPopup(); map.setView(latlng, 14); }
-            else if(inputEl.id === 'dropoff'){ if(dropoffMarker) map.removeLayer(dropoffMarker); dropoffMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupDropoff).openPopup(); map.setView(latlng, 14); }
+            if(inputEl.id === 'pickup'){ 
+                if(pickupMarker) map.removeLayer(pickupMarker); 
+                pickupMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupPickup).openPopup(); 
+                map.setView(latlng, 14); 
+            } else if(inputEl.id === 'dropoff'){ 
+                if(dropoffMarker) map.removeLayer(dropoffMarker); 
+                dropoffMarker = L.marker(latlng).addTo(map).bindPopup(translations.mapPopupDropoff).openPopup(); 
+                map.setView(latlng, 14); 
+            } else {
+                // Điểm dừng mới, không cần marker riêng
+            }
           }
         });
         boxEl.appendChild(d);
       });
-    }catch(err){ if(err.name !== 'AbortError') console.error('suggest error', err); }
+    }catch(err){ if(err.name !== 'AbortError') console.error('Mapbox suggest error', err); }
   };
   inputEl.addEventListener('input', debounce(doSearch));
   document.addEventListener('click', (ev)=>{ if(!boxEl.contains(ev.target) && ev.target !== inputEl) boxEl.style.display = 'none'; });
@@ -1388,11 +1427,11 @@ document.getElementById('add-stop-btn').addEventListener('click', ()=> createSto
 
 
 async function resolveCoordForInput(inputEl){
-    if(inputEl.dataset && inputEl.dataset.lat && inputEl.dataset.lon) return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)];
+    if(inputEl.dataset && inputEl.dataset.lat && inputEl.dataset.lon) return [parseFloat(inputEl.dataset.lat), parseFloat(inputEl.dataset.lon)]; // [lat, lon]
     const v = inputEl.value.trim();
     if(!v) return null;
     const place = await geocodeOnce(v + ' Việt Nam');
-    if(place){ inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon; return [parseFloat(place.lat), parseFloat(place.lon)]; }
+    if(place){ inputEl.dataset.lat = place.lat; inputEl.dataset.lon = place.lon; return [place.lat, place.lon]; } // [lat, lon]
     return null;
 }
 function validateRouteInputs() {
@@ -1409,7 +1448,8 @@ function validateRouteInputs() {
 function initModalMap(center) {
     if (!modalMap) {
         modalMap = L.map(mapModalContainer).setView(center, 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(modalMap);
+        // Sử dụng Mapbox Streets Tile Layer cho modal map
+        L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`).addTo(modalMap);
         modalMap.on('click', (e) => {
             if (modalMarker) {
                 modalMarker.setLatLng(e.latlng);
@@ -1484,6 +1524,7 @@ confirmMapSelectionBtn.addEventListener('click', async () => {
             dropoffMarker = L.marker([lat, lng]).addTo(map).bindPopup(i18n[currentLang].mapPopupDropoff).openPopup(); 
             map.setView([lat, lng], 14); 
         } else {
+             // For stopovers, just place a temp marker to show location
              L.marker([lat, lng]).addTo(map).bindPopup(i18n[currentLang].mapPopupStop).openPopup();
         }
     }
@@ -1527,20 +1568,26 @@ async function calculateAndGenerateMessage() {
         }
     }
     coords.push(dropoffCoord);
-
+    
+    // Mapbox Directions API dùng [lon, lat] cho các điểm. coord[0] là lat, coord[1] là lon
     const coordStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
-    const url = `${OSRM}/${coordStr}?overview=full&geometries=geojson`;
+    // Sử dụng Mapbox Directions API, profile 'driving'
+    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordStr}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}&language=${currentLang}`;
 
     try{
         const r = await fetch(url);
         const data = await r.json();
+        
         if(!data.routes || data.routes.length === 0){ distanceText.textContent = translations.statusNoRoute; return false; }
+        
         const route = data.routes[0];
+        // Mapbox trả về distance (meters) và duration (seconds)
         const dist = route.distance / 1000;
         const minutes = Math.round(route.duration / 60);
 
         if(map) {
             if(routeLayer) map.removeLayer(routeLayer);
+            // L.geoJSON có thể tự động xử lý Mapbox GeoJSON
             routeLayer = L.geoJSON(route.geometry, { style: { color: '#007bff', weight: 5 } }).addTo(map);
             map.fitBounds(routeLayer.getBounds(), { padding: [20,20] });
         }
@@ -1575,7 +1622,8 @@ async function calculateAndGenerateMessage() {
         }
         pickupInfo.textContent = `${translations.resultPickupTime} ${pickupDt}`;
 
-        const getMapLink = (lat, lon, name) => `${GOOGLE_MAPS_BASE_URL}${lat},${lon}`;
+        // Hàm tạo link Google Maps
+        const getMapLink = (lat, lon, name) => `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
         const stopAddresses = stopCoords.map((item, i) => `📍 Điểm dừng ${i+1}: ${item.input.value}\n  [🔗 Vị Trí: ${getMapLink(item.coord[0], item.coord[1], item.input.value)}]`).join('\n');
         
         finalZaloMessage = [
@@ -1593,6 +1641,7 @@ async function calculateAndGenerateMessage() {
             stopAddresses,
             `🏁 Điểm đến: ${dropoffEl.value}\n  [🔗 Vị Trí: ${getMapLink(dropoffCoord[0], dropoffCoord[1], dropoffEl.value)}]`,
             `---`,
+            `✏️ Quãng đường dự kiến: ${dist.toFixed(1)} km`,
             `💵 **Giá dự kiến: ${total.toLocaleString('vi-VN')} đ**`,
             tripType === '2' ? `💰 Đặt cọc (20%): ${Math.round(total * 0.2).toLocaleString('vi-VN')} đ` : '',
             `--------------------------------`,
@@ -1604,6 +1653,7 @@ async function calculateAndGenerateMessage() {
         instructionText.innerHTML = translations.statusActive;
         return true;
     }catch(e){
+        console.error("Routing failed:", e);
         distanceText.textContent = translations.statusNoRoute; priceValue.textContent = 'LỖI'; return false;
     }
 }
@@ -1689,16 +1739,22 @@ function showZaloModal(isMail = false) {
     const translations = i18n[currentLang];
     modalText.textContent = finalZaloMessage;
     const titleEl = zaloModal.querySelector('h3');
+    const ZaloMailBtn = document.getElementById('zaloModalBtn');
+    
     if (isMail) {
-        titleEl.textContent = "THÔNG TIN ĐẶT MAIL";
-        zaloModalBtn.textContent = "📧 Gửi qua Email";
-        zaloModalBtn.onclick = () => {
+        titleEl.textContent = "📧 THÔNG TIN ĐẶT MAIL";
+        ZaloMailBtn.textContent = "📧 Gửi qua Email";
+        ZaloMailBtn.classList.remove('zalo-color-btn');
+        ZaloMailBtn.style.backgroundColor = 'var(--danger)';
+        ZaloMailBtn.onclick = () => {
             window.location.href = `mailto:truongan.driving@gmail.com?subject=Đặt xe Trường An Driving&body=${encodeURIComponent(finalZaloMessage)}`;
         };
     } else {
         titleEl.textContent = translations.modalBookingTitle;
-        zaloModalBtn.textContent = translations.modalBtnZalo;
-        zaloModalBtn.onclick = () => window.open(ZALO_URL, '_blank');
+        ZaloMailBtn.textContent = translations.modalBtnZalo;
+        ZaloMailBtn.classList.add('zalo-color-btn');
+        ZaloMailBtn.style.backgroundColor = ''; // Reset CSS
+        ZaloMailBtn.onclick = () => window.open(ZALO_URL, '_blank');
     }
     openModal(zaloModal);
 }
