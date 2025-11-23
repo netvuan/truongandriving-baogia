@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>🚖 Trường An Driving - Đặt Xe Nhanh</title>
+    <title>🚖 Trường An Driving</title>
     <meta name="theme-color" content="#006400">
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -13,527 +13,522 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* --- CORE STYLES --- */
-        :root {
-            --primary: #006400; /* Xanh lá đậm */
-            --primary-light: #28a745;
-            --accent: #ffc107; /* Vàng */
-            --bg: #f4f6f8;
-            --white: #ffffff;
-            --text: #333;
-            --radius: 12px;
-        }
+        /* --- CORE --- */
+        :root { --primary: #006400; --primary-light: #28a745; --bg: #f4f6f8; --white: #fff; --text: #333; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; }
-
-        /* HEADER */
+        /* HEADER & LANG */
         header {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white; padding: 15px; text-align: center;
+            color: white; padding: 15px; position: sticky; top: 0; z-index: 1000;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            position: sticky; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .header-title { font-size: 20px; font-weight: 900; text-transform: uppercase; margin: 0; }
-        .hotline-badge {
-            display: inline-block; background: white; color: var(--primary);
-            padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 14px;
-            margin-top: 5px; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .brand-col { display: flex; flex-direction: column; }
+        .brand-title { font-size: 18px; font-weight: 900; text-transform: uppercase; margin: 0; }
+        .hotline { font-size: 13px; font-weight: bold; color: #ffeb3b; text-decoration: none; margin-top: 2px; }
+        
+        .lang-switch { display: flex; gap: 5px; }
+        .lang-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+            color: white; padding: 5px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;
         }
+        .lang-btn.active { background: white; color: var(--primary); font-weight: bold; }
 
         /* CONTAINER */
-        .container { max-width: 650px; margin: 0 auto; padding: 15px; }
-
-        /* CARD STYLE */
-        .card {
-            background: white; border-radius: var(--radius); padding: 15px;
-            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-        }
+        .container { max-width: 650px; margin: 0 auto; padding: 10px; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .section-head {
-            font-size: 15px; font-weight: 700; color: var(--primary);
-            text-transform: uppercase; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;
+            font-size: 14px; font-weight: 700; color: var(--primary); text-transform: uppercase;
+            margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         /* INPUTS */
         .input-group { margin-bottom: 12px; position: relative; }
-        label { font-size: 13px; font-weight: 600; color: #555; display: block; margin-bottom: 4px; }
-        
+        label { font-size: 12px; font-weight: 600; color: #555; display: block; margin-bottom: 4px; }
         input, select {
-            width: 100%; padding: 12px 14px; padding-right: 40px;
-            border: 1px solid #ddd; border-radius: 8px; font-size: 16px;
-            background: #fafafa; transition: 0.3s;
+            width: 100%; padding: 12px; padding-right: 40px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 16px; background: #fafafa;
         }
-        input:focus, select:focus { border-color: var(--primary-light); background: #fff; box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1); }
+        input:focus { border-color: var(--primary-light); background: #fff; }
         
-        /* Nút X và Map trong Input */
-        .input-wrapper { position: relative; }
-        .tools {
-            position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
-            display: flex; gap: 5px; align-items: center;
+        .tools { position: absolute; right: 5px; top: 28px; display: flex; gap: 5px; }
+        .btn-icon {
+            width: 28px; height: 28px; border-radius: 4px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
         }
-        .btn-x {
-            width: 24px; height: 24px; border-radius: 50%; background: #eee; border: none;
-            color: #666; font-size: 12px; font-weight: bold; cursor: pointer;
-            display: none; align-items: center; justify-content: center;
-        }
-        .btn-x.show { display: flex; }
-        .btn-map-icon {
-            background: var(--primary-light); color: white; border: none;
-            padding: 5px 8px; border-radius: 6px; font-size: 12px; cursor: pointer;
-        }
+        .btn-x { background: #eee; color: #555; display: none; }
+        .btn-map { background: var(--primary-light); color: white; }
 
         /* AUTOCOMPLETE */
         .suggestions {
-            position: absolute; top: 100%; left: 0; width: 100%;
-            background: white; z-index: 99; border: 1px solid #ddd;
-            border-radius: 0 0 8px 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            max-height: 200px; overflow-y: auto; display: none;
+            position: absolute; top: 100%; left: 0; width: 100%; background: white;
+            z-index: 99; border: 1px solid #ddd; border-radius: 0 0 8px 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; display: none;
         }
-        .suggestion-item {
-            padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 14px; cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .suggestion-item:hover { background: #f9f9f9; }
+        .sug-item { padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 13px; cursor: pointer; }
+        .sug-item:hover { background: #f9f9f9; }
 
-        /* NÚT TÍNH GIÁ */
+        /* BUTTONS */
         .btn-calc {
-            width: 100%; padding: 15px; background: linear-gradient(to right, var(--primary), var(--primary-light));
-            color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 900;
-            cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,100,0,0.3);
-            display: flex; justify-content: center; align-items: center; gap: 10px;
+            width: 100%; padding: 14px; background: linear-gradient(to right, var(--primary), var(--primary-light));
+            color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 900;
+            text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 10px rgba(0,100,0,0.2);
         }
-        .btn-calc:active { transform: scale(0.98); }
-
-        /* KẾT QUẢ */
-        #result-box { display: none; animation: fadeIn 0.5s; }
-        .price-big {
-            font-size: 32px; font-weight: 900; color: var(--primary);
-            text-align: center; margin: 5px 0; display: block;
-        }
-        .detail-list { list-style: none; padding: 0; margin: 10px 0; font-size: 14px; }
-        .detail-list li {
-            display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee;
-        }
-        .detail-list li strong { color: #333; }
-
-        /* NÚT ACTION */
         .actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-act {
-            flex: 1; padding: 12px; border-radius: 8px; text-align: center;
-            color: white; font-weight: 700; text-decoration: none; cursor: pointer; border: none;
-        }
+        .btn-act { flex: 1; padding: 12px; border-radius: 8px; color: white; font-weight: bold; border: none; cursor: pointer; }
         .zalo { background: #0068ff; }
         .mail { background: #dc3545; }
 
-        /* GHI CHÚ CHÍNH SÁCH (Theo ảnh cũ) */
-        .policy-box {
-            font-size: 13px; color: #555; background: #fff; padding: 15px;
-            border-radius: 12px; margin-top: 20px; border: 1px solid #eee;
-        }
-        .policy-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
-        .policy-item i { color: #dc3545; margin-top: 3px; }
-
-        /* MAP */
-        #map { height: 300px; width: 100%; border-radius: 12px; margin-top: 15px; border: 1px solid #ccc; z-index: 1;}
-
-        /* MODAL */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 9999; display: none; flex-direction: column;
-        }
-        .modal-head { padding: 15px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { flex: 1; position: relative; }
-        .center-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -100%); z-index: 1000; pointer-events: none; }
+        /* RESULT & POLICY */
+        #result-box { display: none; border: 2px solid var(--primary-light); animation: fadeUp 0.3s; }
+        .price-tag { font-size: 28px; font-weight: 900; color: var(--primary); text-align: center; display: block; margin: 5px 0; }
+        .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed #eee; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .policy { font-size: 12px; color: #555; background: #fff; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #ccc; }
+        .policy p { margin: 4px 0; display: flex; gap: 5px; }
+        .policy i { color: #dc3545; }
+
+        /* MODALS */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-head { padding: 12px; background: var(--primary); color: white; font-weight: bold; display: flex; justify-content: space-between; }
+        
+        /* Phone Modal Specific */
+        #phone-modal .modal-content { padding: 20px; text-align: center; height: auto; }
+        #phone-modal input { text-align: center; font-size: 18px; margin: 15px 0; }
+
+        @keyframes fadeUp { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
     </style>
 </head>
 <body>
 
-<div id="kill-switch" style="display:none; position:fixed; inset:0; background:white; z-index:10000; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-    <i class="fas fa-tools" style="font-size:50px; color:#ffc107;"></i>
-    <h2>Hệ thống đang bảo trì</h2>
-    <a href="tel:0847526893" style="margin-top:20px; font-weight:bold; color:#006400;">Liên hệ: 084.752.6893</a>
-</div>
-
 <header>
-    <div class="header-title">TRƯỜNG AN DRIVING</div>
-    <a href="tel:0847526893" class="hotline-badge">☎️ 084.752.6893</a>
+    <div class="brand-col">
+        <div class="brand-title" data-i18n="brand">TRƯỜNG AN DRIVING</div>
+        <a href="tel:0847526893" class="hotline">☎️ 084.752.6893</a>
+    </div>
+    <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('vi')">VN</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('cn')">CN</button>
+    </div>
 </header>
 
 <div class="container">
-
     <div class="card">
-        <div class="section-head"><i class="fas fa-user-check"></i> Thông tin đặt xe</div>
-        
-        <div class="input-group">
-            <label>Số điện thoại (Bắt buộc):</label>
-            <div class="input-wrapper">
-                <input type="tel" id="phone" placeholder="Nhập số điện thoại...">
-                <div class="tools"><button class="btn-x" onclick="clearInput('phone')">✕</button></div>
-            </div>
+        <div class="section-head">
+            <span data-i18n="sec_info">📋 THÔNG TIN</span>
         </div>
-
         <div class="input-group">
-            <label>Thời gian đón:</label>
+            <label data-i18n="lbl_phone">Số điện thoại (Tùy chọn):</label>
+            <input type="tel" id="phone" placeholder="...">
+            <div class="tools"><button class="btn-icon btn-x" onclick="clearInp('phone')">✕</button></div>
+        </div>
+        <div class="input-group">
+            <label data-i18n="lbl_time">Thời gian đón:</label>
             <input type="datetime-local" id="time">
         </div>
     </div>
 
     <div class="card">
         <div class="section-head">
-            <i class="fas fa-route"></i> Lộ trình
-            <span style="margin-left:auto; font-size:11px; color:#007bff; cursor:pointer;" onclick="getMyLoc()">🎯 Vị trí tôi</span>
+            <span data-i18n="sec_route">🗺️ LỘ TRÌNH</span>
+            <small style="color:#007bff; cursor:pointer;" onclick="getMyLoc()" data-i18n="btn_myloc">🎯 Vị trí tôi</small>
         </div>
-
+        
         <div class="input-group">
-            <label>Điểm đón:</label>
-            <div class="input-wrapper">
-                <input type="text" id="pickup" placeholder="Nhập điểm đón...">
-                <div class="tools">
-                    <button class="btn-x" onclick="clearInput('pickup')">✕</button>
-                    <button class="btn-map-icon" onclick="openMap('pickup')">🗺️</button>
-                </div>
-                <div id="sug-pickup" class="suggestions"></div>
+            <label data-i18n="lbl_pickup">Điểm đón:</label>
+            <input type="text" id="pickup" placeholder="...">
+            <div class="tools">
+                <button class="btn-icon btn-x" onclick="clearInp('pickup')">✕</button>
+                <button class="btn-icon btn-map" onclick="openMap('pickup')">🗺️</button>
             </div>
+            <div id="sug-pickup" class="suggestions"></div>
         </div>
 
-        <div id="stops-container"></div>
+        <div id="stops-box"></div>
         <div style="text-align:right; margin-bottom:10px;">
-            <button onclick="addStop()" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">
-                <i class="fas fa-plus-circle"></i> Thêm điểm dừng
-            </button>
+            <button onclick="addStop()" style="background:none; border:none; color:var(--primary); font-weight:bold;" data-i18n="btn_add_stop">+ Thêm điểm dừng</button>
         </div>
 
         <div class="input-group">
-            <label>Điểm đến:</label>
-            <div class="input-wrapper">
-                <input type="text" id="dropoff" placeholder="Nhập điểm đến...">
-                <div class="tools">
-                    <button class="btn-x" onclick="clearInput('dropoff')">✕</button>
-                    <button class="btn-map-icon" onclick="openMap('dropoff')">🗺️</button>
-                </div>
-                <div id="sug-dropoff" class="suggestions"></div>
+            <label data-i18n="lbl_dropoff">Điểm đến:</label>
+            <input type="text" id="dropoff" placeholder="...">
+            <div class="tools">
+                <button class="btn-icon btn-x" onclick="clearInp('dropoff')">✕</button>
+                <button class="btn-icon btn-map" onclick="openMap('dropoff')">🗺️</button>
             </div>
+            <div id="sug-dropoff" class="suggestions"></div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-head"><i class="fas fa-car-side"></i> Tùy chọn xe</div>
-        
+        <div class="section-head" data-i18n="sec_opt">🚘 TÙY CHỌN XE</div>
         <div class="input-group">
-            <label>Loại xe:</label>
+            <label data-i18n="lbl_car">Loại xe:</label>
             <select id="carType">
-                <option value="4">🚗 Xe 4 chỗ (10.000đ/km)</option>
-                <option value="7">🚐 Xe 7 chỗ (12.000đ/km)</option>
+                <option value="4" data-i18n="opt_4seat">🚗 Xe 4 chỗ (10k/km)</option>
+                <option value="7" data-i18n="opt_7seat">🚐 Xe 7 chỗ (12k/km)</option>
             </select>
         </div>
-
         <div class="input-group">
-            <label>Hình thức đi:</label>
+            <label data-i18n="lbl_type">Hình thức:</label>
             <select id="tripType" onchange="toggleWait()">
-                <option value="1">➡️ Đi 1 Chiều</option>
-                <option value="2">🔄 Đi 2 Chiều (Giảm 40% chiều về)</option>
+                <option value="1" data-i18n="opt_1way">➡️ 1 Chiều</option>
+                <option value="2" data-i18n="opt_2way">🔄 2 Chiều (Ưu đãi)</option>
             </select>
         </div>
-
-        <div id="wait-area" style="display:none; background:#f0f9f0; padding:10px; border-radius:8px; margin-bottom:10px;">
-            <label>⏳ Thời gian chờ (Miễn phí 3h đầu):</label>
-            <input type="number" id="waitHour" placeholder="Nhập số giờ chờ..." value="0">
-            <small style="color:#666; font-size:11px;">Sau 3h, phụ phí 50.000đ/giờ</small>
+        <div id="wait-area" style="display:none; background:#e8f5e9; padding:8px; border-radius:8px; margin-bottom:10px;">
+            <label data-i18n="lbl_wait">⏳ Giờ chờ (Free 3h):</label>
+            <input type="number" id="waitHour" value="0">
         </div>
-
         <div class="input-group">
-            <label>Chọn tài xế:</label>
+            <label data-i18n="lbl_driver">Tài xế:</label>
             <select id="driver">
-                <option value="Hệ thống">⭐ Hệ thống Trường An (Nhanh nhất)</option>
+                <option value="Hệ thống" data-i18n="opt_system">⭐ Hệ thống (Nhanh nhất)</option>
                 <option value="Thanh Loan">👩‍🦰 Thanh Loan</option>
                 <option value="Đình Tâm">👨‍✈️ Đình Tâm</option>
             </select>
         </div>
     </div>
 
-    <button class="btn-calc" id="btn-cal" onclick="calcPrice()">
-        <i class="fas fa-calculator"></i> TÍNH GIÁ CƯỚC
-    </button>
+    <button class="btn-calc" id="btn-calc" onclick="calculate()" data-i18n="btn_calc">💰 TÍNH GIÁ CƯỚC</button>
 
-    <div id="map"></div>
+    <div id="main-map" style="height:250px; margin-top:15px; border-radius:12px; border:1px solid #ccc; z-index:1;"></div>
 
-    <div id="result-box" class="card" style="margin-top:15px; border:2px solid var(--primary-light);">
-        <div style="text-align:center; font-size:14px; color:#555;">💰 Giá dự kiến</div>
-        <span class="price-big" id="res-total">0 đ</span>
+    <div id="result-box" class="card" style="margin-top:15px;">
+        <div style="text-align:center; color:#555;" data-i18n="lbl_est_price">Giá dự kiến</div>
+        <span class="price-tag" id="res-total">0 đ</span>
         
-        <ul class="detail-list">
-            <li><span>✏️ Quãng đường:</span> <strong id="res-km">0 km</strong></li>
-            <li><span>⏱ Thời gian chạy:</span> <strong id="res-time">0 phút</strong></li>
-            
-            <li id="row-go" style="color:#555;"><span>Chiều đi:</span> <strong id="val-go">0 đ</strong></li>
-            <li id="row-back" style="display:none; color:var(--primary);"><span>Chiều về (-40%):</span> <strong id="val-back">0 đ</strong></li>
-            <li id="row-wait-fee" style="display:none;"><span>Phí chờ:</span> <strong id="val-wait">0 đ</strong></li>
-            
-            <li id="row-deposit" style="display:none; background:#fff3cd; padding:5px; margin-top:5px; border-radius:5px;">
-                <span style="font-weight:bold; color:#856404;">💳 Cần đặt cọc (20%):</span> 
-                <strong style="color:#d32f2f;" id="val-deposit">0 đ</strong>
-            </li>
-        </ul>
+        <div class="detail-row">
+            <span data-i18n="res_dist">Quãng đường:</span> <strong id="res-km">0 km</strong>
+        </div>
+        <div class="detail-row">
+            <span data-i18n="res_time">Thời gian:</span> <strong id="res-min">0 min</strong>
+        </div>
+        <div class="detail-row" id="row-back" style="display:none; color:var(--primary);">
+            <span data-i18n="res_return_disc">Giảm giá chiều về:</span> <strong id="val-back">0 đ</strong>
+        </div>
+        <div class="detail-row" id="row-deposit" style="display:none; background:#fff3cd; padding:5px;">
+            <span data-i18n="res_deposit">Đặt cọc (20%):</span> <strong style="color:#d32f2f;" id="val-deposit">0 đ</strong>
+        </div>
 
         <div class="actions">
-            <button class="btn-act zalo" onclick="book('zalo')"><i class="fas fa-comment"></i> Đặt qua Zalo</button>
-            <button class="btn-act mail" onclick="book('mail')"><i class="fas fa-envelope"></i> Gửi Mail</button>
+            <button class="btn-act zalo" onclick="preBook('zalo')">ZALO</button>
+            <button class="btn-act mail" onclick="preBook('mail')">EMAIL</button>
         </div>
     </div>
 
-    <div class="policy-box">
-        <h4 style="margin:0 0 10px 0; font-size:14px; text-transform:uppercase;">📝 Ghi chú quan trọng:</h4>
-        <div class="policy-item"><i class="fas fa-thumbtack"></i> <span>Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km.</span></div>
-        <div class="policy-item"><i class="fas fa-thumbtack"></i> <span>Đi 2 chiều (Tổng > 90km) giảm 40% chiều về.</span></div>
-        <div class="policy-item"><i class="fas fa-clock"></i> <span><strong>Thời gian chờ:</strong> Miễn phí 0-3 giờ đầu. Từ giờ thứ 4 thu 50.000đ/giờ.</span></div>
-        <div class="policy-item"><i class="fas fa-exclamation-circle"></i> <span>Giá chưa bao gồm phí cầu đường, bến bãi.</span></div>
+    <div class="policy">
+        <p><i class="fas fa-info-circle"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km</span></p>
+        <p><i class="fas fa-percent"></i> <span data-i18n="note_disc">Đi 2 chiều (1 chiều >45km / Tổng >90km) giảm 40% chiều về.</span></p>
+        <p><i class="fas fa-clock"></i> <span data-i18n="note_wait">Chờ: Miễn phí 3h đầu. Sau đó 50k/h.</span></p>
+        <p><i class="fas fa-road"></i> <span data-i18n="note_fee">Chưa bao gồm phí cầu đường.</span></p>
     </div>
 </div>
 
 <div id="modal-map" class="modal">
-    <div class="modal-head">
-        <span>Chọn vị trí</span>
-        <button onclick="closeMap()" style="background:none; border:none; color:white; font-size:24px;">&times;</button>
+    <div class="modal-content" style="height:80vh;">
+        <div class="modal-head">
+            <span data-i18n="modal_map_title">Chọn vị trí</span>
+            <span onclick="closeMap()" style="cursor:pointer;">✕</span>
+        </div>
+        <div style="flex:1; position:relative;">
+            <div id="picker-map" style="width:100%; height:100%;"></div>
+            <img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-100%); z-index:1000;">
+        </div>
+        <button onclick="confirmMap()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; font-weight:bold;" data-i18n="btn_confirm">XÁC NHẬN</button>
     </div>
-    <div class="modal-body">
-        <div id="picker-map" style="width:100%; height:100%;"></div>
-        <img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png" class="center-marker">
-    </div>
-    <div style="padding:15px; text-align:center; background:white;">
-        <p style="margin:0 0 10px; font-size:12px; color:#666;">Di chuyển bản đồ để ghim vị trí</p>
-        <button onclick="confirmLoc()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold;">XÁC NHẬN</button>
+</div>
+
+<div id="phone-modal" class="modal">
+    <div class="modal-content">
+        <h3 data-i18n="modal_phone_title">Nhập Số Điện Thoại</h3>
+        <p data-i18n="modal_phone_desc">Vui lòng nhập SĐT để tài xế liên hệ:</p>
+        <input type="tel" id="quick-phone" placeholder="09xxxx..." autofocus>
+        <div style="display:flex; gap:10px;">
+            <button onclick="closePhoneModal()" style="flex:1; padding:10px; border:none; background:#eee;" data-i18n="btn_cancel">Hủy</button>
+            <button onclick="savePhoneAndBook()" style="flex:1; padding:10px; border:none; background:var(--primary); color:white; font-weight:bold;" data-i18n="btn_ok">OK & Đặt</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- CẤU HÌNH ---
-    const P4 = 10000, P7 = 12000, WAIT_FEE = 50000;
-    let map, routeL, pickerMap, activeInp;
-    let stopCount = 0;
-
-    // --- KHỞI TẠO ---
-    window.onload = () => {
-        // Kill Switch Logic (Sửa false thành true để bảo trì)
-        if(false) document.getElementById('kill-switch').style.display = 'flex';
-
-        // Map chính
-        map = L.map('map').setView([10.7769, 106.7009], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        // Set time
-        let now = new Date(); now.setMinutes(now.getMinutes()+30-now.getTimezoneOffset());
-        document.getElementById('time').value = now.toISOString().slice(0,16);
-
-        // Input Logic
-        setupInputs();
+    // --- 1. NGÔN NGỮ (I18N) ---
+    const LANG = {
+        vi: {
+            brand: "TRƯỜNG AN DRIVING", sec_info: "📋 THÔNG TIN", lbl_phone: "Số điện thoại:", lbl_time: "Thời gian đón:",
+            sec_route: "🗺️ LỘ TRÌNH", btn_myloc: "🎯 Vị trí tôi", lbl_pickup: "Điểm đón:", lbl_dropoff: "Điểm đến:", btn_add_stop: "+ Thêm điểm dừng",
+            sec_opt: "🚘 TÙY CHỌN", lbl_car: "Loại xe:", opt_4seat: "🚗 Xe 4 chỗ (10k/km)", opt_7seat: "🚐 Xe 7 chỗ (12k/km)",
+            lbl_type: "Hình thức:", opt_1way: "➡️ 1 Chiều", opt_2way: "🔄 2 Chiều (Ưu đãi)",
+            lbl_wait: "⏳ Giờ chờ (Free 3h):", lbl_driver: "Tài xế:", opt_system: "⭐ Hệ thống (Nhanh nhất)",
+            btn_calc: "💰 TÍNH GIÁ CƯỚC", lbl_est_price: "Giá dự kiến", res_dist: "Quãng đường:", res_time: "Thời gian:",
+            res_return_disc: "Giảm giá chiều về:", res_deposit: "Cần đặt cọc (20%):",
+            note_price: "Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km",
+            note_disc: "Đi 2 chiều (1 chiều >45km / Tổng >90km) giảm 40% chiều về.",
+            note_wait: "Chờ: Miễn phí 3h đầu. Sau đó 50k/h.", note_fee: "Giá chưa gồm phí cầu đường.",
+            modal_map_title: "Chọn vị trí", btn_confirm: "XÁC NHẬN",
+            modal_phone_title: "Nhập Số Điện Thoại", modal_phone_desc: "Nhà xe cần SĐT để liên hệ đón bạn:",
+            btn_cancel: "Hủy", btn_ok: "Xác nhận", plh: "Nhập địa chỉ..."
+        },
+        en: {
+            brand: "TRUONG AN DRIVING", sec_info: "📋 INFORMATION", lbl_phone: "Phone Number:", lbl_time: "Pickup Time:",
+            sec_route: "🗺️ ROUTE", btn_myloc: "🎯 My Location", lbl_pickup: "Pick-up:", lbl_dropoff: "Drop-off:", btn_add_stop: "+ Add Stop",
+            sec_opt: "🚘 OPTIONS", lbl_car: "Car Type:", opt_4seat: "🚗 4 Seats (10k/km)", opt_7seat: "🚐 7 Seats (12k/km)",
+            lbl_type: "Trip Type:", opt_1way: "➡️ One way", opt_2way: "🔄 Round trip",
+            lbl_wait: "⏳ Waiting (Free 3h):", lbl_driver: "Driver:", opt_system: "⭐ System (Fastest)",
+            btn_calc: "💰 CALCULATE PRICE", lbl_est_price: "Estimated Price", res_dist: "Distance:", res_time: "Duration:",
+            res_return_disc: "Return Discount:", res_deposit: "Deposit (20%):",
+            note_price: "4 Seats: 10k/km | 7 Seats: 12k/km",
+            note_disc: "Round trip (One-way >45km / Total >90km) get 40% off return.",
+            note_wait: "Waiting: Free first 3h. Then 50k/h.", note_fee: "Tolls not included.",
+            modal_map_title: "Pick Location", btn_confirm: "CONFIRM",
+            modal_phone_title: "Enter Phone Number", modal_phone_desc: "We need your phone to contact:",
+            btn_cancel: "Cancel", btn_ok: "Confirm", plh: "Enter address..."
+        },
+        cn: {
+            brand: "长安驾驶", sec_info: "📋 信息", lbl_phone: "电话号码:", lbl_time: "接车时间:",
+            sec_route: "🗺️ 路线", btn_myloc: "🎯 我的位置", lbl_pickup: "上车地点:", lbl_dropoff: "下车地点:", btn_add_stop: "+ 增加站点",
+            sec_opt: "🚘 车型选择", lbl_car: "车型:", opt_4seat: "🚗 4座 (10k/km)", opt_7seat: "🚐 7座 (12k/km)",
+            lbl_type: "行程:", opt_1way: "➡️ 单程", opt_2way: "🔄 往返",
+            lbl_wait: "⏳ 等待 (免费3h):", lbl_driver: "司机:", opt_system: "⭐ 系统分配 (最快)",
+            btn_calc: "💰 计算价格", lbl_est_price: "预计价格", res_dist: "距离:", res_time: "时间:",
+            res_return_disc: "返程优惠:", res_deposit: "定金 (20%):",
+            note_price: "4座: 10k/km | 7座: 12k/km",
+            note_disc: "往返 (单程>45km / 总程>90km) 返程减40%。",
+            note_wait: "等待: 前3小时免费。之后 50k/小时。", note_fee: "价格不含过路费。",
+            modal_map_title: "选择位置", btn_confirm: "确认",
+            modal_phone_title: "输入电话号码", modal_phone_desc: "我们需要电话联系您:",
+            btn_cancel: "取消", btn_ok: "确认", plh: "输入地址..."
+        }
     };
 
-    // --- INPUT XỬ LÝ ---
-    function setupInputs(){
-        ['phone','pickup','dropoff'].forEach(id => {
-            let el = document.getElementById(id);
-            el.addEventListener('input', function(){
-                toggleX(this);
-                if(id!='phone') searchAddr(this);
-            });
-            el.addEventListener('focus', ()=> toggleX(el));
+    let curLang = 'vi';
+    function setLang(code) {
+        curLang = code;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.lang-btn[onclick="setLang('${code}')"]`).classList.add('active');
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            let key = el.getAttribute('data-i18n');
+            if(LANG[code][key]) el.innerText = LANG[code][key];
         });
+        
+        // Placeholder
+        ['pickup','dropoff'].forEach(id => document.getElementById(id).placeholder = LANG[code].plh);
     }
 
+    // --- 2. LOGIC BẢN ĐỒ & TÌM KIẾM ---
+    const CFG = { p4:10000, p7:12000, wait:50000 };
+    let map, pickerMap, routeL, activeInp;
+    let pendingMethod = null;
+
+    window.onload = () => {
+        map = L.map('main-map').setView([10.7769, 106.7009], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        let now = new Date(); now.setMinutes(now.getMinutes()+30-now.getTimezoneOffset());
+        document.getElementById('time').value = now.toISOString().slice(0,16);
+        
+        setupInp('phone'); setupInp('pickup'); setupInp('dropoff');
+        setLang('vi'); // Default
+    };
+
+    function setupInp(id) {
+        let el = document.getElementById(id);
+        el.addEventListener('input', function() {
+            toggleX(this);
+            if(id!=='phone') searchAddr(this);
+        });
+        el.addEventListener('focus', ()=>toggleX(el));
+    }
+    
     function toggleX(inp) {
         let btn = inp.parentElement.querySelector('.btn-x');
         if(btn) btn.style.display = inp.value ? 'flex' : 'none';
     }
-
-    function clearInput(id) {
-        let inp = document.getElementById(id);
-        inp.value = ''; delete inp.dataset.lat; delete inp.dataset.lon;
-        toggleX(inp); inp.focus();
+    function clearInp(id) {
+        let i = document.getElementById(id); i.value=''; delete i.dataset.lat; toggleX(i);
     }
 
-    // --- TÌM ĐỊA CHỈ (NOMINATIM) ---
+    // --- TÌM KIẾM THÔNG MINH (OPTIMIZED) ---
     let timer;
     function searchAddr(inp) {
         clearTimeout(timer);
-        let list = inp.parentElement.querySelector('.suggestions');
-        if(inp.value.length < 3) { list.style.display='none'; return; }
-        
+        let box = inp.parentElement.querySelector('.suggestions');
+        if(inp.value.length<3) { box.style.display='none'; return; }
+
         timer = setTimeout(() => {
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&countrycodes=vn&limit=5`)
-            .then(r=>r.json()).then(d => {
-                list.innerHTML = '';
-                if(!d.length) { list.style.display='none'; return; }
+            // Thêm countrycodes=vn và addressdetails=1 để chuẩn hơn
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&countrycodes=vn&addressdetails=1&limit=5&layer=address,poi`)
+            .then(r=>r.json()).then(d=>{
+                box.innerHTML = '';
+                if(!d.length) { box.style.display='none'; return; }
                 d.forEach(i => {
                     let div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.innerHTML = `📍 ${i.display_name.split(',')[0]}`;
+                    div.className = 'sug-item';
+                    // Hiển thị tên ngắn gọn hơn
+                    let name = i.display_name.split(',').slice(0,3).join(',');
+                    div.innerText = `📍 ${name}`;
                     div.onclick = () => {
-                        inp.value = i.display_name;
+                        inp.value = name;
                         inp.dataset.lat = i.lat; inp.dataset.lon = i.lon;
-                        list.style.display='none'; toggleX(inp);
+                        box.style.display='none'; toggleX(inp);
                     };
-                    list.appendChild(div);
+                    box.appendChild(div);
                 });
-                list.style.display='block';
+                box.style.display='block';
             });
-        }, 500);
+        }, 400); // 400ms debounce
     }
-    document.addEventListener('click', e => {
-        if(!e.target.closest('.input-wrapper')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none');
-    });
-
-    // --- ĐIỂM DỪNG ---
-    function addStop(){
-        stopCount++; let id = `stop-${stopCount}`;
-        let d = document.createElement('div'); d.className='input-group';
-        d.innerHTML = `<div class="input-wrapper">
-            <input type="text" id="${id}" placeholder="Điểm dừng ${stopCount}..." oninput="toggleX(this); searchAddr(this)">
-            <div class="tools"><button class="btn-x" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button></div>
-            <div class="suggestions"></div></div>`;
-        document.getElementById('stops-container').appendChild(d);
-    }
+    // Click outside hides suggestion
+    document.addEventListener('click', e => { if(!e.target.closest('.input-group')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none'); });
 
     // --- BẢN ĐỒ PICKER ---
     function openMap(id) {
-        activeInp = id; document.getElementById('modal-map').style.display='flex';
+        activeInp = id; document.getElementById('modal-map').style.display = 'flex';
         if(!pickerMap) {
-            pickerMap = L.map('picker-map').setView([10.7769, 106.7009], 15);
+            pickerMap = L.map('picker-map').setView([10.7769, 106.7009], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
         }
         setTimeout(()=>pickerMap.invalidateSize(), 200);
-        // Định vị
-        if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>{
-            pickerMap.setView([p.coords.latitude, p.coords.longitude], 15);
-        });
+        if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>pickerMap.setView([p.coords.latitude, p.coords.longitude],15));
     }
-    function closeMap(){ document.getElementById('modal-map').style.display='none'; }
-    function confirmLoc(){
+    function closeMap() { document.getElementById('modal-map').style.display='none'; }
+    function confirmMap() {
         let c = pickerMap.getCenter();
-        let inp = document.getElementById(activeInp);
-        inp.dataset.lat = c.lat; inp.dataset.lon = c.lng;
-        inp.value = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
-        // Lấy tên
+        let i = document.getElementById(activeInp);
+        i.dataset.lat=c.lat; i.dataset.lon=c.lng;
+        // Reverse geo
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${c.lat}&lon=${c.lng}`)
-        .then(r=>r.json()).then(d=>{ if(d.display_name) inp.value=d.display_name; });
-        closeMap(); toggleX(inp);
+        .then(r=>r.json()).then(d=>{ i.value = d.display_name || `${c.lat},${c.lng}`; toggleX(i); });
+        closeMap();
     }
-    function getMyLoc(){
-        if(!navigator.geolocation) return alert('Không có quyền GPS');
+    function getMyLoc() {
         navigator.geolocation.getCurrentPosition(p=>{
-            let inp = document.getElementById('pickup');
-            inp.dataset.lat = p.coords.latitude; inp.dataset.lon = p.coords.longitude;
-            inp.value = "Vị trí của tôi";
+            let i = document.getElementById('pickup');
+            i.dataset.lat=p.coords.latitude; i.dataset.lon=p.coords.longitude;
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.coords.latitude}&lon=${p.coords.longitude}`)
-            .then(r=>r.json()).then(d=>{ if(d.display_name) inp.value=d.display_name; });
+            .then(r=>r.json()).then(d=>{ i.value = d.display_name; toggleX(i); });
         });
     }
 
     // --- TÍNH GIÁ ---
-    function toggleWait(){
-        document.getElementById('wait-area').style.display = document.getElementById('tripType').value=='2'?'block':'none';
+    function toggleWait() { document.getElementById('wait-area').style.display = document.getElementById('tripType').value=='2'?'block':'none'; }
+    function addStop() {
+        let div = document.createElement('div'); div.className='input-group';
+        div.innerHTML = `<input type="text" class="stop-inp" placeholder="Điểm dừng..." oninput="searchAddr(this)"><div class="suggestions"></div><div class="tools"><button class="btn-icon btn-x" onclick="this.parentElement.parentElement.remove()">✕</button></div>`;
+        document.getElementById('stops-box').appendChild(div);
     }
 
-    async function calcPrice() {
+    async function calculate() {
         let p = document.getElementById('pickup'), d = document.getElementById('dropoff');
-        if(!p.dataset.lat || !d.dataset.lat) return alert('Vui lòng chọn địa chỉ từ gợi ý hoặc bản đồ!');
+        if(!p.dataset.lat || !d.dataset.lat) return alert(curLang=='vi'?"Vui lòng chọn địa chỉ!":"Please select address!");
         
-        let btn = document.getElementById('btn-cal'); btn.innerHTML = '⏳ Đang tính...'; btn.disabled=true;
+        let btn = document.getElementById('btn-calc'); btn.disabled=true; btn.style.opacity=0.7;
         
-        // Build coords
-        let points = [p, ...document.querySelectorAll('#stops-container input'), d];
-        let coordStr = points.map(i => `${i.dataset.lon},${i.dataset.lat}`).join(';');
+        let points = [p, ...document.querySelectorAll('.stop-inp'), d];
+        let coord = points.map(x=>`${x.dataset.lon},${x.dataset.lat}`).join(';');
 
         try {
-            let res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`);
+            let res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coord}?overview=full&geometries=geojson`);
             let data = await res.json();
-            if(data.code!='Ok') throw 'Err';
+            if(data.code!=='Ok') throw 'Err';
 
             let r = data.routes[0];
-            let dist = r.distance/1000;
+            let km = r.distance/1000;
             let time = Math.round(r.duration/60);
 
-            // Draw
             if(routeL) map.removeLayer(routeL);
             routeL = L.geoJSON(r.geometry).addTo(map);
-            map.fitBounds(routeL.getBounds(), {padding:[50,50]});
+            map.fitBounds(routeL.getBounds(), {padding:[30,30]});
 
-            // Calc
-            let car = document.getElementById('carType').value;
-            let trip = document.getElementById('tripType').value;
-            let priceKm = car=='4'?P4:P7;
+            // PRICE LOGIC
+            let type = document.getElementById('tripType').value;
+            let unit = document.getElementById('carType').value=='4'?CFG.p4:CFG.p7;
             
-            let goPrice = Math.round(dist * priceKm);
-            let backPrice = 0, waitCost = 0;
-            
-            if(trip == '2') {
-                backPrice = (dist >= 45) ? Math.round(goPrice * 0.6) : goPrice;
-                let waitH = parseFloat(document.getElementById('waitHour').value) || 0;
-                if(waitH > 3) waitCost = (waitH - 3) * WAIT_FEE;
+            let go = Math.round(km * unit);
+            let back = 0, wait = 0;
+
+            if(type=='2') {
+                // >45km chiều đi (Tổng >90km) giảm 40%
+                back = (km >= 45) ? Math.round(go*0.6) : go;
+                let wh = parseFloat(document.getElementById('waitHour').value)||0;
+                if(wh>3) wait = (wh-3)*CFG.wait;
             }
+            
+            let total = go + back + wait;
+            let dep = (type=='2') ? Math.round(total*0.2) : 0;
 
-            let total = goPrice + backPrice + waitCost;
-            let deposit = (trip == '2') ? Math.round(total * 0.2) : 0;
-
-            // Display
             document.getElementById('result-box').style.display='block';
             document.getElementById('res-total').innerText = total.toLocaleString() + ' đ';
-            document.getElementById('res-km').innerText = dist.toFixed(1) + ' km';
-            document.getElementById('res-time').innerText = time + ' phút';
+            document.getElementById('res-km').innerText = km.toFixed(1) + ' km';
+            document.getElementById('res-min').innerText = time + ' min';
             
-            document.getElementById('val-go').innerText = goPrice.toLocaleString() + ' đ';
-            
-            let rowBack = document.getElementById('row-back');
-            if(trip=='2'){
-                rowBack.style.display='flex';
-                rowBack.querySelector('strong').innerText = backPrice.toLocaleString() + ' đ';
-            } else rowBack.style.display='none';
+            // Show discount/deposit
+            let rBack = document.getElementById('row-back');
+            if(type=='2' && km>=45) {
+                rBack.style.display='flex';
+                document.getElementById('val-back').innerText = `-${(go-back).toLocaleString()}đ`;
+            } else rBack.style.display='none';
 
-            let rowWait = document.getElementById('row-wait-fee');
-            if(waitCost>0){
-                rowWait.style.display='flex';
-                document.getElementById('val-wait').innerText = waitCost.toLocaleString() + ' đ';
-            } else rowWait.style.display='none';
-
-            let rowDep = document.getElementById('row-deposit');
-            if(deposit>0){
-                rowDep.style.display='flex';
-                document.getElementById('val-deposit').innerText = deposit.toLocaleString() + ' đ';
-            } else rowDep.style.display='none';
+            let rDep = document.getElementById('row-deposit');
+            if(dep>0) {
+                rDep.style.display='flex';
+                document.getElementById('val-deposit').innerText = dep.toLocaleString() + ' đ';
+            } else rDep.style.display='none';
 
             document.getElementById('result-box').scrollIntoView({behavior:'smooth'});
 
-        } catch(e) { alert('Không tìm thấy đường!'); }
-        btn.innerHTML = '💰 TÍNH GIÁ CƯỚC'; btn.disabled=false;
+        } catch(e) { alert('Error route!'); }
+        btn.disabled=false; btn.style.opacity=1;
     }
 
-    // --- BOOKING ---
-    function book(method) {
+    // --- 3. ĐẶT XE & MODAL SĐT ---
+    function preBook(method) {
         let phone = document.getElementById('phone').value;
-        if(!phone) return alert('Vui lòng nhập Số điện thoại để chúng tôi liên hệ!');
+        if(!phone) {
+            pendingMethod = method;
+            document.getElementById('phone-modal').style.display='flex';
+            document.getElementById('quick-phone').focus();
+        } else {
+            finalBook(method);
+        }
+    }
 
+    function closePhoneModal() { document.getElementById('phone-modal').style.display='none'; pendingMethod=null; }
+    
+    function savePhoneAndBook() {
+        let p = document.getElementById('quick-phone').value;
+        if(p.length < 8) return alert("Vui lòng nhập SĐT đúng!");
+        document.getElementById('phone').value = p;
+        closePhoneModal();
+        finalBook(pendingMethod);
+    }
+
+    function finalBook(method) {
         let info = {
-            from: document.getElementById('pickup').value,
-            to: document.getElementById('dropoff').value,
+            p: document.getElementById('pickup').value, d: document.getElementById('dropoff').value,
+            ph: document.getElementById('phone').value,
+            t: document.getElementById('time').value.replace('T',' '),
+            money: document.getElementById('res-total').innerText,
             car: document.getElementById('carType').selectedOptions[0].text,
-            type: document.getElementById('tripType').selectedOptions[0].text,
-            total: document.getElementById('res-total').innerText,
-            deposit: document.getElementById('val-deposit').innerText
+            type: document.getElementById('tripType').selectedOptions[0].text
         };
-
-        let msg = `🚖 TRƯỜNG AN DRIVING\n-----------------\n📱 Khách: ${phone}\n🕒 Đón: ${document.getElementById('time').value.replace('T',' ')}\n📍 Đi: ${info.from}\n🏁 Đến: ${info.to}\n🚘 Xe: ${info.car}\n🔄 Loại: ${info.type}\n💰 TỔNG: ${info.total}`;
         
-        if(document.getElementById('tripType').value=='2') msg += `\n💳 Đặt cọc (20%): ${info.deposit}`;
+        let msg = `🚖 BOOKING (${curLang.toUpperCase()})\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n📍 ${info.p}\n🏁 ${info.d}\n🚘 ${info.car}\n🔄 ${info.type}\n💰 TOTAL: ${info.money}`;
+        if(document.getElementById('row-deposit').style.display=='flex') 
+            msg += `\n💳 Cọc: ${document.getElementById('val-deposit').innerText}`;
 
         if(method=='zalo') {
             navigator.clipboard.writeText(msg);
-            alert('Đã copy đơn! Mở Zalo...');
+            alert("Copied! Open Zalo...");
             window.open('https://zalo.me/0847526893');
         } else {
-            window.location.href = `mailto:truongan.driving@gmail.com?subject=ĐẶT XE&body=${encodeURIComponent(msg)}`;
+            window.location.href = `mailto:truongan.driving@gmail.com?subject=BOOKING&body=${encodeURIComponent(msg)}`;
         }
     }
 </script>
