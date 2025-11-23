@@ -266,7 +266,7 @@
         el.addEventListener('focus',()=>toggleX(el));
     }
     function toggleX(i){let b=i.parentElement.querySelector('.btn-x');if(b)b.style.display=i.value?'flex':'none'}
-    function clearInp(id){let i=document.getElementById(id);i.value='';delete i.dataset.lat;toggleX(i)}
+    function clearInp(id){let i=document.getElementById(id);i.value='';delete i.dataset.lat;delete i.dataset.lon;toggleX(i)} // Cập nhật để xóa cả dataset.lon
 
     let timer;
     function searchAddr(inp){
@@ -274,6 +274,22 @@
         let box=inp.parentElement.querySelector('.suggestions');
         if(inp.value.length<3){box.style.display='none';return}
         timer=setTimeout(()=>{
+            // Kiểm tra nếu người dùng nhập tọa độ (chứa dấu phẩy và số)
+            const coordRegex = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/;
+            if(coordRegex.test(inp.value.trim())) {
+                let [lat, lon] = inp.value.split(',').map(s => s.trim());
+                if(lat && lon) {
+                    inp.dataset.lat = lat;
+                    inp.dataset.lon = lon;
+                    box.style.display = 'none';
+                    // Tự động Reverse Geocoding để hiển thị tên đường (không chặn luồng)
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    .then(r=>r.json()).then(d=>{if(d.display_name)inp.value=d.display_name;toggleX(inp)})
+                    .catch(e => { console.error("Lỗi Reverse Geocoding Tọa độ nhập:", e); });
+                    return;
+                }
+            }
+            // Nếu không phải tọa độ, tiếp tục tìm kiếm địa chỉ
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&countrycodes=vn&addressdetails=1&limit=5&layer=address,poi`)
             .then(r=>r.json()).then(d=>{
                 box.innerHTML='';if(!d.length){box.style.display='none';return}
@@ -293,6 +309,7 @@
     function addStop(){
         let plh = LANG[curLang].plh_stop;
         let div=document.createElement('div');div.className='input-group stop-item';
+        // Đã thêm placeholder
         div.innerHTML=`<input type="text" class="stop-inp" placeholder="${plh}" oninput="searchAddr(this)"><div class="suggestions"></div><div class="tools"><button class="btn-icon btn-trash" onclick="this.parentElement.parentElement.remove()">🗑️</button><button class="btn-icon btn-map" onclick="openMapStop(this)">🗺️</button></div>`;
         document.getElementById('stops-box').appendChild(div);
     }
@@ -399,8 +416,9 @@
             let lat1=p.dataset.lat, lon1=p.dataset.lon;
             let lat2=d.dataset.lat, lon2=d.dataset.lon;
             
-            let link1 = `https://maps.google.com/?q=${lat1},${lon1}`;
-            let link2 = `https://maps.google.com/?q=${lat2},${lon2}`;
+            // ĐÃ SỬA LỖI LINK: SỬ DỤNG CÚ PHÁP CHUẨN CỦA GOOGLE MAPS
+            let link1 = `https://www.google.com/maps/place/${lat1},${lon1}`;
+            let link2 = `https://www.google.com/maps/place/${lat2},${lon2}`;
 
             let info={
                 ph:document.getElementById('phone').value,
