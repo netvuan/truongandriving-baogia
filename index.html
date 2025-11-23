@@ -276,19 +276,23 @@
         
         let valueToSearch = inp.value.trim();
         
-        // 1. Xử lý Tọa độ dấu phẩy (10,8034178, 106,6698965)
-        // Regex: Tìm kiếm hai cụm số (có thể có dấu phẩy/khoảng trắng) được ngăn cách bằng một dấu phẩy chính
-        let coordParts = valueToSearch.match(/^(-?\s*\d+([,\s]\d+)*)\s*,\s*(-?\s*\d+([,\s]\d+)*)$/);
+        // 1. Xử lý Tọa độ dấu phẩy (Ví dụ: 10,8034178, 106,6698965)
+        // Regex: Tìm kiếm hai cụm số lớn được ngăn cách bằng một dấu phẩy chính.
+        // Cụm số có thể chứa dấu chấm hoặc dấu phẩy (được coi là dấu thập phân)
+        
+        // Regex kiểm tra 2 số (có thể có dấu chấm hoặc dấu phẩy) ngăn cách bằng dấu phẩy Lat/Lon
+        let coordParts = valueToSearch.match(/^(-?\s*\d+([,.]\d+)*)\s*,\s*(-?\s*\d+([,.]\d+)*)$/);
         
         if (coordParts) {
             let latStr = coordParts[1].trim();
             let lonStr = coordParts[3].trim();
             
-            // Chuyển đổi tất cả các dấu phẩy/khoảng trắng trong số thành dấu chấm decimal
+            // Chuyển đổi tất cả dấu phẩy (decimal) thành dấu chấm và loại bỏ khoảng trắng
+            // Nếu có cả dấu chấm và dấu phẩy, nó sẽ giữ lại dấu chấm cuối cùng (hoặc dấu phẩy cuối cùng được chuyển thành chấm)
             let lat = latStr.replace(/,/g, '.').replace(/\s/g, '');
             let lon = lonStr.replace(/,/g, '.').replace(/\s/g, '');
 
-            // Kiểm tra xem đã chuyển thành số hợp lệ chưa
+            // Kiểm tra tính hợp lệ bằng cách cố gắng phân tích thành số
             if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
                 // Đã nhận diện thành công tọa độ
                 inp.dataset.lat = lat;
@@ -307,7 +311,7 @@
         }
         
         // 2. Plus Code / Địa chỉ thông thường: Dùng Nominatim Search
-        // Xử lý địa chỉ tìm kiếm thông thường (bao gồm cả Plus Code)
+        // Chúng ta gửi nguyên chuỗi tìm kiếm (bao gồm Plus Code) và Nominatim sẽ cố gắng giải quyết.
         
         timer=setTimeout(()=>{
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&countrycodes=vn&addressdetails=1&limit=5&layer=address,poi`)
@@ -315,6 +319,7 @@
                 box.innerHTML='';if(!d.length){box.style.display='none';return}
                 d.forEach(i=>{
                     let div=document.createElement('div');div.className='sug-item';
+                    // Chỉ lấy 3 phần tử đầu tiên của tên hiển thị để ngắn gọn
                     let n=i.display_name.split(',').slice(0,3).join(',');
                     div.innerText=`📍 ${n}`;
                     div.onclick=()=>{inp.value=n;inp.dataset.lat=i.lat;inp.dataset.lon=i.lon;box.style.display='none';toggleX(inp)};
@@ -435,7 +440,7 @@
             let lat1=p.dataset.lat, lon1=p.dataset.lon;
             let lat2=d.dataset.lat, lon2=d.dataset.lon;
             
-            // Đã sửa lỗi link: SỬ DỤNG CÚ PHÁP CHUẨN CỦA GOOGLE MAPS
+            // SỬ DỤNG CÚ PHÁP CHUẨN CỦA GOOGLE MAPS
             let link1 = `https://www.google.com/maps/place/${lat1},${lon1}`;
             let link2 = `https://www.google.com/maps/place/${lat2},${lon2}`;
 
