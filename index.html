@@ -590,7 +590,7 @@
             
             if (prices.back_full > 0) {
                  if (prices.isDiscounted) {
-                     priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ (Gạch bỏ)\n`;
+                     priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ \n`;
                      priceDetail += `5. Giảm giá 40% (Chiều về): -${(prices.back_full - prices.back_disc).toLocaleString()} đ\n`;
                      priceDetail += `6. Giá chiều về (Sau giảm): ${prices.back_disc.toLocaleString()} đ\n`;
                  } else {
