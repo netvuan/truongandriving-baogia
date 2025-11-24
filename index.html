@@ -229,7 +229,7 @@
 <div id="phone-modal" class="modal">
     <div class="modal-content">
         <h3 data-i18n="modal_phone_title">Nhập Số Điện Thoại</h3>
-        <p data-i18n="modal_phone_desc">Vui lòng nhập SĐT để tài xế liên hệ:</p>
+        <p data-i18n="modal_phone_desc">Nhà xe cần SĐT để liên hệ đón bạn:</p>
         <input type="tel" id="quick-phone" placeholder="09xxxx..." autofocus>
         <div style="display:flex; gap:10px;">
             <button onclick="closePhoneModal()" style="flex:1; padding:10px; border:none; background:#eee;" data-i18n="btn_cancel">Hủy</button>
@@ -255,19 +255,17 @@
     };
     let curLang='vi';
     const CFG={p4:10000,p7:12000,wait:50000};
-    // 📢 CẦN THAY THẾ CHỖ NÀY BẰNG API KEY CỦA BẠN
-    const GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY"; 
-
+    
     let map,pickerMap,routeL,activeInp,pendingMethod;
     let cachedPrices = {go: 0, back_full: 0, back_disc: 0, wait: 0, deposit: 0, total: 0, isDiscounted: false};
 
     window.onload=()=>{
-        // Thử khởi tạo bản đồ chính
+        // Khởi tạo bản đồ chính (Sử dụng OpenStreetMap)
         try {
             map=L.map('main-map').setView([10.7769,106.7009],13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         } catch(e) {
-            console.error("Lỗi khởi tạo Leaflet/Bản đồ chính. Hãy kiểm tra kết nối mạng và các thư viện Leaflet:", e);
+            console.error("Lỗi khởi tạo Leaflet/Bản đồ chính:", e);
         }
 
         let now=new Date(); now.setMinutes(now.getMinutes()+30-now.getTimezoneOffset());
@@ -282,7 +280,6 @@
             const key=el.getAttribute('data-i18n');
             if(LANG[lang][key]){
                 if(el.tagName === 'OPTION' && key.startsWith('opt_')){
-                    // Dành cho option, chỉ thay đổi text
                     el.textContent = LANG[lang][key];
                 } else if(el.tagName === 'INPUT' && key.startsWith('plh_')) {
                     el.placeholder = LANG[lang][key];
@@ -293,20 +290,16 @@
                 }
             }
         });
-        // Cập nhật Placeholder cho các Input không dùng data-i18n
         document.getElementById('phone').placeholder = LANG[lang].plh_phone;
         document.getElementById('pickup').placeholder = LANG[lang].plh_pickup;
         document.getElementById('dropoff').placeholder = LANG[lang].plh_dropoff;
         document.getElementById('note').placeholder = LANG[lang].plh_note;
-        
-        // Cập nhật Placeholder cho điểm dừng
         document.querySelectorAll('.stop-inp').forEach(inp => inp.placeholder = LANG[lang].plh_stop);
 
 
         document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
         document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
 
-        // Hiển thị lại giá đã tính (nếu có) bằng ngôn ngữ mới
         if(cachedPrices.total > 0) updateResultDisplay();
     }
 
@@ -320,51 +313,41 @@
     function clearInp(id){let i=document.getElementById(id);i.value='';delete i.dataset.lat;delete i.dataset.lon;toggleX(i)}
 
     let timer;
+    // TÌM KIẾM ĐỊA CHỈ SỬ DỤNG NOMINATIM (Miễn phí)
     function searchAddr(inp){
         clearTimeout(timer);
         let box=inp.parentElement.querySelector('.suggestions');
-        if(inp.value.length<3){box.style.display='none';return}
-        
         let valueToSearch = inp.value.trim();
+        box.innerHTML='';
+        if(valueToSearch.length<3){box.style.display='none';return}
         
-        // 1. Xử lý Tọa độ dấu phẩy (Ví dụ: 10,8034178, 106,6698965)
+        // 1. Xử lý Tọa độ dấu phẩy (lat, lon)
         let coordParts = valueToSearch.match(/^(-?\s*\d+([,.]\d+)*)\s*,\s*(-?\s*\d+([,.]\d+)*)$/);
-        
         if (coordParts) {
-            let latStr = coordParts[1].trim();
-            let lonStr = coordParts[3].trim();
-            
-            let lat = latStr.replace(/,/g, '.').replace(/\s/g, '');
-            let lon = lonStr.replace(/,/g, '.').replace(/\s/g, '');
-
+            let lat = coordParts[1].trim().replace(/,/g, '.').replace(/\s/g, '');
+            let lon = coordParts[3].trim().replace(/,/g, '.').replace(/\s/g, '');
             if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lon))) {
-                reverseGeocode(lat, lon, inp);
+                reverseGeocode(lat, lon, inp); // Tra ngược tọa độ để lấy địa chỉ
                 box.style.display = 'none';
                 return;
             }
         }
         
-        // 2. Plus Code / Địa chỉ thông thường: Dùng Google Geocoding API
+        // 2. Plus Code / Địa chỉ thông thường: Dùng Nominatim API
+        // Nominatim không hỗ trợ Plus Code. Nó sẽ cố gắng tìm kiếm như địa chỉ thường.
         timer=setTimeout(()=>{
-            if(GOOGLE_API_KEY==="YOUR_GOOGLE_API_KEY") {
-                box.innerHTML=`<div class='sug-item' style='color:red;'>⚠️ Thiếu API Key!</div>`;
-                box.style.display='block';
-                return;
-            }
-            
-            // Sử dụng Google Geocoding API
-            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(valueToSearch)}&components=country:VN&key=${GOOGLE_API_KEY}`;
+            // Thêm "Vietnam" để giới hạn kết quả
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(valueToSearch + ', Vietnam')}&format=json&limit=5&addressdetails=0`;
             
             fetch(url)
             .then(r=>r.json()).then(d=>{
-                box.innerHTML='';
-                if(d.status!=='OK'||!d.results.length){box.style.display='none';return}
+                if(!d || d.length===0){box.style.display='none';return}
                 
-                d.results.slice(0,5).forEach(i=>{ // Lấy tối đa 5 kết quả
+                d.forEach(i=>{
                     let div=document.createElement('div');div.className='sug-item';
-                    let name = i.formatted_address;
-                    let lat = i.geometry.location.lat;
-                    let lon = i.geometry.location.lng;
+                    let name = i.display_name;
+                    let lat = i.lat;
+                    let lon = i.lon;
 
                     div.innerText=`📍 ${name}`;
                     div.onclick=()=>{
@@ -378,28 +361,26 @@
                 });
                 box.style.display='block';
             })
-            .catch(e => { console.error("Lỗi tìm kiếm địa chỉ (Google Geocoding API):", e); box.style.display='none'; });
+            .catch(e => { console.error("Lỗi tìm kiếm địa chỉ (Nominatim API):", e); box.style.display='none'; });
         },400);
     }
     
+    // TRA NGƯỢC TỌA ĐỘ SỬ DỤNG NOMINATIM (Miễn phí)
     function reverseGeocode(lat, lon, inp) {
-        if(GOOGLE_API_KEY==="YOUR_GOOGLE_API_KEY") {
-             inp.value = `${lat}, ${lon}`;
-             return;
-        }
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${GOOGLE_API_KEY}`;
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=18&addressdetails=0`;
         fetch(url)
         .then(r=>r.json()).then(d=>{
-            if(d.status==='OK'&&d.results.length) {
-                inp.value = d.results[0].formatted_address;
+            if(d.display_name) {
+                inp.value = d.display_name;
                 inp.dataset.lat = lat;
                 inp.dataset.lon = lon;
             } else {
+                // Nếu không tìm thấy tên, giữ nguyên toạ độ trong input
                 inp.value = `${lat}, ${lon}`; 
             }
             toggleX(inp);
         })
-        .catch(e => { console.error("Lỗi Reverse Geocoding:", e); inp.value = `${lat}, ${lon}`; toggleX(inp); });
+        .catch(e => { console.error("Lỗi Reverse Geocoding (Nominatim):", e); inp.value = `${lat}, ${lon}`; toggleX(inp); });
     }
 
     document.addEventListener('click',e=>{if(!e.target.closest('.input-group'))document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none')});
@@ -418,6 +399,7 @@
         try {
             if(!pickerMap){pickerMap=L.map('picker-map').setView([10.7769,106.7009],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap)}
             setTimeout(()=>pickerMap.invalidateSize(),200);
+            // Cố gắng định vị người dùng
             if(navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>pickerMap.setView([p.coords.latitude,p.coords.longitude],15));
         } catch(e) {
              console.error("Lỗi khởi tạo Leaflet/Bản đồ chọn:", e);
@@ -458,25 +440,20 @@
         document.getElementById('res-total').innerText = totalFinal;
         document.getElementById('res-total-final').innerText = totalFinal;
         
-        // Cập nhật giá chiều đi
         document.getElementById('val-go').innerText = p.go.toLocaleString() + ' đ';
 
-        // Cập nhật giá chiều về (chưa giảm)
         document.getElementById('row-back-full').style.display = p.back_full > 0 ? 'flex' : 'none';
         document.getElementById('val-back-full').innerText = p.back_full.toLocaleString() + ' đ';
 
-        // Cập nhật giá chiều về (sau giảm)
         document.getElementById('row-back-disc').style.display = p.isDiscounted ? 'flex' : 'none';
         if (p.isDiscounted) {
              const discountAmount = p.back_full - p.back_disc;
              document.getElementById('val-back-disc').innerHTML = `<s>${p.back_full.toLocaleString()} đ</s> ${p.back_disc.toLocaleString()} đ (-${discountAmount.toLocaleString()}đ)`;
         }
 
-        // Cập nhật phí chờ
         document.getElementById('row-wait').style.display = p.wait > 0 ? 'flex' : 'none';
         document.getElementById('val-wait').innerText = p.wait.toLocaleString() + ' đ';
 
-        // Cập nhật đặt cọc
         document.getElementById('row-deposit').style.display = p.deposit > 0 ? 'flex' : 'none';
         if (p.deposit > 0) document.getElementById('val-deposit').innerText = p.deposit.toLocaleString() + ' đ';
 
@@ -491,7 +468,6 @@
         let btn=document.getElementById('btn-calc');btn.disabled=true;btn.style.opacity=0.7;
         
         let points=[p,...document.querySelectorAll('.stop-inp')].filter(x=>x.dataset.lat);
-        // Thêm điểm đến (dropoff) vào cuối
         if (d.dataset.lat) points.push(d); 
 
         if (points.length < 2) {
@@ -500,6 +476,7 @@
              return;
         }
 
+        // Dùng OSRM (Miễn phí) để tính lộ trình
         let coord=points.map(x=>`${x.dataset.lon},${x.dataset.lat}`).join(';');
         
         try{
@@ -511,11 +488,10 @@
             
             let type=document.getElementById('tripType').value, unit=document.getElementById('carType').value=='4'?CFG.p4:CFG.p7;
             
-            // Tính giá cơ bản
             let priceGo = Math.round(km * unit);
             let priceBackFull = (type === '2') ? priceGo : 0;
             
-            // Logic giảm giá 2 chiều: Áp dụng khi 1 chiều >45km HOẶC tổng >90km (giữ nguyên logic cũ)
+            // Logic giảm giá 2 chiều: Áp dụng khi 1 chiều >= 45km
             let isDiscounted = (type=='2' && km>=45);
             let priceBackDisc = isDiscounted ? Math.round(priceBackFull * 0.6) : priceBackFull; 
             
@@ -526,7 +502,6 @@
             let total = priceGo + priceBackDisc + priceWait;
             let deposit = (type=='2') ? Math.round(total * 0.2) : 0;
 
-            // Lưu vào cachedPrices
             cachedPrices = {
                 go: priceGo,
                 back_full: priceBackFull,
@@ -539,7 +514,6 @@
                 time: time
             };
             
-            // Xóa và vẽ lại Route trên bản đồ chính
             if(routeL)map.removeLayer(routeL);
             routeL=L.geoJSON(r.geometry).addTo(map);map.fitBounds(routeL.getBounds(),{padding:[30,30]});
 
@@ -547,10 +521,10 @@
             document.getElementById('res-km').innerText=km.toFixed(1)+' km';
             document.getElementById('res-min').innerText=time+' min';
             
-            updateResultDisplay(); // Cập nhật hiển thị kết quả chi tiết
+            updateResultDisplay();
             
         }catch(e){
-            alert(LANG[curLang].plh_pickup.includes('VD:') ? 'Lỗi tính cước! Vui lòng kiểm tra lại địa chỉ hoặc kết nối mạng.' : 'Pricing error! Please check the address or network connection.');
+            alert(LANG[curLang].plh_pickup.includes('VD:') ? 'Lỗi tính cước! Vui lòng kiểm tra lại địa chỉ hoặc kết nối mạng. (OSRM)' : 'Pricing error! Please check the address or network connection. (OSRM)');
             console.error("Lỗi tính cước OSRM:", e);
         }
         btn.disabled=false;btn.style.opacity=1;
@@ -584,8 +558,9 @@
             let lat2=d.dataset.lat, lon2=d.dataset.lon;
             const prices = cachedPrices;
             
-            let link1 = `https://www.google.com/maps/place/${lat1},${lon1}`;
-            let link2 = `https://www.google.com/maps/place/${lat2},${lon2}`;
+            // Link Maps tạo thủ công (chỉ để tham khảo, không dùng API của Google Maps)
+            let link1 = `https://maps.google.com/?q=${lat1},${lon1}`;
+            let link2 = `https://maps.google.com/?q=${lat2},${lon2}`;
 
             let info={
                 ph:document.getElementById('phone').value,
@@ -615,7 +590,7 @@
             
             if (prices.back_full > 0) {
                  if (prices.isDiscounted) {
-                     priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ\n`;
+                     priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ (Gạch bỏ)\n`;
                      priceDetail += `5. Giảm giá 40% (Chiều về): -${(prices.back_full - prices.back_disc).toLocaleString()} đ\n`;
                      priceDetail += `6. Giá chiều về (Sau giảm): ${prices.back_disc.toLocaleString()} đ\n`;
                  } else {
@@ -626,8 +601,7 @@
                  priceDetail += `7. Phí chờ (Sau 3h): ${prices.wait.toLocaleString()} đ\n`;
             }
 
-            priceDetail += `\n**TỔNG CỘNG:** ${prices.total.toLocaleString()} đ\n`;
-            priceDetail += `(Chưa bao gồm phí cầu đường, bến bãi)\n`;
+            priceDetail += `\n**TỔNG CỘNG (Chưa gồm phí cầu đường, bến bãi):** ${prices.total.toLocaleString()} đ\n`;
             
             if(prices.deposit > 0)
                 priceDetail += `\n💳 Cọc (20%): ${prices.deposit.toLocaleString()} đ`;
