@@ -185,11 +185,11 @@
             <span data-i18n="res_go_price">Giá chiều đi:</span> <strong id="val-go">0 đ</strong>
         </div>
         <div class="detail-row" id="row-back-full" style="display:none;">
-            <span data-i18n="res_back_full">Giá chiều về (chưa giảm):</span> <strong id="val-back-full">0 đ</strong>
+            <span data-i18n="res_back_full">Giá chiều về:</span> <strong id="val-back-full"><s>0 đ</s></strong>
         </div>
         <div class="detail-row" id="row-back-disc" style="display:none; color:var(--primary);">
             <span data-i18n="res_return_disc">Giá chiều về (sau giảm):</span> 
-            <strong id="val-back-disc"><s>0 đ</s> 0 đ</strong>
+            <strong id="val-back-disc">0 đ</strong>
         </div>
         <div class="detail-row" id="row-wait" style="display:none;">
             <span data-i18n="res_wait_fee">Phí chờ (sau 3h):</span> <strong id="val-wait">0 đ</strong>
@@ -241,15 +241,15 @@
 <script>
     const LANG={
         vi:{
-            brand:"TRƯỜNG AN DRIVING",sec_info:"📋 THÔNG TIN",lbl_phone:"Số điện thoại:",lbl_time:"Thời gian đón:",sec_route:"🗺️ LỘ TRÌNH",btn_myloc:"🎯 Vị trí tôi",lbl_pickup:"Điểm đón:",lbl_dropoff:"Điểm đến:",btn_add_stop:"+ Thêm điểm dừng",sec_opt:"🚘 TÙY CHỌN",lbl_car:"Loại xe:",opt_4seat:"🚗 Xe 4 chỗ (10k/km)",opt_7seat:"🚐 Xe 7 chỗ (12k/km)",lbl_type:"Hình thức:",opt_1way:"➡️ 1 Chiều",opt_2way:"🔄 2 Chiều (Ưu đãi)",lbl_wait:"⏳ Giờ chờ (Free 3h):",lbl_driver:"Tài xế:",opt_system:"⭐ Hệ thống (Nhanh nhất)",lbl_note:"📝 Yêu cầu/Ghi chú:",btn_calc:"💰 TÍNH GIÁ CƯỚC",lbl_est_price:"Giá dự kiến",res_dist:"Quãng đường:",res_time:"Thời gian:",res_go_price:"Giá chiều đi:",res_back_full:"Giá chiều về (chưa giảm):",res_return_disc:"Giá chiều về (sau giảm):",res_wait_fee:"Phí chờ (sau 3h):",res_deposit:"Đặt cọc (20%):",res_total_final:"TỔNG CỘNG (Chưa gồm phí cầu đường, bến bãi):",note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km",note_disc:"Đi 2 chiều (1 chiều >45km / Tổng >90km) giảm 40% chiều về.",note_wait:"Chờ: Miễn phí 3h đầu. Sau đó 50k/h.",note_fee:"Giá chưa gồm phí cầu đường, bến bãi.",modal_map_title:"Chọn vị trí",btn_confirm:"XÁC NHẬN",modal_phone_title:"Nhập Số Điện Thoại",modal_phone_desc:"Nhà xe cần SĐT để liên hệ đón bạn:",btn_cancel:"Hủy",btn_ok:"Xác nhận",
+            brand:"TRƯỜNG AN DRIVING",sec_info:"📋 THÔNG TIN",lbl_phone:"Số điện thoại:",lbl_time:"Thời gian đón:",sec_route:"🗺️ LỘ TRÌNH",btn_myloc:"🎯 Vị trí tôi",lbl_pickup:"Điểm đón:",lbl_dropoff:"Điểm đến:",btn_add_stop:"+ Thêm điểm dừng",sec_opt:"🚘 TÙY CHỌN",lbl_car:"Loại xe:",opt_4seat:"🚗 Xe 4 chỗ (10k/km)",opt_7seat:"🚐 Xe 7 chỗ (12k/km)",lbl_type:"Hình thức:",opt_1way:"➡️ 1 Chiều",opt_2way:"🔄 2 Chiều (Ưu đãi)",lbl_wait:"⏳ Giờ chờ (Free 3h):",lbl_driver:"Tài xế:",opt_system:"⭐ Hệ thống (Nhanh nhất)",lbl_note:"📝 Yêu cầu/Ghi chú:",btn_calc:"💰 TÍNH GIÁ CƯỚC",lbl_est_price:"Giá dự kiến",res_dist:"Quãng đường:",res_time:"Thời gian:",res_go_price:"Giá chiều đi:",res_back_full:"Giá chiều về:",res_return_disc:"Giá chiều về (sau giảm):",res_wait_fee:"Phí chờ (sau 3h):",res_deposit:"Đặt cọc (20%):",res_total_final:"TỔNG CỘNG (Chưa gồm phí cầu đường, bến bãi):",note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km",note_disc:"Đi 2 chiều (1 chiều >45km / Tổng >90km) giảm 40% chiều về.",note_wait:"Chờ: Miễn phí 3h đầu. Sau đó 50k/h.",note_fee:"Giá chưa gồm phí cầu đường, bến bãi.",modal_map_title:"Chọn vị trí",btn_confirm:"XÁC NHẬN",modal_phone_title:"Nhập Số Điện Thoại",modal_phone_desc:"Nhà xe cần SĐT để liên hệ đón bạn:",btn_cancel:"Hủy",btn_ok:"Xác nhận",
             plh_phone:"VD: 0912345678", plh_pickup:"VD: 200 Đồng Khởi, Quận 1", plh_dropoff:"VD: Sân bay Tân Sơn Nhất (TSN)", plh_stop:"Địa chỉ điểm dừng (nếu có)...", plh_note:"VD: Đón đúng giờ, xe sạch sẽ, có bật nhạc trữ tình."
         },
         en:{
-            brand:"TRUONG AN DRIVING",sec_info:"📋 INFORMATION",lbl_phone:"Phone Number:",lbl_time:"Pickup Time:",sec_route:"🗺️ ROUTE",btn_myloc:"🎯 My Location",lbl_pickup:"Pick-up:",lbl_dropoff:"Drop-off:",btn_add_stop:"+ Add Stop",sec_opt:"🚘 OPTIONS",lbl_car:"Car Type:",opt_4seat:"🚗 4 Seats (10k/km)",opt_7seat:"🚐 7 Seats (12k/km)",lbl_type:"Trip Type:",opt_1way:"➡️ One way",opt_2way:"🔄 Round trip",lbl_wait:"⏳ Waiting (Free 3h):",lbl_driver:"Driver:",opt_system:"⭐ System (Fastest)",lbl_note:"📝 Request/Note:",btn_calc:"💰 CALCULATE PRICE",lbl_est_price:"Estimated Price",res_dist:"Distance:",res_time:"Duration:",res_go_price:"One-way Price:",res_back_full:"Return Price (No Discount):",res_return_disc:"Return Price (After Discount):",res_wait_fee:"Waiting Fee (After 3h):",res_deposit:"Deposit (20%):",res_total_final:"TOTAL (Tolls/Parking not included):",note_price:"4 Seats: 10k/km | 7 Seats: 12k/km",note_disc:"Round trip (One-way >45km / Total >90km) get 40% off return.",note_wait:"Waiting: Free first 3h. Then 50k/h.",note_fee:"Tolls/Parking not included.",modal_map_title:"Pick Location",btn_confirm:"CONFIRM",modal_phone_title:"Enter Phone Number",modal_phone_desc:"We need your phone to contact:",btn_cancel:"Cancel",btn_ok:"Confirm",
+            brand:"TRUONG AN DRIVING",sec_info:"📋 INFORMATION",lbl_phone:"Phone Number:",lbl_time:"Pickup Time:",sec_route:"🗺️ ROUTE",btn_myloc:"🎯 My Location",lbl_pickup:"Pick-up:",lbl_dropoff:"Drop-off:",btn_add_stop:"+ Add Stop",sec_opt:"🚘 OPTIONS",lbl_car:"Car Type:",opt_4seat:"🚗 4 Seats (10k/km)",opt_7seat:"🚐 7 Seats (12k/km)",lbl_type:"Trip Type:",opt_1way:"➡️ One way",opt_2way:"🔄 Round trip",lbl_wait:"⏳ Waiting (Free 3h):",lbl_driver:"Driver:",opt_system:"⭐ System (Fastest)",lbl_note:"📝 Request/Note:",btn_calc:"💰 CALCULATE PRICE",lbl_est_price:"Estimated Price",res_dist:"Distance:",res_time:"Duration:",res_go_price:"One-way Price:",res_back_full:"Return Price:",res_return_disc:"Return Price (After Discount):",res_wait_fee:"Waiting Fee (After 3h):",res_deposit:"Deposit (20%):",res_total_final:"TOTAL (Tolls/Parking not included):",note_price:"4 Seats: 10k/km | 7 Seats: 12k/km",note_disc:"Round trip (One-way >45km / Total >90km) get 40% off return.",note_wait:"Waiting: Free first 3h. Then 50k/h.",note_fee:"Tolls/Parking not included.",modal_map_title:"Pick Location",btn_confirm:"CONFIRM",modal_phone_title:"Enter Phone Number",modal_phone_desc:"We need your phone to contact:",btn_cancel:"Cancel",btn_ok:"Confirm",
             plh_phone:"Ex: 0912345678", plh_pickup:"Ex: 200 Dong Khoi, Dist 1", plh_dropoff:"Ex: Tan Son Nhat Airport (TSN)", plh_stop:"Stop address (if any)...", plh_note:"Ex: Be on time, clean car, soft music."
         },
         cn:{
-            brand:"长安驾驶",sec_info:"📋 信息",lbl_phone:"电话号码:",lbl_time:"接车时间:",sec_route:"🗺️ 路线",btn_myloc:"🎯 我的位置",lbl_pickup:"上车地点:",lbl_dropoff:"下车地点:",btn_add_stop:"+ 增加站点",sec_opt:"🚘 车型选择",lbl_car:"车型:",opt_4seat:"🚗 4座 (10k/km)",opt_7seat:"🚐 7座 (12k/km)",lbl_type:"行程:",opt_1way:"➡️ 单程",opt_2way:"🔄 往返",lbl_wait:"⏳ 等待 (免费3h):",lbl_driver:"司机:",opt_system:"⭐ 系统分配 (最快)",lbl_note:"📝 要求/备注:",btn_calc:"💰 计算价格",lbl_est_price:"预计价格",res_dist:"距离:",res_time:"时间:",res_go_price:"单程价格:",res_back_full:"返程价格 (无折扣):",res_return_disc:"返程价格 (折扣后):",res_wait_fee:"等待费 (超过3小时):",res_deposit:"定金 (20%):",res_total_final:"总价 (不含过路费/停车费):",note_price:"4座: 10k/km | 7座: 12k/km",note_disc:"往返 (单程>45km / 总程>90km) 返程减40%。",note_wait:"等待: 前3小时免费。之后 50k/小时。",note_fee:"价格不含过路费/停车费。",modal_map_title:"选择位置",btn_confirm:"确认",btn_cancel:"取消",btn_ok:"确认",
+            brand:"长安驾驶",sec_info:"📋 信息",lbl_phone:"电话号码:",lbl_time:"接车时间:",sec_route:"🗺️ 路线",btn_myloc:"🎯 我的位置",lbl_pickup:"上车地点:",lbl_dropoff:"下车地点:",btn_add_stop:"+ 增加站点",sec_opt:"🚘 车型选择",lbl_car:"车型:",opt_4seat:"🚗 4座 (10k/km)",opt_7seat:"🚐 7座 (12k/km)",lbl_type:"行程:",opt_1way:"➡️ 单程",opt_2way:"🔄 往返",lbl_wait:"⏳ 等待 (免费3h):",lbl_driver:"司机:",opt_system:"⭐ 系统分配 (最快)",lbl_note:"📝 要求/备注:",btn_calc:"💰 计算价格",lbl_est_price:"预计价格",res_dist:"距离:",res_time:"时间:",res_go_price:"单程价格:",res_back_full:"返程价格:",res_return_disc:"返程价格 (折扣后):",res_wait_fee:"等待费 (超过3小时):",res_deposit:"定金 (20%):",res_total_final:"总价 (不含过路费/停车费):",note_price:"4座: 10k/km | 7座: 12k/km",note_disc:"往返 (单程>45km / 总程>90km) 返程减40%。",note_wait:"等待: 前3小时免费。之后 50k/小时。",note_fee:"价格不含过路费/停车费。",modal_map_title:"选择位置",btn_confirm:"确认",btn_cancel:"取消",btn_ok:"确认",
             plh_phone:"例: 0912345678", plh_pickup:"例: 200 Đồng Khởi, 1区", plh_dropoff:"例: 新山一机场 (TSN)", plh_stop:"停靠点地址...", plh_note:"例: 准时接车，车内干净，播放舒缓音乐。"
         }
     };
@@ -313,7 +313,7 @@
     function clearInp(id){let i=document.getElementById(id);i.value='';delete i.dataset.lat;delete i.dataset.lon;toggleX(i)}
 
     let timer;
-    // TÌM KIẾM ĐỊA CHỈ SỬ DỤNG NOMINATIM (Miễn phí)
+    // TÌM KIẾM ĐỊA CHỈ SỬ DỤNG NOMINATIM (Miễn phí) - Tối ưu hóa độ trễ
     function searchAddr(inp){
         clearTimeout(timer);
         let box=inp.parentElement.querySelector('.suggestions');
@@ -321,7 +321,7 @@
         box.innerHTML='';
         if(valueToSearch.length<3){box.style.display='none';return}
         
-        // 1. Xử lý Tọa độ dấu phẩy (lat, lon)
+        // 1. Xử lý Tọa độ dấu phẩy (lat, lon) hoặc Plus Code
         let coordParts = valueToSearch.match(/^(-?\s*\d+([,.]\d+)*)\s*,\s*(-?\s*\d+([,.]\d+)*)$/);
         if (coordParts) {
             let lat = coordParts[1].trim().replace(/,/g, '.').replace(/\s/g, '');
@@ -333,11 +333,10 @@
             }
         }
         
-        // 2. Plus Code / Địa chỉ thông thường: Dùng Nominatim API
-        // Nominatim không hỗ trợ Plus Code. Nó sẽ cố gắng tìm kiếm như địa chỉ thường.
+        // 2. Plus Code / Địa chỉ thông thường: Dùng Nominatim API (đã tối ưu: 300ms, limit 10)
         timer=setTimeout(()=>{
-            // Thêm "Vietnam" để giới hạn kết quả
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(valueToSearch + ', Vietnam')}&format=json&limit=5&addressdetails=0`;
+            // Thêm "Vietnam" để giới hạn kết quả, và giới hạn 10 kết quả
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(valueToSearch + ', Vietnam')}&format=json&limit=10&addressdetails=0`;
             
             fetch(url)
             .then(r=>r.json()).then(d=>{
@@ -362,7 +361,7 @@
                 box.style.display='block';
             })
             .catch(e => { console.error("Lỗi tìm kiếm địa chỉ (Nominatim API):", e); box.style.display='none'; });
-        },400);
+        },300); // Giảm độ trễ xuống 300ms
     }
     
     // TRA NGƯỢC TỌA ĐỘ SỬ DỤNG NOMINATIM (Miễn phí)
@@ -433,6 +432,7 @@
 
     function toggleWait(){document.getElementById('wait-area').style.display=document.getElementById('tripType').value=='2'?'block':'none'}
     
+    // Cập nhật hiển thị kết quả trên giao diện
     function updateResultDisplay() {
         const p = cachedPrices;
         const totalFinal = p.total.toLocaleString() + ' đ';
@@ -442,13 +442,21 @@
         
         document.getElementById('val-go').innerText = p.go.toLocaleString() + ' đ';
 
-        document.getElementById('row-back-full').style.display = p.back_full > 0 ? 'flex' : 'none';
-        document.getElementById('val-back-full').innerText = p.back_full.toLocaleString() + ' đ';
-
-        document.getElementById('row-back-disc').style.display = p.isDiscounted ? 'flex' : 'none';
+        document.getElementById('row-back-full').style.display = p.back_full > 0 && p.isDiscounted ? 'flex' : 'none'; // Chỉ hiện dòng này khi có giảm giá
+        
         if (p.isDiscounted) {
+             const fullPrice = p.back_full.toLocaleString() + ' đ';
+             document.getElementById('val-back-full').innerHTML = `<s>${fullPrice}</s>`;
+             document.getElementById('row-back-disc').style.display = 'flex';
              const discountAmount = p.back_full - p.back_disc;
-             document.getElementById('val-back-disc').innerHTML = `<s>${p.back_full.toLocaleString()} đ</s> ${p.back_disc.toLocaleString()} đ (-${discountAmount.toLocaleString()}đ)`;
+             document.getElementById('val-back-disc').innerHTML = `${p.back_disc.toLocaleString()} đ (-${discountAmount.toLocaleString()}đ)`;
+        } else {
+             document.getElementById('row-back-disc').style.display = 'none';
+             if (p.back_full > 0) { // Nếu là 2 chiều nhưng không giảm giá, hiển thị giá ở dòng chiều đi
+                 document.getElementById('row-go').innerHTML = `<span data-i18n="res_go_price">${LANG[curLang].res_go_price} (Cả 2 chiều):</span> <strong id="val-go">${p.go.toLocaleString()} đ</strong>`;
+             } else {
+                 document.getElementById('row-go').innerHTML = `<span data-i18n="res_go_price">${LANG[curLang].res_go_price}:</span> <strong id="val-go">${p.go.toLocaleString()} đ</strong>`;
+             }
         }
 
         document.getElementById('row-wait').style.display = p.wait > 0 ? 'flex' : 'none';
@@ -499,7 +507,7 @@
             let paidWaitHours = Math.max(0, waitHours - 3);
             let priceWait = waitHours > 0 ? Math.round(paidWaitHours * CFG.wait) : 0;
             
-            let total = priceGo + priceBackDisc + priceWait;
+            let total = priceGo + (type=='2' && !isDiscounted ? priceBackFull : priceBackDisc) + priceWait; // Tính lại tổng
             let deposit = (type=='2') ? Math.round(total * 0.2) : 0;
 
             cachedPrices = {
@@ -590,11 +598,13 @@
             
             if (prices.back_full > 0) {
                  if (prices.isDiscounted) {
-                     priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ \n`;
+                     // Bỏ chữ "(Gạch bỏ)" và dùng chỉ số 4 cho giá đầy đủ bị gạch (Chỉ hiển thị trên Zalo/Email để giải thích)
+                     priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ\n`;
                      priceDetail += `5. Giảm giá 40% (Chiều về): -${(prices.back_full - prices.back_disc).toLocaleString()} đ\n`;
                      priceDetail += `6. Giá chiều về (Sau giảm): ${prices.back_disc.toLocaleString()} đ\n`;
                  } else {
-                     priceDetail += `4. Giá chiều về: ${prices.back_full.toLocaleString()} đ\n`;
+                     // Nếu 2 chiều mà không giảm (km < 45), cộng vào chiều đi (đã xử lý ở hàm calculate), không cần thêm dòng này nữa
+                      priceDetail += `4. Giá chiều về: ${prices.back_full.toLocaleString()} đ\n`;
                  }
             }
             if (prices.wait > 0) {
@@ -611,8 +621,8 @@
             msg += `🕒 Đón lúc: ${info.t}\n`;
             msg += `🚘 Xe: ${info.car} | ${info.type}\n`;
             msg += `\n--- LỘ TRÌNH ---\n`;
-            msg += `📍 Đón: ${info.p}\n   └ GPS: ${shortC(lat1)},${shortC(lon1)}\n   👉 Map: ${link1}${stopsInfo}\n`;
-            msg += `🏁 Đến: ${info.d}\n   └ GPS: ${shortC(lat2)},${shortC(lon2)}\n   👉 Map: ${link2}`;
+            msg += `📍 Đón: ${info.p}\n   └ GPS: ${shortC(lat1)},${lon1}\n   👉 Map: ${link1}${stopsInfo}\n`;
+            msg += `🏁 Đến: ${info.d}\n   └ GPS: ${shortC(lat2)},${lon2}\n   👉 Map: ${link2}`;
             msg += priceDetail;
             
             if (info.note) {
