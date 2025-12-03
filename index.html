@@ -44,8 +44,8 @@
         .form-label { font-size: 12px; font-weight: 600; color: #444; margin-bottom: 5px; display: block; }
         input, select, textarea { 
             width: 100%; padding: 12px; padding-right: 85px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; box-sizing: border-box; background: #fff; transition: 0.3s; 
-            /* Cải thiện hiển thị cho select/input */
-            font-weight: 500;
+            /* Loại bỏ in đậm */
+            font-weight: 400; 
             color: #000;
         }
         input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1); }
@@ -175,15 +175,15 @@
             <div class="form-group" style="flex:1">
                 <label class="form-label" data-i18n="lbl_car">Loại xe:</label>
                 <select id="carType">
-                    <option value="4" data-i18n="opt_4seat">Xe 4 chỗ (10k/km)</option>
-                    <option value="7" data-i18n="opt_7seat">Xe 7 chỗ (12k/km)</option>
+                    <option value="4" data-i18n="opt_4seat">Xe 4 chỗ (10.000đ/km)</option>
+                    <option value="7" data-i18n="opt_7seat">Xe 7 chỗ (12.000đ/km)</option>
                 </select>
             </div>
             <div class="form-group" style="flex:1">
                 <label class="form-label" data-i18n="lbl_type">Hình thức:</label>
                 <select id="tripType" onchange="toggleWait()">
-                    <option value="1" data-i18n="opt_1way">1 Chiều</option>
-                    <option value="2" data-i18n="opt_2way">2 Chiều (Ưu đãi)</option>
+                     <option value="1" data-i18n="opt_1way">1 Chiều</option>
+                    <option value="2" data-i18n="opt_2way">2 Chiều (Giảm 40% Chiều về > 45km)</option>
                 </select>
             </div>
         </div>
@@ -208,7 +208,7 @@
 
         <div class="footer-notes">
             <div style="font-weight:bold; margin-bottom: 5px;" data-i18n="note_policy_title">CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)</div>
-            <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km.</span></div>
+            <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10.000đ/km | 7 chỗ: 12.000đ/km.</span></div>
             <div class="note-item"><i class="fas fa-sync"></i> <span data-i18n="note_disc_cond">Ưu đãi 2 chiều: Giảm 40% chiều về nếu chiều đi trên 45km.</span></div>
             <div class="note-item"><i class="fas fa-clock"></i> <span data-i18n="note_wait_fee">Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.</span></div>
             <div class="note-item"><i class="fas fa-exclamation-triangle" style="color:#ffc107;"></i> <span data-i18n="note_toll_fee">⚠️ Giá tạm tính chưa bao gồm phí cầu đường, bến bãi.</span></div>
@@ -279,15 +279,16 @@
         vi: {
             brand:"TRƯỜNG AN DRIVING", sec_info:"THÔNG TIN", lbl_phone:"Số điện thoại:", lbl_time:"Thời gian đón:",
             sec_route:"LỘ TRÌNH", btn_myloc:"VỊ TRÍ TÔI", lbl_pickup:"Điểm đón:", lbl_dropoff:"Điểm đến:", btn_add_stop:"+ Thêm điểm dừng",
-            sec_opt:"TÙY CHỌN", lbl_car:"Loại xe:", opt_4seat:"Xe 4 chỗ (10k/km)", opt_7seat:"Xe 7 chỗ (12k/km)",
-            lbl_type:"Hình thức:", opt_1way:"1 Chiều", opt_2way:"2 Chiều (Ưu đãi)", lbl_wait:"⏳ Giờ chờ (Miễn phí 3h đầu):",
+            sec_opt:"TÙY CHỌN", lbl_car:"Loại xe:", opt_4seat:"Xe 4 chỗ (10.000đ/km)", opt_7seat:"Xe 7 chỗ (12.000đ/km)",
+            lbl_type:"Hình thức:", opt_1way:"1 Chiều", opt_2way:"2 Chiều (Giảm 40% Chiều về > 45km)",
+            lbl_wait:"⏳ Giờ chờ (Miễn phí 3h đầu):",
             lbl_driver:"Tài xế:", opt_system:"⭐ Hệ thống (Nhanh nhất)", lbl_note:"📝 Yêu cầu/Ghi chú:", btn_calc:"💰 TÍNH GIÁ CƯỚC",
-            btn_zalo:"Đặt chuyến qua ZALO", // Cập nhật
-            btn_mail:"Đặt chuyến qua MAIL", // Cập nhật
+            btn_zalo:"Đặt chuyến qua ZALO", 
+            btn_mail:"Đặt chuyến qua MAIL", 
             lbl_est_price:"BẢNG GIÁ CHI TIẾT", res_dist:"Quãng đường:", res_time:"Thời gian:", res_go_price:"Chiều đi:",
             res_back_full:"Chiều về (Gốc):", res_return_disc:"Chiều về (-40%):", res_wait_fee:"Phí chờ:", res_deposit:"Cọc (20%):",
             note_policy_title: "CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)", 
-            note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km.", 
+            note_price:"Giá 4 chỗ: 10.000đ/km | 7 chỗ: 12.000đ/km.", 
             note_disc_cond:"Ưu đãi 2 chiều: Giảm 40% chiều về nếu chiều đi trên 45km.", 
             note_wait_fee:"Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.",
             note_toll_fee:"⚠️ Giá tạm tính chưa bao gồm phí cầu đường, bến bãi.", 
@@ -299,15 +300,16 @@
         en: {
             brand:"TRUONG AN DRIVING", sec_info:"INFORMATION", lbl_phone:"Phone Number:", lbl_time:"Pickup Time:",
             sec_route:"ROUTE", btn_myloc:"MY LOCATION", lbl_pickup:"Pick-up:", lbl_dropoff:"Drop-off:", btn_add_stop:"+ Add Stop",
-            sec_opt:"OPTIONS", lbl_car:"Car Type:", opt_4seat:"4 Seats (10k/km)", opt_7seat:"7 Seats (12k/km)",
-            lbl_type:"Trip Type:", opt_1way:"One way", opt_2way:"Round trip", lbl_wait:"⏳ Waiting Time (Free 3h):",
+            sec_opt:"OPTIONS", lbl_car:"Car Type:", opt_4seat:"4 Seats (10,000đ/km)", opt_7seat:"7 Seats (12,000đ/km)",
+            lbl_type:"Trip Type:", opt_1way:"One way", opt_2way:"Round trip (40% Off Return > 45km)", 
+            lbl_wait:"⏳ Waiting Time (Free 3h):",
             lbl_driver:"Driver:", opt_system:"⭐ System (Fastest)", lbl_note:"📝 Note/Request:", btn_calc:"💰 CALCULATE PRICE",
-            btn_zalo:"Book via ZALO", // Cập nhật
-            btn_mail:"Book via MAIL", // Cập nhật
+            btn_zalo:"Book via ZALO", 
+            btn_mail:"Book via MAIL", 
             lbl_est_price:"PRICE DETAILS", res_dist:"Distance:", res_time:"Duration:", res_go_price:"One-way:",
             res_back_full:"Return (Orig):", res_return_disc:"Return (-40%):", res_wait_fee:"Waiting Fee:", res_deposit:"Deposit (20%):",
             note_policy_title: "PRICING POLICY (Details)", 
-            note_price:"4 Seats: 10k/km | 7 Seats: 12k/km.", 
+            note_price:"4 Seats: 10,000đ/km | 7 Seats: 12,000đ/km.", 
             note_disc_cond:"Round Trip Offer: 40% off return if one-way distance is over 45km.", 
             note_wait_fee:"Waiting Fee: First 3 hours free. After that, 50,000đ/hour.",
             note_toll_fee:"⚠️ Estimated price excludes toll fees and parking fees.", 
@@ -319,15 +321,16 @@
         cn: {
             brand:"长安驾驶", sec_info:"信息", lbl_phone:"电话号码:", lbl_time:"接车时间:",
             sec_route:"路线", btn_myloc:"我的位置", lbl_pickup:"上车点:", lbl_dropoff:"下车点:", btn_add_stop:"+ 增加站点",
-            sec_opt:"选项", lbl_car:"车型:", opt_4seat:"4座 (10k/km)", opt_7seat:"7座 (12k/km)",
-            lbl_type:"行程:", opt_1way:"单程", opt_2way:"往返 (优惠)", lbl_wait:"⏳ 等待时间 (免费3h):",
+            sec_opt:"选项", lbl_car:"车型:", opt_4seat:"4座 (10,000đ/km)", opt_7seat:"7座 (12,000đ/km)",
+            lbl_type:"行程:", opt_1way:"单程", opt_2way:"往返 (回程减40% > 45km)", 
+            lbl_wait:"⏳ 等待时间 (免费3h):",
             lbl_driver:"司机:", opt_system:"⭐ 系统 (最快)", lbl_note:"📝 备注/要求:", btn_calc:"💰 计算价格",
-            btn_zalo:"通过ZALO预订", // Cập nhật
-            btn_mail:"通过MAIL预订", // Cập nhật
+            btn_zalo:"通过ZALO预订", 
+            btn_mail:"通过MAIL预订", 
             lbl_est_price:"价格详情", res_dist:"距离:", res_time:"时间:", res_go_price:"去程:",
             res_back_full:"回程 (原价):", res_return_disc:"回程 (-40%):", res_wait_fee:"等待费:", res_deposit:"定金 (20%):",
             note_policy_title: "价格政策 (详情)", 
-            note_price:"4座: 10k/km | 7座: 12k/km。", 
+            note_price:"4座: 10,000đ/km | 7座: 12,000đ/km。", 
             note_disc_cond:"往返优惠: 单程距离超过45公里，回程减40%。", 
             note_wait_fee:"等待费: 前3小时免费。之后50,000đ/小时。",
             note_toll_fee:"⚠️ 预估价格不包含过路费和停车费。", 
@@ -366,12 +369,37 @@
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
         document.querySelector(`.lang-btn[onclick="changeLang('${code}')"]`).classList.add('active');
         
+        // Tải lại các option cho Loại xe và Hình thức
+        const updateSelectOptions = (id, options) => {
+            const select = document.getElementById(id);
+            const currentVal = select.value;
+            select.innerHTML = '';
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.setAttribute('data-i18n', opt.i18nKey);
+                option.textContent = LANG[code][opt.i18nKey];
+                select.appendChild(option);
+            });
+            select.value = currentVal; // Giữ nguyên lựa chọn
+        };
+
+        updateSelectOptions('carType', [
+            { value: '4', i18nKey: 'opt_4seat' },
+            { value: '7', i18nKey: 'opt_7seat' }
+        ]);
+
+        updateSelectOptions('tripType', [
+            { value: '1', i18nKey: 'opt_1way' },
+            { value: '2', i18nKey: 'opt_2way' }
+        ]);
+        
+        // Cập nhật các text/placeholder khác
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.dataset.i18n;
             if(LANG[code][key]) {
                 if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = LANG[code][key];
-                else if(el.tagName === 'OPTION') el.text = LANG[code][key];
-                else el.innerText = LANG[code][key];
+                else if(el.tagName !== 'OPTION') el.innerText = LANG[code][key];
             }
         });
         
@@ -444,7 +472,7 @@
                         inp.dataset.lon = item.lon;
                         box.style.display = 'none';
                         toggleX(inp);
-                        inp.blur(); // THÊM: Đóng bàn phím sau khi chọn
+                        inp.blur(); // Đóng bàn phím sau khi chọn
                     };
                     box.appendChild(div);
                 });
@@ -547,6 +575,8 @@
 
             // 2. Map Route
             routeLayer = L.geoJSON(r.geometry).addTo(map);
+            // Thiết lập zoom thủ công, sau đó fitbounds để đảm bảo hiển thị hết các điểm
+            map.setZoom(10); 
             map.fitBounds(routeLayer.getBounds(), {padding:[30,30]});
             document.getElementById('main-map').style.display = 'block';
 
@@ -698,13 +728,10 @@
         if(info.n) msg += `\n📝 Ghi chú: ${info.n}`;
 
         if(method == 'zalo') {
+             // Cải thiện tốc độ: Sao chép và mở Zalo ngay
             navigator.clipboard.writeText(msg).then(() => {
-                 // Dùng setTimeout để đảm bảo clipboard đã được ghi trước khi chuyển hướng
-                setTimeout(() => {
-                    window.open('https://zalo.me/0847526893');
-                }, 100); 
+                window.open('https://zalo.me/0847526893');
             }).catch(err => {
-                 // Nếu không thể truy cập clipboard (ví dụ: trình duyệt cũ), vẫn mở Zalo
                  window.open('https://zalo.me/0847526893');
             });
         } else {
