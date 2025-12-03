@@ -64,7 +64,6 @@
         .btn-add-stop { width: 100%; color: var(--green); background: none; border: none; font-weight: bold; cursor: pointer; text-align: right; display: block; margin-bottom: 10px; }
         
         /* NÚT TÍNH GIÁ (TO, XANH) */
-        /* Áp dụng cho nút trong bottom-bar */
         .btn-calc { width: 100%; background: var(--green); color: white; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-top: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
         .btn-calc:active { transform: scale(0.98); }
 
@@ -78,7 +77,7 @@
             margin-top: 15px;
             font-size: 13px;
             color: #555;
-            background: #f0fff4; /* Nền nhẹ để nổi bật */
+            background: #f0fff4; 
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #c3e6cb;
@@ -111,7 +110,7 @@
             max-width: 600px; 
             background: white; 
             padding: 10px; 
-            display: flex; /* Quan trọng: Đảm bảo flex để các nút căn chỉnh */
+            display: flex; 
             gap: 10px; 
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
             z-index: 100; 
@@ -119,6 +118,9 @@
         .act-btn { flex: 1; padding: 12px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; }
         .zalo { background: #0068ff; }
         .mail { background: var(--red); }
+        
+        /* ẨN NÚT TÍNH GIÁ BAN ĐẦU */
+        #btn-calc-main { display: none; } 
     </style>
 </head>
 <body>
@@ -194,12 +196,12 @@
                     <option value="4" data-i18n="opt_4seat_disp">Xe 4 chỗ</option>
                     <option value="7" data-i18n="opt_7seat_disp">Xe 7 chỗ</option>
                 </select>
-                 <small class="select-note" id="car-note"></small>
+                <small class="select-note" id="car-note"></small>
             </div>
             <div class="form-group" style="flex:1">
                 <label class="form-label" data-i18n="lbl_type">Hình thức:</label>
                 <select id="tripType" onchange="toggleWait(); updateTripNote()">
-                     <option value="1" data-i18n="opt_1way_disp">1 Chiều</option>
+                    <option value="1" data-i18n="opt_1way_disp">1 Chiều</option>
                     <option value="2" data-i18n="opt_2way_disp">2 Chiều</option>
                 </select>
                 <small class="select-note" id="trip-note"></small>
@@ -300,10 +302,8 @@
             brand:"TRƯỜNG AN DRIVING", sec_info:"THÔNG TIN", lbl_phone:"Số điện thoại:", lbl_time:"Thời gian đón:",
             sec_route:"LỘ TRÌNH", btn_myloc:"VỊ TRÍ TÔI", lbl_pickup:"Điểm đón:", lbl_dropoff:"Điểm đến:", btn_add_stop:"+ Thêm điểm dừng",
             sec_opt:"TÙY CHỌN", lbl_car:"Loại xe:", 
-            // Cập nhật key/text cho Select Options
             opt_4seat_disp:"Xe 4 chỗ", opt_7seat_disp:"Xe 7 chỗ",
             opt_1way_disp:"1 Chiều", opt_2way_disp:"2 Chiều",
-            // Chú thích nhỏ
             note_car_4:"Giá cước: 10.000đ/km", note_car_7:"Giá cước: 12.000đ/km",
             note_trip_disc:"Ưu đãi giảm 40% chiều về > 45km",
             lbl_type:"Hình thức:", lbl_wait:"⏳ Giờ chờ (Miễn phí 3h đầu):",
@@ -395,6 +395,8 @@
         changeLang('vi'); // Khởi tạo ngôn ngữ
         updateCarNote();  // Cập nhật chú thích Loại xe ban đầu
         updateTripNote(); // Cập nhật chú thích Hình thức ban đầu
+        
+        // Ban đầu nút Tính giá đã bị ẩn bởi CSS, không cần gọi checkIfReadyToCalculate ở đây.
     };
     
     // --- UPDATE NOTES ---
@@ -432,7 +434,6 @@
                 const option = document.createElement('option');
                 option.value = opt.value;
                 option.setAttribute('data-i18n', opt.i18nKey);
-                // Chỉ set text cho option, không cần data-i18n cho select/input
                 option.textContent = LANG[code][opt.i18nKey]; 
                 select.appendChild(option);
             });
@@ -453,7 +454,7 @@
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.dataset.i18n;
             if(LANG[code][key]) {
-                if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = LANG[code][key];
+                if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = LANG[code][`plh_${el.id}`] || LANG[code][key];
                 else if(el.tagName !== 'OPTION' && el.tagName !== 'SELECT') el.innerText = LANG[code][key];
             }
         });
@@ -470,16 +471,37 @@
 
     // --- BUTTON AND MAP RESET ---
     function resetButtonsAndMap() {
-        document.getElementById('btn-calc-main').style.display = 'flex'; // Hiện nút Tính giá
+        document.getElementById('btn-calc-main').style.display = 'none'; // Ẩn nút Tính giá
         document.getElementById('book-buttons-bar').style.display = 'none'; // Ẩn nút Đặt chuyến
         document.getElementById('result-area').style.display = 'none'; // Ẩn kết quả
         
-        // Xóa layer map cũ (Lộ trình và Marker)
         if(routeLayer) map.removeLayer(routeLayer);
         markerLayer.clearLayers();
         document.getElementById('main-map').style.display = 'none'; // Ẩn mini map
+        
+        checkIfReadyToCalculate(); // Kiểm tra xem có nên hiện nút Tính giá không
     }
     
+    // --- CHECK IF READY TO CALCULATE (New function) ---
+    function checkIfReadyToCalculate() {
+        const p = document.getElementById('pickup');
+        const d = document.getElementById('dropoff');
+        const btnCalc = document.getElementById('btn-calc-main');
+        
+        // Kiểm tra nếu có tọa độ hoặc có giá trị nhập vào Điểm đón HOẶC Điểm đến
+        const isReady = (p.dataset.lat && p.value) || (d.dataset.lat && d.value) || (p.value.length > 0) || (d.value.length > 0);
+        
+        if (isReady && btnCalc.style.display !== 'none') {
+             // Đảm bảo chỉ hiện nút Tính giá nếu đang ẩn nút Đặt chuyến
+             if(document.getElementById('book-buttons-bar').style.display === 'none') {
+                btnCalc.style.display = 'flex';
+             }
+        } else if (!isReady) {
+            btnCalc.style.display = 'none';
+        }
+    }
+
+
     // --- INPUT HANDLING ---
     function setupInp(id) {
         let el = document.getElementById(id);
@@ -522,9 +544,7 @@
         if(inp.value.length < 3) { box.style.display='none'; return; }
 
         timer = setTimeout(() => {
-            // Tối ưu hóa tìm kiếm số nhà/tên đường
             let q = encodeURIComponent(inp.value);
-            // Thêm extratags=1&namedetails=1 để cải thiện chất lượng tìm kiếm địa chỉ chi tiết (street/house number)
             let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10&viewbox=105.0,8.0,109.0,16.0&extratags=1&namedetails=1`;
             
             fetch(url).then(r=>r.json()).then(data => {
@@ -545,7 +565,7 @@
                         inp.dataset.lon = item.lon;
                         box.style.display = 'none';
                         toggleX(inp);
-                        inp.blur(); // Đóng bàn phím sau khi chọn
+                        inp.blur(); 
                         resetButtonsAndMap(); // Reset khi chọn địa chỉ mới
                     };
                     box.appendChild(div);
@@ -583,6 +603,8 @@
     function getMyLoc() {
         if(!navigator.geolocation) return alert("Vui lòng bật GPS!");
         let btn = document.getElementById('btn-loc'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
+        
+        // Cải tiến: Thêm timeout 7 giây
         navigator.geolocation.getCurrentPosition(p => {
             let i = document.getElementById('pickup');
             i.dataset.lat = p.coords.latitude; i.dataset.lon = p.coords.longitude;
@@ -593,9 +615,19 @@
                 btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
                 resetButtonsAndMap(); // Reset khi lấy vị trí hiện tại
             });
-        }, () => {
-            alert("Không thể lấy vị trí!");
+        }, (error) => {
+            let msg = "Không thể lấy vị trí!";
+            if (error.code === error.TIMEOUT) {
+                msg = "Lấy vị trí quá lâu (Timeout 7s). Vui lòng thử lại hoặc nhập thủ công.";
+            } else if (error.code === error.PERMISSION_DENIED) {
+                 msg = "Vui lòng cho phép truy cập vị trí (GPS) trong cài đặt trình duyệt.";
+            }
+            alert(msg);
             btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
+        }, { 
+            enableHighAccuracy: true, 
+            timeout: 7000, 
+            maximumAge: 0 
         });
     }
 
@@ -627,8 +659,12 @@
 
     async function calculate() {
         let p = document.getElementById('pickup'), d = document.getElementById('dropoff');
-        if(!p.dataset.lat || !d.dataset.lat) return alert("Vui lòng chọn địa chỉ từ gợi ý hoặc bản đồ!");
         
+        // Kiểm tra điều kiện tối thiểu để tính toán
+        if((!p.dataset.lat || !p.value) && (!d.dataset.lat || !d.value)) {
+            return alert("Vui lòng nhập Điểm đón hoặc Điểm đến hợp lệ để tính toán!");
+        }
+
         let btn = document.getElementById('btn-calc-main');
         let oldText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...'; btn.disabled=true;
@@ -640,6 +676,13 @@
         // Gom tọa độ
         let points = [p, ...document.querySelectorAll('.stop-inp'), d];
         let validPoints = points.filter(x => x.dataset.lat);
+        
+        if (validPoints.length < 2) {
+            alert("Vui lòng chọn cả Điểm đón và Điểm đến từ gợi ý/bản đồ!");
+            btn.innerHTML = oldText; btn.disabled=false;
+            return;
+        }
+        
         let coords = validPoints.map(x => `${x.dataset.lon},${x.dataset.lat}`).join(';');
 
         try {
@@ -651,14 +694,12 @@
             let km = r.distance / 1000;
             let min = Math.round(r.duration / 60);
 
-            // 2. Map Route: Tăng cường độ rõ nét của đường đi
+            // 2. Map Route
             routeLayer = L.geoJSON(r.geometry, {
-                style: { color: '#007bff', weight: 6, opacity: 1.0 } // Màu Xanh Dương (Blue), đậm hơn
+                style: { color: '#007bff', weight: 6, opacity: 1.0 } 
             }).addTo(map);
             
             document.getElementById('main-map').style.display = 'block';
-            
-            // KHẮC PHỤC LỖI MAP KHÔNG HIỂN THỊ KHI CHUYỂN TỪ HIDDEN SANG VISIBLE
             map.invalidateSize(); 
 
             // 3. Tính toán khung nhìn mới:
@@ -754,7 +795,7 @@
             btn.style.display = 'none'; // Ẩn nút Tính giá
             document.getElementById('book-buttons-bar').style.display = 'flex'; // Hiện nút Đặt chuyến
 
-        } catch(e) { alert("Không tìm thấy đường đi!"); }
+        } catch(e) { alert("Không tìm thấy đường đi giữa các điểm đã chọn!"); }
         
         btn.innerHTML = oldText; btn.disabled=false;
     }
@@ -788,10 +829,8 @@
             n: document.getElementById('note').value
         };
 
-        // Dùng Google Maps link ngắn gọn
         const linkMap = (el) => `http://maps.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
 
-        // Cập nhật dòng đầu: TRƯỜNG AN DRIVING
         let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Yêu cầu tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
         
         document.querySelectorAll('.stop-inp').forEach((inp, i) => {
@@ -800,9 +839,7 @@
 
         msg += `🏁 Đến: ${d.value}\n   👉 Map: ${linkMap(d)}\n\n`;
         
-        // Chi tiết giá
         msg += `--- CHI TIẾT GIÁ ---\n`;
-        // LƯU Ý PHÍ CẦU ĐƯỜNG
         msg += `⚠️ Lưu ý: Giá chưa bao gồm phí cầu đường, bến bãi.\n`; 
         msg += `1. Quãng đường: ${cachedData.km} km\n`;
         msg += `2. Chiều đi: ${cachedData.go.toLocaleString()} đ\n`;
