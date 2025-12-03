@@ -231,6 +231,7 @@
             </div>
 
             <div class="price-tag" id="res-total">0 đ</div>
+            <div style="font-size:12px; font-style:italic; color:#888; text-align:center; margin-top:-5px; margin-bottom:10px;" data-i18n="note_toll_fee_small">Giá chưa bao gồm phí cầu đường, bến bãi.</div>
         </div>
     </div>
     
@@ -282,7 +283,8 @@
             note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km.", 
             note_disc_cond:"Ưu đãi 2 chiều: Giảm 40% chiều về nếu chiều đi trên 45km.", 
             note_wait_fee:"Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.",
-            note_toll_fee:"⚠️ Giá tạm tính chưa bao gồm phí cầu đường, bến bãi.", // DÒNG MỚI
+            note_toll_fee:"⚠️ Giá tạm tính chưa bao gồm phí cầu đường, bến bãi.", // DÒNG LỚN (POLICY)
+            note_toll_fee_small:"Giá chưa bao gồm phí cầu đường, bến bãi.", // DÒNG NHỎ (KẾT QUẢ)
             modal_map_title:"CHỌN VỊ TRÍ", btn_confirm:"XÁC NHẬN",
             modal_phone_title:"NHẬP SỐ ĐIỆN THOẠI", modal_phone_desc:"Vui lòng nhập SĐT để chúng tôi liên hệ:",
             plh_phone:"VD: 0912345678", plh_pickup:"Nhập điểm đón...", plh_dropoff:"Nhập điểm đến...", plh_stop:"Điểm dừng...", plh_note:"VD: Xe sạch, đón đúng giờ..."
@@ -299,7 +301,8 @@
             note_price:"4 Seats: 10k/km | 7 Seats: 12k/km.", 
             note_disc_cond:"Round Trip Offer: 40% off return if one-way distance is over 45km.", 
             note_wait_fee:"Waiting Fee: First 3 hours free. After that, 50,000đ/hour.",
-            note_toll_fee:"⚠️ Estimated price excludes toll fees and parking fees.", // DÒNG MỚI
+            note_toll_fee:"⚠️ Estimated price excludes toll fees and parking fees.", // DÒNG LỚN (POLICY)
+            note_toll_fee_small:"Price excludes toll fees and parking fees.", // DÒNG NHỎ (KẾT QUẢ)
             modal_map_title:"PICK LOCATION", btn_confirm:"CONFIRM",
             modal_phone_title:"ENTER PHONE", modal_phone_desc:"Please enter phone number:",
             plh_phone:"Ex: 0912345678", plh_pickup:"Enter pick-up...", plh_dropoff:"Enter drop-off...", plh_stop:"Stop point...", plh_note:"Ex: Clean car, on time..."
@@ -316,7 +319,8 @@
             note_price:"4座: 10k/km | 7座: 12k/km。", 
             note_disc_cond:"往返优惠: 单程距离超过45公里，回程减40%。", 
             note_wait_fee:"等待费: 前3小时免费。之后50,000đ/小时。",
-            note_toll_fee:"⚠️ 预估价格不包含过路费和停车费。", // DÒNG MỚI
+            note_toll_fee:"⚠️ 预估价格不包含过路费和停车费。", // DÒNG LỚN (POLICY)
+            note_toll_fee_small:"预估价格不包含过路费和停车费。", // DÒNG NHỎ (KẾT QUẢ)
             modal_map_title:"选择位置", btn_confirm:"确认",
             modal_phone_title:"输入电话", modal_phone_desc:"请输入电话号码:",
             plh_phone:"例: 0912345678", plh_pickup:"输入上车点...", plh_dropoff:"输入下车点...", plh_stop:"站点...", plh_note:"例: 准时, 车内干净..."
@@ -550,7 +554,7 @@
                     .bindTooltip(label + title, {
                         permanent: true,
                         direction: 'right',
-                        offset: [10, 0]
+                        offset: [10, 0] // Offset để tooltip không bị dính vào marker
                     });
                 
                 // Mở tooltip vĩnh viễn cho điểm đón/trả
@@ -650,15 +654,15 @@
             t: document.getElementById('time').value.replace('T',' '),
             c: document.getElementById('carType').selectedOptions[0].text,
             k: document.getElementById('tripType').selectedOptions[0].text,
-            dr: document.getElementById('driver').selectedOptions[0].text, // THÊM: Tài xế
+            dr: document.getElementById('driver').selectedOptions[0].text, 
             n: document.getElementById('note').value
         };
 
         // Dùng Google Maps link ngắn gọn
         const linkMap = (el) => `http://maps.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
 
-        // THÊM YÊU CẦU TÀI XẾ
-        let msg = `🚖 ĐẶT XE TRƯỜNG AN\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Yêu cầu tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
+        // CẬP NHẬT DÒNG ĐẦU: TRƯỜNG AN DRIVING
+        let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Yêu cầu tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
         
         document.querySelectorAll('.stop-inp').forEach((inp, i) => {
             if(inp.dataset.lat) msg += `🔸 Dừng ${i+1}: ${inp.value}\n   👉 Map: ${linkMap(inp)}\n`;
@@ -668,7 +672,7 @@
         
         // Chi tiết giá
         msg += `--- CHI TIẾT GIÁ ---\n`;
-        // THÊM LƯU Ý PHÍ CẦU ĐƯỜNG
+        // LƯU Ý PHÍ CẦU ĐƯỜNG
         msg += `⚠️ Lưu ý: Giá chưa bao gồm phí cầu đường, bến bãi.\n`; 
         msg += `1. Quãng đường: ${cachedData.km} km\n`;
         msg += `2. Chiều đi: ${cachedData.go.toLocaleString()} đ\n`;
@@ -692,7 +696,7 @@
                  window.open('https://zalo.me/0847526893');
             });
         } else {
-            const subject = 'ĐẶT XE TRƯỜNG AN DRIVING'; // TIÊU ĐỀ MAIL MỚI
+            const subject = 'ĐẶT XE TRƯỜNG AN DRIVING'; 
             window.location.href = `mailto:truongan.driving@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
         }
     }
