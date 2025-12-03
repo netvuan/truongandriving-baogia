@@ -619,10 +619,12 @@
             routeLayer = L.geoJSON(r.geometry).addTo(map);
             document.getElementById('main-map').style.display = 'block';
 
-            // Cải tiến Map: Dùng fitBounds hai lần để đảm bảo hiển thị rõ ràng
-            map.fitBounds(routeLayer.getBounds(), {padding:[30,30]}); 
+            // Cải tiến Map: Tăng padding lên [60, 60] để chừa không gian cho nhãn (tooltips)
+            const mapOptions = {padding:[60, 60]}; // Tăng Padding
+            map.fitBounds(routeLayer.getBounds(), mapOptions); 
+            // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn cho tối ưu
             setTimeout(() => {
-                map.fitBounds(routeLayer.getBounds(), {padding:[30,30]});
+                map.fitBounds(routeLayer.getBounds(), mapOptions);
             }, 50);
 
             // 3. Add Markers & Permanent Tooltips
@@ -644,10 +646,9 @@
                         offset: [10, 0]
                     });
                 
-                // Mở tooltip vĩnh viễn cho điểm đón/trả
-                if (index === 0 || index === validPoints.length - 1) {
-                    marker.openTooltip();
-                }
+                // Mở tooltip vĩnh viễn cho tất cả các điểm trên bản đồ
+                marker.openTooltip();
+                
 
                 markerLayer.addLayer(marker); 
             });
