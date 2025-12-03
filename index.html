@@ -492,9 +492,10 @@
         if(inp.value.length < 3) { box.style.display='none'; return; }
 
         timer = setTimeout(() => {
-            // Tối ưu hóa: viewbox=105.0,8.0,109.0,16.0 (Ưu tiên tìm kiếm khu vực Nam và Trung Việt Nam)
+            // Cải tiến gợi ý: Đảm bảo có thể nhập số nhà/tên đường chi tiết
             let q = encodeURIComponent(inp.value);
-            let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10&viewbox=105.0,8.0,109.0,16.0`;
+            // Thêm search=true để cải thiện chất lượng tìm kiếm địa chỉ chi tiết (street/house number)
+            let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10&viewbox=105.0,8.0,109.0,16.0&extratags=1&namedetails=1`;
             
             fetch(url).then(r=>r.json()).then(data => {
                 box.innerHTML = '';
@@ -616,18 +617,26 @@
             let min = Math.round(r.duration / 60);
 
             // 2. Map Route
-            routeLayer = L.geoJSON(r.geometry).addTo(map);
+            routeLayer = L.geoJSON(r.geometry, {
+                style: { color: '#008000', weight: 5, opacity: 0.7 } // Đường màu xanh đậm hơn
+            }).addTo(map);
             document.getElementById('main-map').style.display = 'block';
 
-            // Cải tiến Map: Tăng padding lên [60, 60] để chừa không gian cho nhãn (tooltips)
-            const mapOptions = {padding:[60, 60]}; // Tăng Padding
-            map.fitBounds(routeLayer.getBounds(), mapOptions); 
-            // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn cho tối ưu (Vẫn cần thiết)
+            // 3. Tính toán khung nhìn mới:
+            const bounds = new L.LatLngBounds();
+            validPoints.forEach(el => {
+                bounds.extend(new L.LatLng(el.dataset.lat, el.dataset.lon));
+            });
+            
+            // Ép map thu nhỏ để bao trọn tất cả các điểm mốc và chừa chỗ cho nhãn
+            const mapOptions = {padding:[60, 60]}; 
+            map.fitBounds(bounds, mapOptions); 
+            // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn tối ưu
             setTimeout(() => {
-                map.fitBounds(routeLayer.getBounds(), mapOptions);
+                map.fitBounds(bounds, mapOptions);
             }, 50);
 
-            // 3. Add Markers & Permanent Tooltips (Hiển thị VỊ TRÍ và TÊN ĐỊA ĐIỂM RÕ RÀNG)
+            // 4. Add Markers & Permanent Tooltips
             validPoints.forEach((el, index) => {
                 let lat = parseFloat(el.dataset.lat);
                 let lon = parseFloat(el.dataset.lon);
@@ -639,19 +648,16 @@
                 else label = `DỪNG ${index}: `;
                 
                 let marker = L.marker([lat, lon])
-                    // Popup khi click
                     .bindPopup(`<b>${label}${title}</b>`) 
-                    // Tooltip Vĩnh Viễn (Hiển thị tên địa điểm)
                     .bindTooltip(label + title, { 
-                        permanent: true, // Luôn hiển thị nhãn
-                        direction: 'right', // Nhãn hiện bên phải marker
-                        offset: [10, 0] // Dịch chuyển nhãn
+                        permanent: true, 
+                        direction: 'right', 
+                        offset: [10, 0] 
                     });
                 
-                // Mở tooltip vĩnh viễn (đảm bảo nhãn luôn hiện, ngay cả khi không hover)
+                // Mở tooltip vĩnh viễn
                 marker.openTooltip();
                 
-
                 markerLayer.addLayer(marker); 
             });
 
