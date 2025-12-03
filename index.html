@@ -260,7 +260,7 @@
     </div>
     
     <div class="bottom-bar">
-        <button class="btn-calc" id="btn-calc-main" onclick="calculate()" data-i18n="btn_calc"><i class="fas fa-calculator"></i> TÍNH GIÁ CƯỚC</button>
+        <button class="btn-calc" id="btn-calc-main" onclick="calculate()" data-i18n="btn_calc" style="display: none;"><i class="fas fa-calculator"></i> TÍNH GIÁ CƯỚC</button>
 
         <div id="book-buttons-bar" style="display:none; width:100%; display:flex; gap:10px;">
             <button class="act-btn zalo" onclick="preBook('zalo')" data-i18n="btn_zalo">Đặt chuyến qua ZALO</button>
@@ -297,7 +297,7 @@
 </div>
 
 <script>
-    // --- I18N DATA ---
+    // --- I18N DATA (Giữ nguyên) ---
     const LANG = {
         vi: {
             brand:"TRƯỜNG AN DRIVING", sec_info:"THÔNG TIN", lbl_phone:"Số điện thoại:", lbl_time:"Thời gian đón:",
@@ -392,22 +392,25 @@
         let now = new Date(); now.setMinutes(now.getMinutes()+30-now.getTimezoneOffset());
         document.getElementById('time').value = now.toISOString().slice(0,16);
         
-        setupInp('phone'); 
-        // Thay đổi oninput/onchange của các trường này để gọi resetButtonsAndMap()
+        // Cấu hình các trường thông tin chung và gọi resetButtonsAndMap() khi thay đổi
         document.getElementById('phone').addEventListener('input', resetButtonsAndMap);
         document.getElementById('time').addEventListener('change', resetButtonsAndMap);
         document.getElementById('note').addEventListener('input', resetButtonsAndMap);
-
-        setupAddr('pickup'); setupAddr('dropoff');
-        changeLang('vi'); // Khởi tạo ngôn ngữ
-        updateCarNote();  // Cập nhật chú thích Loại xe ban đầu
-        updateTripNote(); // Cập nhật chú thích Hình thức ban đầu
+        setupInp('phone');
         
-        // Ban đầu, tất cả các nút đều ẩn (theo CSS và logic)
+        setupAddr('pickup'); setupAddr('dropoff');
+        changeLang('vi'); 
+        updateCarNote();  
+        updateTripNote(); 
+        
+        // **ĐẢM BẢO ẨN CẢ HAI NÚT HÀNH ĐỘNG KHI TẢI TRANG**
+        document.getElementById('btn-calc-main').style.display = 'none';
+        document.getElementById('book-buttons-bar').style.display = 'none';
+        
         checkIfReadyToCalculate();
     };
     
-    // --- UPDATE NOTES ---
+    // --- UPDATE NOTES (Giữ nguyên) ---
     function updateCarNote() {
         const carType = document.getElementById('carType').value;
         const noteEl = document.getElementById('car-note');
@@ -477,7 +480,7 @@
         updateTripNote(); // Cập nhật chú thích theo ngôn ngữ mới
     }
 
-    // --- BUTTON AND MAP RESET ---
+    // --- BUTTON AND MAP RESET (Giữ nguyên logic) ---
     function resetButtonsAndMap() {
         // 1. Ẩn nút Đặt chuyến và kết quả
         document.getElementById('book-buttons-bar').style.display = 'none'; 
@@ -492,7 +495,7 @@
         checkIfReadyToCalculate(); 
     }
     
-    // --- CHECK IF READY TO CALCULATE (Sửa logic) ---
+    // --- CHECK IF READY TO CALCULATE (Giữ nguyên logic) ---
     function checkIfReadyToCalculate() {
         const p = document.getElementById('pickup');
         const d = document.getElementById('dropoff');
@@ -507,14 +510,17 @@
         const isReady = isPickupReady || isDropoffReady || isStopReady;
         
         if (isReady) {
-            btnCalc.style.display = 'flex'; // Hiển thị nút Tính giá
+            // Chỉ hiển thị nút Tính giá nếu nút Đặt chuyến đang ẩn
+            if (document.getElementById('book-buttons-bar').style.display === 'none') {
+                btnCalc.style.display = 'flex'; // Hiển thị nút Tính giá
+            }
         } else {
             btnCalc.style.display = 'none'; // Ẩn nút Tính giá
         }
     }
 
 
-    // --- INPUT HANDLING ---
+    // --- INPUT HANDLING (Giữ nguyên) ---
     function setupInp(id) {
         let el = document.getElementById(id);
         el.addEventListener('input', () => toggleX(el));
@@ -548,7 +554,7 @@
         resetButtonsAndMap(); // Reset khi người dùng xóa địa chỉ
     }
 
-    // --- SEARCH (NOMINATIM) ---
+    // --- SEARCH (NOMINATIM) (Giữ nguyên) ---
     let timer;
     function search(inp) {
         clearTimeout(timer);
@@ -587,7 +593,7 @@
         }, 300);
     }
 
-    // --- MAP PICKER ---
+    // --- MAP PICKER (Giữ nguyên) ---
     function openMap(id) {
         activeInp = document.getElementById(id);
         document.getElementById('modal-map').style.display = 'flex';
@@ -609,14 +615,15 @@
             toggleX(activeInp);
         });
         closeMap();
-        resetButtonsAndMap(); // **Quan trọng:** Reset sau khi chọn vị trí trên map
+        resetButtonsAndMap(); 
     }
 
+    // --- getMyLoc (Giữ nguyên logic timeout) ---
     function getMyLoc() {
         if(!navigator.geolocation) return alert("Vui lòng bật GPS!");
         let btn = document.getElementById('btn-loc'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
         
-        // Cải tiến: Thêm timeout 7 giây
+        // Thêm timeout 7 giây
         navigator.geolocation.getCurrentPosition(p => {
             let i = document.getElementById('pickup');
             i.dataset.lat = p.coords.latitude; i.dataset.lon = p.coords.longitude;
@@ -625,7 +632,7 @@
                 i.value = d.display_name; 
                 toggleX(i); 
                 btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
-                resetButtonsAndMap(); // **Quan trọng:** Reset khi lấy vị trí hiện tại
+                resetButtonsAndMap(); // Reset khi lấy vị trí hiện tại
             });
         }, (error) => {
             let msg = "Không thể lấy vị trí!";
@@ -643,7 +650,7 @@
         });
     }
 
-    // --- ADD STOP ---
+    // --- ADD STOP (Giữ nguyên) ---
     function addStop() {
         let id = 'stop-' + Date.now();
         let div = document.createElement('div');
@@ -660,24 +667,21 @@
         `;
         document.getElementById('stops-container').appendChild(div);
         setupAddr(id);
-        resetButtonsAndMap(); // **Quan trọng:** Reset khi thêm điểm dừng
+        resetButtonsAndMap(); 
     }
 
-    // --- CALCULATE ---
+    // --- CALCULATE (Giữ nguyên logic) ---
     function toggleWait() {
-        // Chỉ ẩn/hiện, không reset ở đây vì reset đã được gọi trong onchange của tripType
         document.getElementById('wait-area').style.display = document.getElementById('tripType').value=='2' ? 'block' : 'none';
     }
 
     async function calculate() {
         let p = document.getElementById('pickup'), d = document.getElementById('dropoff');
         
-        // Kiểm tra điều kiện tối thiểu để tính toán
         if(!p.dataset.lat && !d.dataset.lat) {
             return alert("Vui lòng chọn Điểm đón và Điểm đến từ gợi ý/bản đồ để tính toán!");
         }
         
-        // Phải có 2 điểm được xác định tọa độ
         let points = [p, ...document.querySelectorAll('.stop-inp'), d];
         let validPoints = points.filter(x => x.dataset.lat);
         if (validPoints.length < 2) {
@@ -803,7 +807,7 @@
             
             // 6. Hoán đổi nút hành động ở thanh dưới: Ẩn Tính giá, hiện Đặt chuyến
             btn.style.display = 'none'; 
-            document.getElementById('book-buttons-bar').style.display = 'flex'; 
+            document.getElementById('book-buttons-bar').style.display = 'flex'; // Hiển thị nút Đặt chuyến
 
         } catch(e) { 
             alert("Không tìm thấy đường đi giữa các điểm đã chọn. Vui lòng kiểm tra lại tọa độ đã chọn trên bản đồ/gợi ý."); 
@@ -815,7 +819,7 @@
         btn.innerHTML = oldText; btn.disabled=false;
     }
 
-    // --- BOOK ---
+    // --- BOOK (Giữ nguyên) ---
     function preBook(method) {
         if(!document.getElementById('phone').value) {
             pendingMethod = method;
