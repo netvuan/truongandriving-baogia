@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRƯỜNG AN DRIVING</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -203,8 +203,8 @@
 
         <div class="footer-notes">
             <div style="font-weight:bold; margin-bottom: 5px;" data-i18n="note_policy_title">CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)</div>
-            <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km. Áp dụng cho >30km.</span></div>
-            <div class="note-item"><i class="fas fa-sync"></i> <span data-i18n="note_disc_cond">Ưu đãi 2 chiều: Giảm 40% chiều về nếu tổng quãng đường >90km hoặc chiều đi >45km.</span></div>
+            <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km.</span></div>
+            <div class="note-item"><i class="fas fa-sync"></i> <span data-i18n="note_disc_cond">Ưu đãi 2 chiều: Giảm 40% chiều về nếu chiều đi trên 45km.</span></div>
             <div class="note-item"><i class="fas fa-clock"></i> <span data-i18n="note_wait_fee">Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.</span></div>
         </div>
 
@@ -277,7 +277,8 @@
             lbl_driver:"Tài xế:", opt_system:"⭐ Hệ thống (Nhanh nhất)", lbl_note:"📝 Yêu cầu/Ghi chú:", btn_calc:"💰 TÍNH GIÁ CƯỚC",
             lbl_est_price:"BẢNG GIÁ CHI TIẾT", res_dist:"Quãng đường:", res_time:"Thời gian:", res_go_price:"Chiều đi:",
             res_back_full:"Chiều về (Gốc):", res_return_disc:"Chiều về (-40%):", res_wait_fee:"Phí chờ:", res_deposit:"Cọc (20%):",
-            note_policy_title: "CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)", note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km. Áp dụng cho >30km.", note_disc_cond:"Ưu đãi 2 chiều: Giảm 40% chiều về nếu tổng quãng đường >90km hoặc chiều đi >45km.", note_wait_fee:"Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.",
+            // Cập nhật Chính sách Giá Cước (bỏ >30km và tổng >90km)
+            note_policy_title: "CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)", note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km.", note_disc_cond:"Ưu đãi 2 chiều: Giảm 40% chiều về nếu chiều đi trên 45km.", note_wait_fee:"Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.",
             modal_map_title:"CHỌN VỊ TRÍ", btn_confirm:"XÁC NHẬN",
             modal_phone_title:"NHẬP SỐ ĐIỆN THOẠI", modal_phone_desc:"Vui lòng nhập SĐT để chúng tôi liên hệ:",
             plh_phone:"VD: 0912345678", plh_pickup:"Nhập điểm đón...", plh_dropoff:"Nhập điểm đến...", plh_stop:"Điểm dừng...", plh_note:"VD: Xe sạch, đón đúng giờ..."
@@ -290,7 +291,7 @@
             lbl_driver:"Driver:", opt_system:"⭐ System (Fastest)", lbl_note:"📝 Note/Request:", btn_calc:"💰 CALCULATE PRICE",
             lbl_est_price:"PRICE DETAILS", res_dist:"Distance:", res_time:"Duration:", res_go_price:"One-way:",
             res_back_full:"Return (Orig):", res_return_disc:"Return (-40%):", res_wait_fee:"Waiting Fee:", res_deposit:"Deposit (20%):",
-            note_policy_title: "PRICING POLICY (Details)", note_price:"4 Seats: 10k/km | 7 Seats: 12k/km. Applied for >30km.", note_disc_cond:"Round Trip Offer: 40% off return if total distance >90km or one-way >45km.", note_wait_fee:"Waiting Fee: First 3 hours free. After that, 50,000đ/hour.",
+            note_policy_title: "PRICING POLICY (Details)", note_price:"4 Seats: 10k/km | 7 Seats: 12k/km.", note_disc_cond:"Round Trip Offer: 40% off return if one-way distance is over 45km.", note_wait_fee:"Waiting Fee: First 3 hours free. After that, 50,000đ/hour.",
             modal_map_title:"PICK LOCATION", btn_confirm:"CONFIRM",
             modal_phone_title:"ENTER PHONE", modal_phone_desc:"Please enter phone number:",
             plh_phone:"Ex: 0912345678", plh_pickup:"Enter pick-up...", plh_dropoff:"Enter drop-off...", plh_stop:"Stop point...", plh_note:"Ex: Clean car, on time..."
@@ -303,7 +304,7 @@
             lbl_driver:"司机:", opt_system:"⭐ 系统 (最快)", lbl_note:"📝 备注/要求:", btn_calc:"💰 计算价格",
             lbl_est_price:"价格详情", res_dist:"距离:", res_time:"时间:", res_go_price:"去程:",
             res_back_full:"回程 (原价):", res_return_disc:"回程 (-40%):", res_wait_fee:"等待费:", res_deposit:"定金 (20%):",
-            note_policy_title: "价格政策 (详情)", note_price:"4座: 10k/km | 7座: 12k/km。 适用于 >30km。", note_disc_cond:"往返优惠: 总距离 >90km 或单程 >45km，回程减40%。", note_wait_fee:"等待费: 前3小时免费。之后50,000đ/小时。",
+            note_policy_title: "价格政策 (详情)", note_price:"4座: 10k/km | 7座: 12k/km。", note_disc_cond:"往返优惠: 单程距离超过45公里，回程减40%。", note_wait_fee:"等待费: 前3小时免费。之后50,000đ/小时。",
             modal_map_title:"选择位置", btn_confirm:"确认",
             modal_phone_title:"输入电话", modal_phone_desc:"请输入电话号码:",
             plh_phone:"例: 0912345678", plh_pickup:"输入上车点...", plh_dropoff:"输入下车点...", plh_stop:"站点...", plh_note:"例: 准时, 车内干净..."
@@ -521,18 +522,30 @@
             map.fitBounds(routeLayer.getBounds(), {padding:[30,30]});
             document.getElementById('main-map').style.display = 'block';
 
-            // 3. Add Markers
+            // 3. Add Markers & Permanent Tooltips
             validPoints.forEach((el, index) => {
                 let lat = parseFloat(el.dataset.lat);
                 let lon = parseFloat(el.dataset.lon);
                 let title = el.value;
                 
                 let label = '';
-                if (index === 0) label = 'Đón: ';
-                else if (index === validPoints.length - 1) label = 'Đến: ';
-                else label = `Dừng ${index}: `;
+                if (index === 0) label = 'ĐÓN: ';
+                else if (index === validPoints.length - 1) label = 'ĐẾN: ';
+                else label = `DỪNG ${index}: `;
+                
+                let marker = L.marker([lat, lon])
+                    .bindPopup(`<b>${label}${title}</b>`)
+                    .bindTooltip(label + title, {
+                        permanent: true,
+                        direction: 'right',
+                        offset: [10, 0]
+                    });
+                
+                // Mở tooltip vĩnh viễn cho điểm đón/trả
+                if (index === 0 || index === validPoints.length - 1) {
+                    marker.openTooltip();
+                }
 
-                let marker = L.marker([lat, lon]).bindPopup(`<b>${label}${title}</b>`);
                 markerLayer.addLayer(marker); 
             });
 
@@ -551,7 +564,7 @@
 
             if(type == '2') {
                 let backFull = go;
-                // Điều kiện giảm giá: >45km 1 chiều
+                // Điều kiện giảm giá: Chiều đi >= 45km
                 if(km >= 45) { 
                     back = Math.round(go * 0.6); // Giảm 40%
                     document.getElementById('row-back-full').style.display = 'flex';
@@ -629,7 +642,7 @@
         };
 
         // Dùng Google Maps link ngắn gọn
-        const linkMap = (el) => `https://maps.google.com/?q=${el.dataset.lat},${el.dataset.lon}`;
+        const linkMap = (el) => `http://maps.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
 
         let msg = `🚖 ĐẶT XE TRƯỜNG AN\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
         
@@ -653,8 +666,15 @@
         if(info.n) msg += `\n📝 Ghi chú: ${info.n}`;
 
         if(method == 'zalo') {
-            navigator.clipboard.writeText(msg);
-            window.open('https://zalo.me/0847526893');
+            navigator.clipboard.writeText(msg).then(() => {
+                 // Dùng setTimeout để đảm bảo clipboard đã được ghi trước khi chuyển hướng
+                setTimeout(() => {
+                    window.open('https://zalo.me/0847526893');
+                }, 100); 
+            }).catch(err => {
+                 // Nếu không thể truy cập clipboard (ví dụ: trình duyệt cũ), vẫn mở Zalo
+                 window.open('https://zalo.me/0847526893');
+            });
         } else {
             window.location.href = `mailto:truongan.driving@gmail.com?body=${encodeURIComponent(msg)}`;
         }
