@@ -622,12 +622,12 @@
             // Cải tiến Map: Tăng padding lên [60, 60] để chừa không gian cho nhãn (tooltips)
             const mapOptions = {padding:[60, 60]}; // Tăng Padding
             map.fitBounds(routeLayer.getBounds(), mapOptions); 
-            // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn cho tối ưu
+            // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn cho tối ưu (Vẫn cần thiết)
             setTimeout(() => {
                 map.fitBounds(routeLayer.getBounds(), mapOptions);
             }, 50);
 
-            // 3. Add Markers & Permanent Tooltips
+            // 3. Add Markers & Permanent Tooltips (Hiển thị VỊ TRÍ và TÊN ĐỊA ĐIỂM RÕ RÀNG)
             validPoints.forEach((el, index) => {
                 let lat = parseFloat(el.dataset.lat);
                 let lon = parseFloat(el.dataset.lon);
@@ -639,14 +639,16 @@
                 else label = `DỪNG ${index}: `;
                 
                 let marker = L.marker([lat, lon])
-                    .bindPopup(`<b>${label}${title}</b>`)
-                    .bindTooltip(label + title, {
-                        permanent: true,
-                        direction: 'right',
-                        offset: [10, 0]
+                    // Popup khi click
+                    .bindPopup(`<b>${label}${title}</b>`) 
+                    // Tooltip Vĩnh Viễn (Hiển thị tên địa điểm)
+                    .bindTooltip(label + title, { 
+                        permanent: true, // Luôn hiển thị nhãn
+                        direction: 'right', // Nhãn hiện bên phải marker
+                        offset: [10, 0] // Dịch chuyển nhãn
                     });
                 
-                // Mở tooltip vĩnh viễn cho tất cả các điểm trên bản đồ
+                // Mở tooltip vĩnh viễn (đảm bảo nhãn luôn hiện, ngay cả khi không hover)
                 marker.openTooltip();
                 
 
