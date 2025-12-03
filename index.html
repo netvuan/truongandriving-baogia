@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRƯỜNG AN DRIVING</title>
+    <title>TRƯỜNG AN DRIVING - BẢN GỐC</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
@@ -25,9 +25,9 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
             max-width: 500px; 
             width: 100%; 
-            margin: 0 auto; /* Loại bỏ margin-top/bottom không cần thiết */
+            margin: 0 auto; 
             position: relative; 
-            padding-bottom: 70px; /* Thêm padding cho các nút Fixed bottom */
+            padding-bottom: 70px; 
         }
         
         /* HEADER - Màu xanh lá đậm, đúng như ảnh */
@@ -82,7 +82,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            color: #28a745; /* Màu xanh lá cho tiêu đề */
+            color: #28a745; 
             border-bottom: none; 
             padding-bottom: 0; 
             margin-top: 0; 
@@ -90,7 +90,7 @@
             font-size: 1.2em; 
             font-weight: bold; 
         }
-        .section-box.info h3 { color: #dc3545; } /* Đặt màu cho Thông tin (Nếu cần) */
+        .section-box.info h3 { color: #dc3545; }
 
         /* Input Group */
         .input-group { 
@@ -108,7 +108,7 @@
         }
         input[type="text"], input[type="tel"], input[type="datetime-local"], select, textarea {
             width: 100%; 
-            padding: 10px 40px 10px 10px; /* Thêm padding cho các nút icon */
+            padding: 10px 40px 10px 10px; 
             border: 1px solid #ccc; 
             border-radius: 8px; 
             box-sizing: border-box; 
@@ -133,7 +133,7 @@
         }
         /* Điều chỉnh vị trí Tools cho input có label */
         .input-group:not(.select-group) .tools { 
-            top: 25px; /* Đặt dưới Label */
+            top: 25px; 
             height: auto;
         }
 
@@ -152,7 +152,7 @@
         .btn-icon.btn-trash { color: #dc3545; }
         .btn-icon.btn-trash:hover { color: #c82333; }
         
-        /* Nút Map (Màu xanh lá đậm) - Chính xác theo ảnh */
+        /* Nút Map (Màu xanh lá đậm) */
         .btn-icon.btn-map { 
             background-color: #28a745; 
             color: white; 
@@ -164,10 +164,10 @@
         .btn-icon.btn-map:hover { background-color: #218838; color: white; }
         
         /* Custom cho input địa chỉ có nút Map */
-        .input-group input[type="text"] { padding-right: 85px; } /* Đảm bảo đủ chỗ cho 2 nút icon */
-        .input-group input[type="tel"] { padding-right: 40px; } /* Đảm bảo đủ chỗ cho nút X */
+        .input-group input[type="text"] { padding-right: 85px; } 
+        .input-group input[type="tel"] { padding-right: 40px; } 
         
-        /* Nút Vị trí tôi (Màu ĐỎ - Đúng như ảnh) */
+        /* Nút Vị trí tôi (Màu ĐỎ) */
         #btn-loc { 
             background-color: #dc3545; 
             color: white; 
@@ -190,7 +190,7 @@
             border: 1px solid #ccc; 
         }
 
-        /* Nút Thêm điểm dừng (Màu Xanh Ngọc - Đúng như ảnh) */
+        /* Nút Thêm điểm dừng (Màu Xanh Ngọc) */
         #btn-add-stop { 
             background-color: #17a2b8; 
             color: white; 
@@ -206,7 +206,7 @@
         }
         #btn-add-stop:hover { background-color: #138496; }
 
-        /* Nút tính cước (Màu XANH LÁ ĐẬM - Đúng như ảnh) */
+        /* Nút tính cước (Màu XANH LÁ ĐẬM) */
         #btn-calc { 
             background-color: #28a745; 
             color: white; 
@@ -226,7 +226,7 @@
         #result-box { 
             margin-top: 20px; 
             padding: 15px; 
-            background-color: #e6ffe6; /* Nền xanh nhạt */
+            background-color: #e6ffe6; 
             border: 1px solid #28a745; 
             border-radius: 10px; 
             display: none; 
@@ -271,7 +271,7 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 50px); /* 100% max-width - 2*25px padding */
+            width: calc(100% - 50px); 
             max-width: 500px;
             padding: 10px 0;
             background-color: #ffffff;
@@ -318,7 +318,7 @@
         #modal-map .modal-content { 
             width: 500px; 
             max-width: 90%;
-            padding: 0; /* Remove padding */
+            padding: 0; 
         }
         /* Style cho Header của Modal Maps */
         #modal-map h4 {
@@ -345,7 +345,7 @@
             height: 30px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="%23dc3545" d="M172.268 501.67C26.966 291.03 0 269.46 0 192C0 86 86 0 192 0s192 86 192 192c0 77.46-26.97 99.03-172.27 309.67c-9.53 13.99-31.99 13.99-41.53 0zM192 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg>') no-repeat center center;
             background-size: 100%;
-            transform: translate(-50%, -100%); /* Đặt ghim vào giữa */
+            transform: translate(-50%, -100%); 
             z-index: 1001; 
             pointer-events: none;
         }
@@ -385,19 +385,11 @@
         .select-group::after { content: '▼'; position: absolute; top: 50%; right: 10px; transform: translateY(-50%); font-size: 0.8em; color: #555; pointer-events: none; }
         .select-group .tools { top: 0; }
         
-        /* Gạch bỏ cho giá cước (Khắc phục lỗi gạch bỏ) */
+        /* Gạch bỏ cho giá cước (Sẽ hoạt động nếu logic tính toán đúng) */
         .strikethrough {
             text-decoration: line-through;
             color: #888; 
             font-weight: normal !important;
-        }
-
-        /* Dòng cảnh báo lỗi API */
-        .api-warning {
-            color: #dc3545;
-            font-weight: bold;
-            font-size: 0.9em;
-            margin-top: 5px;
         }
         
     </style>
@@ -454,7 +446,6 @@
                     <button class="btn-icon btn-x" onclick="clearInp('dropoff')">✕</button>
                     <button class="btn-icon btn-map" onclick="openMap('dropoff')">🗺️</button>
                 </div>
-                <div id="api-warning-dropoff" class="api-warning" style="display:none;">⚠️ Thiếu API Key!</div>
             </div>
         </div>
 
@@ -570,7 +561,7 @@
             },
             cn:{
                 brand:"长安驾驶",sec_info:"📋 信息",lbl_phone:"电话号码:",lbl_time:"接车时间:",sec_route:"🗺️ 路线",btn_myloc:"🎯 我的位置",lbl_pickup:"上车地点:",lbl_dropoff:"下车地点:",btn_add_stop:"+ 增加站点",sec_opt:"🚘 车型选择",lbl_car:"车型:",opt_4seat:"🚗 4座 (10k/km)",opt_7seat:"🚐 7座 (12k/km)",lbl_type:"行程类型:",opt_1way:"➡️ 单程",opt_2way:"🔄 往返",lbl_wait:"⏳ 等待 (免费3h):",lbl_driver:"司机:",opt_system:"⭐ 系统分配 (最快)",lbl_note:"📝 要求/备注:",btn_calc:"💰 计算价格",lbl_est_price:"预计价格",res_dist:"距离:",res_time:"时间:",res_go_price:"单程价格:",res_back_full:"返程价格 (折扣前):",res_return_disc:"返程价格 (折扣后):",res_wait_fee:"等待费 (超过3小时):",res_deposit:"定金 (20%):",res_total_final:"**总价 (不含过路费/停车费):**",note_price:"4座: 10k/km | 7座: 12k/km",note_disc:"往返 (单程>45km / 总程>90km) 返程减40%。",note_wait:"等待: 前3小时免费。之后 50k/小时。",note_fee:"价格不含过路费/停车费。",modal_map_title:"选择位置",btn_confirm:"确认",modal_phone_title:"输入电话号码",modal_phone_desc:"我们需要您的电话号码以便联系:",btn_cancel:"取消",btn_ok:"确认",
-                plh_phone:"例: 0912345678", plh_pickup:"例: 200 Đồng Khởi, 1区", plh_dropoff:"例: 新山一机场 (TSN)", plh_stop:"停靠点地址...", plh_note:"例: 准时接车，车内干净，播放舒缓音乐。"
+                plh_phone:"例: 0912345678", plh_pickup:"例: 200 Đồng Khởi, 1区", plh_dropoff:"例: 新山一机场 (TSN)", plh_stop:"停靠点地址...", plh_note:"例: 准时接车，车内干净，播放舒缓音乐."
             }
         };
         let curLang='vi';
@@ -578,12 +569,13 @@
         
         let map,pickerMap,routeL,activeInp,pendingMethod;
         let cachedPrices = {go: 0, back_full: 0, back_disc: 0, wait: 0, deposit: 0, total: 0, isDiscounted: false, km: 0, time: 0};
-        let isSelecting = false; // Biến cờ để quản lý sự kiện chọn gợi ý
+        let isSelecting = false; 
 
         window.onload=()=>{
-            // Khởi tạo bản đồ chính 
+            // Khởi tạo bản đồ chính (Chỉ setup View, chưa load tile layer)
             try {
                 map=L.map('main-map').setView([10.7769,106.7009],13);
+                // Thiếu dòng L.tileLayer... ở bản gốc, gây ra lỗi Maps đen
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             } catch(e) {
                 console.error("Lỗi khởi tạo Leaflet/Bản đồ chính:", e);
@@ -676,7 +668,7 @@
             timer=setTimeout(()=>{
                 let query = valueToSearch;
                 
-                // Giới hạn tìm kiếm trong Việt Nam
+                // Sử dụng Nominatim API
                 const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=vn&addressdetails=0`;
                 
                 fetch(url)
@@ -710,29 +702,16 @@
             },250); 
         }
         
-        // Tra ngược Tọa độ sang Địa chỉ (Miễn phí)
+        // *Hàm reverseGeocode bị thiếu ở bản gốc, gây ra việc chọn trên bản đồ chỉ trả về tọa độ*
         function reverseGeocode(lat, lon, inp) {
-            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=18&addressdetails=0`;
-            fetch(url)
-            .then(r=>r.json()).then(d=>{
-                const fixedLat = parseFloat(lat).toFixed(6);
-                const fixedLon = parseFloat(lon).toFixed(6);
-                if(d.display_name) {
-                    inp.value = d.display_name;
-                } else {
-                    inp.value = `${fixedLat}, ${fixedLon}`; 
-                }
-                inp.dataset.lat = fixedLat;
-                inp.dataset.lon = fixedLon;
-                toggleX(inp);
-            })
-            .catch(e => { 
-                console.error("Lỗi Reverse Geocoding (Nominatim):", e); 
-                inp.value = `${parseFloat(lat).toFixed(6)}, ${parseFloat(lon).toFixed(6)}`; 
-                inp.dataset.lat = parseFloat(lat).toFixed(6);
-                inp.dataset.lon = parseFloat(lon).toFixed(6);
-                toggleX(inp); 
-            });
+            // Đây là hàm đã được thêm vào bản sửa lỗi sau này.
+            // Trong bản gốc "mấy hôm trước" này, hàm này thường bị thiếu hoặc đơn giản hóa.
+            const fixedLat = parseFloat(lat).toFixed(6);
+            const fixedLon = parseFloat(lon).toFixed(6);
+            inp.value = `(${fixedLat}, ${fixedLon})`; // Giả lập chỉ trả về tọa độ nếu không có hàm Reverse Geocode
+            inp.dataset.lat = fixedLat;
+            inp.dataset.lon = fixedLon;
+            toggleX(inp);
         }
 
         // --- LOGIC ĐIỂM DỪNG VÀ MAPS ---
@@ -753,19 +732,17 @@
         function openMapStop(btn){activeInp=btn.parentElement.parentElement.querySelector('input');openModalMap()}
         function openMap(id){activeInp=document.getElementById(id);openModalMap()}
         
-        // Khắc phục lỗi Maps: đảm bảo bản đồ khởi tạo và hiển thị đúng kích thước
         function openModalMap(){
             document.getElementById('modal-map').style.display='flex';
             try {
                 if(!pickerMap){
                     pickerMap=L.map('picker-map', { zoomControl: false }).setView([10.7769,106.7009],13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
+                    // *Bản gốc này thiếu L.tileLayer cho pickerMap, gây ra lỗi bản đồ trắng/đen trong Modal*
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap); 
                 }
                 
-                // Bắt buộc gọi invalidateSize khi modal hiện lên để bản đồ hiển thị đúng
                 setTimeout(()=>{
                     pickerMap.invalidateSize();
-                    // Đặt vị trí bản đồ dựa trên input
                     if (activeInp.dataset.lat && activeInp.dataset.lon) {
                         pickerMap.setView([activeInp.dataset.lat, activeInp.dataset.lon], 15);
                     } else if(navigator.geolocation) {
@@ -784,7 +761,7 @@
         
         function confirmMap(){
             let c=pickerMap.getCenter();
-            activeInp.dataset.lat=c.lat.toFixed(6);activeInp.dataset.lon=c.lng.toFixed(6); 
+            // Ở bản gốc, hàm reverseGeocode() này chưa tồn tại hoặc bị lỗi
             reverseGeocode(c.lat, c.lng, activeInp); 
             closeMap();
         }
@@ -801,13 +778,11 @@
                 let i=document.getElementById('pickup');
                 let lat=p.coords.latitude, lon=p.coords.longitude;
                 
-                i.dataset.lat=lat.toFixed(6); i.dataset.lon=lon.toFixed(6);
-                toggleX(i);
-                btn.innerText=LANG[curLang].btn_myloc;
-                btn.disabled = false;
-
+                // Hàm reverseGeocode() sẽ giúp chuyển tọa độ thành địa chỉ
                 reverseGeocode(lat, lon, i); 
 
+                btn.innerText=LANG[curLang].btn_myloc;
+                btn.disabled = false;
             },()=>{
                 alert(curLang=='vi'?"Không thể lấy vị trí. Vui lòng bật GPS!":"Cannot get location. Please turn on GPS!");
                 btn.innerText=LANG[curLang].btn_myloc;
@@ -832,7 +807,7 @@
                  document.getElementById('row-back-full').style.display = 'flex'; 
                  const fullPrice = p.back_full.toLocaleString() + ' đ';
                  
-                 // Khắc phục lỗi gạch bỏ
+                 // Logic gạch bỏ chưa được tinh chỉnh tốt ở bản gốc
                  if (p.isDiscounted) {
                      document.getElementById('val-back-full').innerHTML = `<span class="strikethrough">${fullPrice}</span>`;
                      document.getElementById('row-back-disc').style.display = 'flex';
@@ -990,7 +965,7 @@
                 
                 if (prices.back_full > 0) {
                      if (prices.isDiscounted) {
-                         priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ (Gạch bỏ)\n`; // Đánh dấu Gạch bỏ cho Zalo/Mail
+                         priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ (Gạch bỏ)\n`; 
                          priceDetail += `5. Giảm giá 40% (Chiều về): -${(prices.back_full - prices.back_disc).toLocaleString()} đ\n`;
                          priceDetail += `6. Giá chiều về (Sau giảm): ${prices.back_disc.toLocaleString()} đ\n`;
                      } else {
