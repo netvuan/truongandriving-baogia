@@ -620,10 +620,15 @@
             routeLayer = L.geoJSON(r.geometry, {
                 style: { color: '#007bff', weight: 6, opacity: 1.0 } // Màu Xanh Dương (Blue), đậm hơn
             }).addTo(map);
+            
             document.getElementById('main-map').style.display = 'block';
+            
+            // **KHẮC PHỤC LỖI MAP KHÔNG HIỂN THỊ KHI CHUYỂN TỪ HIDDEN SANG VISIBLE**
+            map.invalidateSize(); 
+            // -------------------------------------------------------------------
 
             // 3. Tính toán khung nhìn mới:
-            // **BẮT ĐẦU VỚI BOUNDS CỦA TUYẾN ĐƯỜNG để đảm bảo lộ trình được nhìn thấy**
+            // BẮT ĐẦU VỚI BOUNDS CỦA TUYẾN ĐƯỜNG để đảm bảo lộ trình được nhìn thấy
             const bounds = routeLayer.getBounds(); 
             
             // Thêm các điểm mốc (markers) vào bounds để nhãn không bị cắt
