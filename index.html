@@ -270,7 +270,7 @@
             },
             cn:{
                 brand:"长安驾驶",sec_info:"📋 信息",lbl_phone:"电话号码:",lbl_time:"接车时间:",sec_route:"🗺️ 路线",btn_myloc:"🎯 我的位置",lbl_pickup:"上车地点:",lbl_dropoff:"下车地点:",btn_add_stop:"+ 增加站点",sec_opt:"🚘 车型选择",lbl_car:"车型:",opt_4seat:"🚗 4座 (10k/km)",opt_7seat:"🚐 7座 (12k/km)",lbl_type:"行程类型:",opt_1way:"➡️ 单程",opt_2way:"🔄 往返",lbl_wait:"⏳ 等待 (免费3h):",lbl_driver:"司机:",opt_system:"⭐ 系统分配 (最快)",lbl_note:"📝 要求/备注:",btn_calc:"💰 计算价格",lbl_est_price:"预计价格",res_dist:"距离:",res_time:"时间:",res_go_price:"单程价格:",res_back_full:"返程价格 (折扣前):",res_return_disc:"返程价格 (折扣后):",res_wait_fee:"等待费 (超过3小时):",res_deposit:"定金 (20%):",res_total_final:"**总价 (不含过路费/停车费):**",note_price:"4座: 10k/km | 7座: 12k/km",note_disc:"往返 (单程>45km / 总程>90km) 返程减40%。",note_wait:"等待: 前3小时免费。之后 50k/小时。",note_fee:"价格不含过路费/停车费。",modal_map_title:"选择位置",btn_confirm:"确认",modal_phone_title:"输入电话号码",modal_phone_desc:"我们需要您的电话号码以便联系:",btn_cancel:"取消",btn_ok:"确认",
-                plh_phone:"例: 0912345678", plh_pickup:"例: 200 Đồng Khởi, 1区", plh_dropoff:"例: 新山一机场 (TSN)", plh_stop:"停靠点地址...", plh_note:"例: 准时接车，车内干净，播放舒缓音乐。"
+                plh_phone:"例: 0912345678", plh_pickup:"例: 200 Đồng Khởi, 1区", plh_dropoff:"例: Tân Sơn Nhất Airport (TSN)", plh_stop:"停靠点地址...", plh_note:"例: 准时接车，车内干净，播放舒缓音乐。"
             }
         };
         let curLang='vi';
@@ -278,7 +278,7 @@
         
         let map,pickerMap,routeL,activeInp,pendingMethod;
         let cachedPrices = {go: 0, back_full: 0, back_disc: 0, wait: 0, deposit: 0, total: 0, isDiscounted: false, km: 0, time: 0};
-        let isSelecting = false; // Biến cờ mới để kiểm soát sự kiện sau khi chọn gợi ý (fix lỗi bàn phím mobile)
+        let isSelecting = false; // Biến cờ mới để kiểm soát sự kiện sau khi chọn gợi ý (Giữ lại cờ này để fix mobile)
 
         window.onload=()=>{
             // Khởi tạo bản đồ chính (Sử dụng OpenStreetMap)
@@ -320,7 +320,7 @@
 
 
             document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.classList.add('active');
 
             if(cachedPrices.total > 0) updateResultDisplay();
         }
@@ -335,13 +335,13 @@
         function setupAddressInputs(id){
             let el=document.getElementById(id);
             el.addEventListener('input',function(){
-                // **FIX** Bỏ qua nếu đang trong quá trình chọn (đã đóng bàn phím)
+                // **Giữ lại logic fix lỗi mobile**
                 if (isSelecting) { isSelecting = false; return; }
                 toggleX(this);
                 searchAddr(this); // Gọi tìm kiếm địa chỉ khi gõ
             });
             el.addEventListener('focus',function(){
-                // **FIX** Bỏ qua nếu đang trong quá trình chọn (đã đóng bàn phím)
+                // **Giữ lại logic fix lỗi mobile**
                 if (isSelecting) { isSelecting = false; return; }
                 toggleX(el);
                 // Hiển thị gợi ý nếu có sẵn nội dung
@@ -370,7 +370,6 @@
             if(valueToSearch.length<3){box.style.display='none';return}
             
             // 1. Xử lý Tọa độ dấu phẩy (lat, lon) HOẶC Plus Code (Ưu tiên: nhanh nhất)
-            // Lấy 11.1177345,106.6024452 hoặc VM97+VH3
             let coordParts = valueToSearch.match(/^(-?\s*\d+([,.]\d+)*)\s*,\s*(-?\s*\d+([,.]\d+)*)$/);
             
             if (coordParts) {
@@ -385,9 +384,9 @@
             
             // 2. Tìm kiếm Địa chỉ thông thường: Dùng Nominatim API (đã tối ưu: 250ms, limit 5)
             timer=setTimeout(()=>{
-                // **FIX** Thêm ', Vietnam' vào truy vấn để tăng cường độ chính xác địa lý
-                // **FIX** Giới hạn 5 kết quả để phản hồi nhanh hơn
-                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(valueToSearch + ', Vietnam')}&format=json&limit=5&addressdetails=0`;
+                // **ĐIỀU CHỈNH QUAN TRỌNG TẠI ĐÂY: Thêm 'city' và 'country' vào truy vấn**
+                // Mục đích: Tăng cường độ chính xác địa lý (geo-biasing)
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(valueToSearch)}&countrycodes=vn&format=json&limit=5&addressdetails=0`;
                 
                 fetch(url)
                 .then(r=>r.json()).then(d=>{
@@ -403,7 +402,7 @@
                         let lon = parseFloat(i.lon).toFixed(6); // Lưu 6 chữ số thập phân
 
                         div.innerText=`📍 ${name}`;
-                        // **FIX** Sử dụng onmousedown để ngăn sự kiện blur/focus khi đóng bàn phím, đảm bảo chọn được
+                        // **Giữ lại logic fix lỗi mobile**
                         div.onmousedown=(e)=>{ 
                             e.preventDefault(); // Ngăn sự kiện mouse down mặc định
                             isSelecting = true; // Đặt cờ đang chọn
@@ -420,7 +419,7 @@
                     box.style.display='block';
                 })
                 .catch(e => { console.error("Lỗi tìm kiếm địa chỉ (Nominatim API):", e); box.style.display='none'; });
-            },250); // GIẢM ĐỘ TRỄ XUỐNG 250ms
+            },250); // GIỮ ĐỘ TRỄ 250ms
         }
         
         // TRA NGƯỢC TỌA ĐỘ SỬ DỤNG NOMINATIM (Miễn phí)
@@ -641,7 +640,7 @@
 
         const shortC = (l) => parseFloat(l).toFixed(6); // Dùng 6 chữ số thập phân
         // Helper để tạo Maps URL theo format: https://www.google.com/maps/search/?api=1&query=lat,lon
-        const createMapUrl = (lat, lon) => `https://www.google.com/maps/search/?api=1&query=$${shortC(lat)},${shortC(lon)}`;
+        const createMapUrl = (lat, lon) => `http://googleusercontent.com/maps.google.com/3${shortC(lat)},${shortC(lon)}`;
 
         function finalBook(method){
             try{
