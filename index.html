@@ -64,7 +64,8 @@
         .btn-add-stop { width: 100%; color: var(--green); background: none; border: none; font-weight: bold; cursor: pointer; text-align: right; display: block; margin-bottom: 10px; }
         
         /* NÚT TÍNH GIÁ (TO, XANH) */
-        .btn-calc { width: 100%; background: var(--green); color: white; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        /* Áp dụng cho nút trong bottom-bar */
+        .btn-calc { width: 100%; background: var(--green); color: white; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-top: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
         .btn-calc:active { transform: scale(0.98); }
 
         /* KẾT QUẢ */
@@ -101,7 +102,20 @@
         .btn-confirm { width: 100%; padding: 12px; background: var(--green); color: white; border: none; border-radius: 8px; font-weight: bold; }
 
         /* FOOTER BUTTONS */
-        .bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: white; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .bottom-bar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 100%; 
+            max-width: 600px; 
+            background: white; 
+            padding: 10px; 
+            display: flex; /* Quan trọng: Đảm bảo flex để các nút căn chỉnh */
+            gap: 10px; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+            z-index: 100; 
+        }
         .act-btn { flex: 1; padding: 12px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; }
         .zalo { background: #0068ff; }
         .mail { background: var(--red); }
@@ -218,8 +232,6 @@
             <div class="note-item"><i class="fas fa-exclamation-triangle" style="color:#ffc107;"></i> <span data-i18n="note_toll_fee">⚠️ Giá tạm tính chưa bao gồm phí cầu đường, bến bãi.</span></div>
         </div>
 
-        <button class="btn-calc" onclick="calculate()" data-i18n="btn_calc"><i class="fas fa-calculator"></i> TÍNH GIÁ CƯỚC</button>
-
         <div id="result-area">
             <div style="text-align:center; color:#28a745; font-weight:bold; margin-bottom:10px;" data-i18n="lbl_est_price">BẢNG GIÁ CHI TIẾT</div>
             <div class="detail-row"><span data-i18n="res_dist">Quãng đường:</span> <strong id="res-km">0 km</strong></div>
@@ -245,8 +257,12 @@
     </div>
     
     <div class="bottom-bar">
-        <button class="act-btn zalo" onclick="preBook('zalo')" data-i18n="btn_zalo">Đặt chuyến qua ZALO</button>
-        <button class="act-btn mail" onclick="preBook('mail')" data-i18n="btn_mail">Đặt chuyến qua MAIL</button>
+        <button class="btn-calc" id="btn-calc-main" onclick="calculate()" data-i18n="btn_calc"><i class="fas fa-calculator"></i> TÍNH GIÁ CƯỚC</button>
+
+        <div id="book-buttons-bar" style="display:none; width:100%; display:flex; gap:10px;">
+            <button class="act-btn zalo" onclick="preBook('zalo')" data-i18n="btn_zalo">Đặt chuyến qua ZALO</button>
+            <button class="act-btn mail" onclick="preBook('mail')" data-i18n="btn_mail">Đặt chuyến qua MAIL</button>
+        </div>
     </div>
 
 </div>
@@ -452,6 +468,18 @@
         updateTripNote(); // Cập nhật chú thích theo ngôn ngữ mới
     }
 
+    // --- BUTTON AND MAP RESET ---
+    function resetButtonsAndMap() {
+        document.getElementById('btn-calc-main').style.display = 'flex'; // Hiện nút Tính giá
+        document.getElementById('book-buttons-bar').style.display = 'none'; // Ẩn nút Đặt chuyến
+        document.getElementById('result-area').style.display = 'none'; // Ẩn kết quả
+        
+        // Xóa layer map cũ (Lộ trình và Marker)
+        if(routeLayer) map.removeLayer(routeLayer);
+        markerLayer.clearLayers();
+        document.getElementById('main-map').style.display = 'none'; // Ẩn mini map
+    }
+    
     // --- INPUT HANDLING ---
     function setupInp(id) {
         let el = document.getElementById(id);
@@ -464,6 +492,7 @@
             if(isSelecting) { isSelecting=false; return; }
             toggleX(this);
             search(this);
+            resetButtonsAndMap(); // Reset khi người dùng nhập địa chỉ mới
         });
         el.addEventListener('focus', function() {
             toggleX(this);
@@ -482,6 +511,7 @@
         let el = document.getElementById(id);
         el.value=''; delete el.dataset.lat; delete el.dataset.lon;
         toggleX(el);
+        resetButtonsAndMap(); // Reset khi người dùng xóa địa chỉ
     }
 
     // --- SEARCH (NOMINATIM) ---
@@ -516,6 +546,7 @@
                         box.style.display = 'none';
                         toggleX(inp);
                         inp.blur(); // Đóng bàn phím sau khi chọn
+                        resetButtonsAndMap(); // Reset khi chọn địa chỉ mới
                     };
                     box.appendChild(div);
                 });
@@ -546,6 +577,7 @@
             toggleX(activeInp);
         });
         closeMap();
+        resetButtonsAndMap(); // Reset khi chọn vị trí trên map
     }
 
     function getMyLoc() {
@@ -559,6 +591,7 @@
                 i.value = d.display_name; 
                 toggleX(i); 
                 btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
+                resetButtonsAndMap(); // Reset khi lấy vị trí hiện tại
             });
         }, () => {
             alert("Không thể lấy vị trí!");
@@ -576,25 +609,27 @@
             <input type="text" id="${id}" class="stop-inp" placeholder="${LANG[curLang].plh_stop}">
             <div class="input-tools">
                 <button class="tool-btn btn-x" onclick="clearInp('${id}')">✕</button>
-                <button class="tool-btn btn-trash" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-trash"></i></button>
+                <button class="tool-btn btn-trash" onclick="this.parentElement.parentElement.remove(); resetButtonsAndMap()"><i class="fas fa-trash"></i></button>
                 <button class="tool-btn btn-map" onclick="openMap('${id}')"><i class="fas fa-map"></i></button>
             </div>
             <div class="suggestions"></div>
         `;
         document.getElementById('stops-container').appendChild(div);
         setupAddr(id);
+        resetButtonsAndMap(); // Reset khi thêm điểm dừng
     }
 
     // --- CALCULATE ---
     function toggleWait() {
         document.getElementById('wait-area').style.display = document.getElementById('tripType').value=='2' ? 'block' : 'none';
+        resetButtonsAndMap(); // Reset khi đổi loại chuyến
     }
 
     async function calculate() {
         let p = document.getElementById('pickup'), d = document.getElementById('dropoff');
         if(!p.dataset.lat || !d.dataset.lat) return alert("Vui lòng chọn địa chỉ từ gợi ý hoặc bản đồ!");
         
-        let btn = document.querySelector('.btn-calc');
+        let btn = document.getElementById('btn-calc-main');
         let oldText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...'; btn.disabled=true;
 
@@ -623,26 +658,18 @@
             
             document.getElementById('main-map').style.display = 'block';
             
-            // **KHẮC PHỤC LỖI MAP KHÔNG HIỂN THỊ KHI CHUYỂN TỪ HIDDEN SANG VISIBLE**
+            // KHẮC PHỤC LỖI MAP KHÔNG HIỂN THỊ KHI CHUYỂN TỪ HIDDEN SANG VISIBLE
             map.invalidateSize(); 
-            // -------------------------------------------------------------------
 
             // 3. Tính toán khung nhìn mới:
-            // BẮT ĐẦU VỚI BOUNDS CỦA TUYẾN ĐƯỜNG để đảm bảo lộ trình được nhìn thấy
             const bounds = routeLayer.getBounds(); 
-            
-            // Thêm các điểm mốc (markers) vào bounds để nhãn không bị cắt
             validPoints.forEach(el => {
                 bounds.extend(new L.LatLng(el.dataset.lat, el.dataset.lon));
             });
             
-            // Áp dụng fitBounds với padding lớn để thu nhỏ bản đồ
             const mapOptions = {padding:[60, 60]}; 
             map.fitBounds(bounds, mapOptions); 
-            // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn tối ưu
-            setTimeout(() => {
-                map.fitBounds(bounds, mapOptions);
-            }, 50);
+            setTimeout(() => { map.fitBounds(bounds, mapOptions); }, 50);
 
             // 4. Add Markers & Permanent Tooltips
             validPoints.forEach((el, index) => {
@@ -663,37 +690,32 @@
                         offset: [10, 0] 
                     });
                 
-                // Mở tooltip vĩnh viễn
                 marker.openTooltip();
-                
                 markerLayer.addLayer(marker); 
             });
 
 
-            // Calc Price
+            // 5. Calc Price
             let type = document.getElementById('tripType').value;
             let unit = document.getElementById('carType').value=='4' ? CFG.p4 : CFG.p7;
             
             let go = Math.round(km * unit);
             let back = 0, wait = 0;
             
-            // Reset visibility
             document.getElementById('row-back-full').style.display = 'none';
             document.getElementById('row-back-disc').style.display = 'none';
             document.getElementById('row-wait').style.display = 'none';
 
             if(type == '2') {
                 let backFull = go;
-                // Điều kiện giảm giá: Chiều đi >= 45km
                 if(km >= 45) { 
-                    back = Math.round(go * 0.6); // Giảm 40%
+                    back = Math.round(go * 0.6); 
                     document.getElementById('row-back-full').style.display = 'flex';
                     document.getElementById('val-back-full').innerText = backFull.toLocaleString() + ' đ';
                     document.getElementById('row-back-disc').style.display = 'flex';
                     document.getElementById('val-back-disc').innerText = back.toLocaleString() + ' đ';
                 } else {
                     back = go;
-                    // Hiển thị giá gốc cho chiều về (vì không đủ điều kiện giảm)
                     document.getElementById('row-back-full').style.display = 'flex';
                     document.getElementById('val-back-full').style.textDecoration = 'none'; 
                     document.getElementById('val-back-full').style.color = '#333';
@@ -727,6 +749,10 @@
             cachedData = { total, km: km.toFixed(1), time: min, go, back, wait, deposit, type };
             
             document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
+            
+            // 6. Hoán đổi nút hành động ở thanh dưới
+            btn.style.display = 'none'; // Ẩn nút Tính giá
+            document.getElementById('book-buttons-bar').style.display = 'flex'; // Hiện nút Đặt chuyến
 
         } catch(e) { alert("Không tìm thấy đường đi!"); }
         
