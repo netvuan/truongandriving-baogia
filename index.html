@@ -16,7 +16,7 @@
         .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 80px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
         
         /* HEADER */
-        header { background-color: #008000; /* Xanh đậm theo ảnh */ padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        header { background-color: #008000; padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; }
         .brand-col { display: flex; flex-direction: column; }
         .brand-name { font-weight: 900; font-size: 18px; text-transform: uppercase; margin: 0; }
         .hotline { font-size: 14px; color: #ff0000; font-weight: bold; background: yellow; padding: 2px 5px; border-radius: 4px; text-decoration: none; display: inline-block; margin-top: 4px; width: fit-content;}
@@ -64,6 +64,19 @@
         .price-tag { font-size: 26px; color: var(--red); font-weight: 900; text-align: center; margin: 10px 0; border-top: 1px dashed #ccc; padding-top: 10px; }
         .detail-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
         
+        /* FOOTER NOTES (Ghi chú chi tiết) */
+        .footer-notes {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #555;
+            background: #f0fff4; /* Nền nhẹ để nổi bật */
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #c3e6cb;
+        }
+        .note-item { margin-bottom: 5px; display: flex; gap: 5px; }
+        .note-item i { color: var(--green); margin-top: 3px; }
+
         /* SUGGESTIONS (Gợi ý) */
         .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; z-index: 999; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
         .sug-item { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
@@ -80,7 +93,7 @@
         .btn-confirm { width: 100%; padding: 12px; background: var(--green); color: white; border: none; border-radius: 8px; font-weight: bold; }
 
         /* FOOTER BUTTONS */
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: white; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
         .act-btn { flex: 1; padding: 12px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; }
         .zalo { background: #0068ff; }
         .mail { background: var(--red); }
@@ -133,7 +146,7 @@
             <div class="suggestions"></div>
         </div>
 
-        <div id="stops-box"></div>
+        <div id="stops-container"></div>
         <button class="btn-add-stop" onclick="addStop()" data-i18n="btn_add_stop">+ Thêm điểm dừng</button>
 
         <div class="form-group">
@@ -210,10 +223,11 @@
 
             <div class="price-tag" id="res-total">0 đ</div>
             
-            <div style="font-size:12px; color:#666; margin-top:10px; border-top:1px dashed #ccc; padding-top:5px;">
-                <p style="margin:2px 0"><i class="fas fa-info-circle"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km</span></p>
-                <p style="margin:2px 0"><i class="fas fa-sync"></i> <span data-i18n="note_disc">2 Chiều (1 chiều >45km) giảm 40% về.</span></p>
-                <p style="margin:2px 0"><i class="fas fa-clock"></i> <span data-i18n="note_wait">Chờ: Miễn phí 3h đầu, sau đó 50k/h.</span></p>
+            <div class="footer-notes">
+                <div style="font-weight:bold; margin-bottom: 5px;" data-i18n="note_policy_title">CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)</div>
+                <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km. Áp dụng cho >30km.</span></div>
+                <div class="note-item"><i class="fas fa-sync"></i> <span data-i18n="note_disc_cond">Ưu đãi 2 chiều: Giảm 40% chiều về nếu tổng quãng đường >90km hoặc chiều đi >45km.</span></div>
+                <div class="note-item"><i class="fas fa-clock"></i> <span data-i18n="note_wait_fee">Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.</span></div>
             </div>
         </div>
     </div>
@@ -262,8 +276,8 @@
             lbl_driver:"Tài xế:", opt_system:"⭐ Hệ thống (Nhanh nhất)", lbl_note:"📝 Yêu cầu/Ghi chú:", btn_calc:"💰 TÍNH GIÁ CƯỚC",
             lbl_est_price:"BẢNG GIÁ CHI TIẾT", res_dist:"Quãng đường:", res_time:"Thời gian:", res_go_price:"Chiều đi:",
             res_back_full:"Chiều về (Gốc):", res_return_disc:"Chiều về (-40%):", res_wait_fee:"Phí chờ:", res_deposit:"Cọc (20%):",
-            note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km", note_disc:"2 Chiều (1 chiều >45km) giảm 40% về.",
-            note_wait:"Chờ: Miễn phí 3h đầu, sau đó 50k/h.", modal_map_title:"CHỌN VỊ TRÍ", btn_confirm:"XÁC NHẬN",
+            note_policy_title: "CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)", note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km. Áp dụng cho >30km.", note_disc_cond:"Ưu đãi 2 chiều: Giảm 40% chiều về nếu tổng quãng đường >90km hoặc chiều đi >45km.", note_wait_fee:"Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.",
+            modal_map_title:"CHỌN VỊ TRÍ", btn_confirm:"XÁC NHẬN",
             modal_phone_title:"NHẬP SỐ ĐIỆN THOẠI", modal_phone_desc:"Vui lòng nhập SĐT để chúng tôi liên hệ:",
             plh_phone:"VD: 0912345678", plh_pickup:"Nhập điểm đón...", plh_dropoff:"Nhập điểm đến...", plh_stop:"Điểm dừng...", plh_note:"VD: Xe sạch, đón đúng giờ..."
         },
@@ -271,12 +285,12 @@
             brand:"TRUONG AN DRIVING", sec_info:"INFORMATION", lbl_phone:"Phone Number:", lbl_time:"Pickup Time:",
             sec_route:"ROUTE", btn_myloc:"MY LOCATION", lbl_pickup:"Pick-up:", lbl_dropoff:"Drop-off:", btn_add_stop:"+ Add Stop",
             sec_opt:"OPTIONS", lbl_car:"Car Type:", opt_4seat:"4 Seats (10k/km)", opt_7seat:"7 Seats (12k/km)",
-            lbl_type:"Trip Type:", opt_1way:"One way", opt_2way:"Round trip", lbl_wait:"⏳ Waiting (Free 3h):",
-            lbl_driver:"Driver:", opt_system:"⭐ System (Fastest)", lbl_note:"📝 Note:", btn_calc:"💰 CALCULATE PRICE",
+            lbl_type:"Trip Type:", opt_1way:"One way", opt_2way:"Round trip", lbl_wait:"⏳ Waiting Time (Free 3h):",
+            lbl_driver:"Driver:", opt_system:"⭐ System (Fastest)", lbl_note:"📝 Note/Request:", btn_calc:"💰 CALCULATE PRICE",
             lbl_est_price:"PRICE DETAILS", res_dist:"Distance:", res_time:"Duration:", res_go_price:"One-way:",
             res_back_full:"Return (Orig):", res_return_disc:"Return (-40%):", res_wait_fee:"Waiting Fee:", res_deposit:"Deposit (20%):",
-            note_price:"4 Seats: 10k/km | 7 Seats: 12k/km", note_disc:"Round trip (>45km) 40% off return.",
-            note_wait:"Waiting: Free 3h, then 50k/h.", modal_map_title:"PICK LOCATION", btn_confirm:"CONFIRM",
+            note_policy_title: "PRICING POLICY (Details)", note_price:"4 Seats: 10k/km | 7 Seats: 12k/km. Applied for >30km.", note_disc_cond:"Round Trip Offer: 40% off return if total distance >90km or one-way >45km.", note_wait_fee:"Waiting Fee: First 3 hours free. After that, 50,000đ/hour.",
+            modal_map_title:"PICK LOCATION", btn_confirm:"CONFIRM",
             modal_phone_title:"ENTER PHONE", modal_phone_desc:"Please enter phone number:",
             plh_phone:"Ex: 0912345678", plh_pickup:"Enter pick-up...", plh_dropoff:"Enter drop-off...", plh_stop:"Stop point...", plh_note:"Ex: Clean car, on time..."
         },
@@ -284,12 +298,12 @@
             brand:"长安驾驶", sec_info:"信息", lbl_phone:"电话号码:", lbl_time:"接车时间:",
             sec_route:"路线", btn_myloc:"我的位置", lbl_pickup:"上车点:", lbl_dropoff:"下车点:", btn_add_stop:"+ 增加站点",
             sec_opt:"选项", lbl_car:"车型:", opt_4seat:"4座 (10k/km)", opt_7seat:"7座 (12k/km)",
-            lbl_type:"行程:", opt_1way:"单程", opt_2way:"往返 (优惠)", lbl_wait:"⏳ 等待 (免费3h):",
-            lbl_driver:"司机:", opt_system:"⭐ 系统 (最快)", lbl_note:"📝 备注:", btn_calc:"💰 计算价格",
+            lbl_type:"行程:", opt_1way:"单程", opt_2way:"往返 (优惠)", lbl_wait:"⏳ 等待时间 (免费3h):",
+            lbl_driver:"司机:", opt_system:"⭐ 系统 (最快)", lbl_note:"📝 备注/要求:", btn_calc:"💰 计算价格",
             lbl_est_price:"价格详情", res_dist:"距离:", res_time:"时间:", res_go_price:"去程:",
             res_back_full:"回程 (原价):", res_return_disc:"回程 (-40%):", res_wait_fee:"等待费:", res_deposit:"定金 (20%):",
-            note_price:"4座: 10k/km | 7座: 12k/km", note_disc:"往返 (>45km) 回程减40%",
-            note_wait:"等待: 免费3h, 之后50k/h", modal_map_title:"选择位置", btn_confirm:"确认",
+            note_policy_title: "价格政策 (详情)", note_price:"4座: 10k/km | 7座: 12k/km。 适用于 >30km。", note_disc_cond:"往返优惠: 总距离 >90km 或单程 >45km，回程减40%。", note_wait_fee:"等待费: 前3小时免费。之后50,000đ/小时。",
+            modal_map_title:"选择位置", btn_confirm:"确认",
             modal_phone_title:"输入电话", modal_phone_desc:"请输入电话号码:",
             plh_phone:"例: 0912345678", plh_pickup:"输入上车点...", plh_dropoff:"输入下车点...", plh_stop:"站点...", plh_note:"例: 准时, 车内干净..."
         }
@@ -378,12 +392,9 @@
         if(inp.value.length < 3) { box.style.display='none'; return; }
 
         timer = setTimeout(() => {
-            // Mở rộng tìm kiếm, không giới hạn quá chặt để tìm được nhiều hơn
+            // Tối ưu hóa: viewbox=105.0,8.0,109.0,16.0 (Ưu tiên tìm kiếm khu vực Nam và Trung Việt Nam)
             let q = encodeURIComponent(inp.value);
-            // countrycodes=vn: Chỉ tìm ở VN
-            // addressdetails=1: Lấy chi tiết
-            // limit=10: Lấy nhiều kết quả hơn
-            let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10`;
+            let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10&viewbox=105.0,8.0,109.0,16.0`;
             
             fetch(url).then(r=>r.json()).then(data => {
                 box.innerHTML = '';
@@ -392,7 +403,6 @@
                 data.forEach(item => {
                     let div = document.createElement('div');
                     div.className = 'sug-item';
-                    // Hiển thị tên ngắn gọn, bỏ bớt phần thừa
                     let name = item.display_name; 
                     div.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${name}`;
                     
@@ -460,7 +470,7 @@
         let div = document.createElement('div');
         div.className = 'form-group';
         div.innerHTML = `
-            <label class="form-label">Điểm dừng:</label>
+            <label class="form-label" data-i18n="lbl_stop_point">Điểm dừng:</label>
             <input type="text" id="${id}" class="stop-inp" placeholder="${LANG[curLang].plh_stop}">
             <div class="input-tools">
                 <button class="tool-btn btn-x" onclick="clearInp('${id}')">✕</button>
@@ -519,7 +529,8 @@
 
             if(type == '2') {
                 let backFull = go;
-                if(km >= 45) {
+                // Điều kiện giảm giá: >45km 1 chiều
+                if(km >= 45) { 
                     back = Math.round(go * 0.6); // Giảm 40%
                     // Hiện dòng Gốc (Gạch bỏ)
                     document.getElementById('row-back-full').style.display = 'flex';
