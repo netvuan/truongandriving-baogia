@@ -492,9 +492,9 @@
         if(inp.value.length < 3) { box.style.display='none'; return; }
 
         timer = setTimeout(() => {
-            // Cải tiến gợi ý: Đảm bảo có thể nhập số nhà/tên đường chi tiết
+            // Tối ưu hóa tìm kiếm số nhà/tên đường
             let q = encodeURIComponent(inp.value);
-            // Thêm search=true để cải thiện chất lượng tìm kiếm địa chỉ chi tiết (street/house number)
+            // Thêm extratags=1&namedetails=1 để cải thiện chất lượng tìm kiếm địa chỉ chi tiết (street/house number)
             let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10&viewbox=105.0,8.0,109.0,16.0&extratags=1&namedetails=1`;
             
             fetch(url).then(r=>r.json()).then(data => {
@@ -616,19 +616,22 @@
             let km = r.distance / 1000;
             let min = Math.round(r.duration / 60);
 
-            // 2. Map Route
+            // 2. Map Route: Tăng cường độ rõ nét của đường đi
             routeLayer = L.geoJSON(r.geometry, {
-                style: { color: '#008000', weight: 5, opacity: 0.7 } // Đường màu xanh đậm hơn
+                style: { color: '#007bff', weight: 6, opacity: 1.0 } // Màu Xanh Dương (Blue), đậm hơn
             }).addTo(map);
             document.getElementById('main-map').style.display = 'block';
 
             // 3. Tính toán khung nhìn mới:
-            const bounds = new L.LatLngBounds();
+            // **BẮT ĐẦU VỚI BOUNDS CỦA TUYẾN ĐƯỜNG để đảm bảo lộ trình được nhìn thấy**
+            const bounds = routeLayer.getBounds(); 
+            
+            // Thêm các điểm mốc (markers) vào bounds để nhãn không bị cắt
             validPoints.forEach(el => {
                 bounds.extend(new L.LatLng(el.dataset.lat, el.dataset.lon));
             });
             
-            // Ép map thu nhỏ để bao trọn tất cả các điểm mốc và chừa chỗ cho nhãn
+            // Áp dụng fitBounds với padding lớn để thu nhỏ bản đồ
             const mapOptions = {padding:[60, 60]}; 
             map.fitBounds(bounds, mapOptions); 
             // Gọi lại lần 2 để đảm bảo Leaflet tính toán lại khung nhìn tối ưu
