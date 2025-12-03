@@ -51,6 +51,7 @@
         .tool-btn { width: 34px; height: 34px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .btn-x { background: #f0f0f0; color: #888; display: none; }
         .btn-map { background: var(--green); color: white; } /* Nút Map Xanh */
+        .btn-trash { background: var(--red); color: white; }
 
         /* ĐIỂM DỪNG */
         .btn-add-stop { width: 100%; color: var(--green); background: none; border: none; font-weight: bold; cursor: pointer; text-align: right; display: block; margin-bottom: 10px; }
@@ -200,6 +201,13 @@
             <textarea id="note" placeholder="..."></textarea>
         </div>
 
+        <div class="footer-notes">
+            <div style="font-weight:bold; margin-bottom: 5px;" data-i18n="note_policy_title">CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)</div>
+            <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km. Áp dụng cho >30km.</span></div>
+            <div class="note-item"><i class="fas fa-sync"></i> <span data-i18n="note_disc_cond">Ưu đãi 2 chiều: Giảm 40% chiều về nếu tổng quãng đường >90km hoặc chiều đi >45km.</span></div>
+            <div class="note-item"><i class="fas fa-clock"></i> <span data-i18n="note_wait_fee">Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.</span></div>
+        </div>
+
         <button class="btn-calc" onclick="calculate()" data-i18n="btn_calc"><i class="fas fa-calculator"></i> TÍNH GIÁ CƯỚC</button>
 
         <div id="result-area">
@@ -222,13 +230,6 @@
             </div>
 
             <div class="price-tag" id="res-total">0 đ</div>
-            
-            <div class="footer-notes">
-                <div style="font-weight:bold; margin-bottom: 5px;" data-i18n="note_policy_title">CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)</div>
-                <div class="note-item"><i class="fas fa-tag"></i> <span data-i18n="note_price">Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km. Áp dụng cho >30km.</span></div>
-                <div class="note-item"><i class="fas fa-sync"></i> <span data-i18n="note_disc_cond">Ưu đãi 2 chiều: Giảm 40% chiều về nếu tổng quãng đường >90km hoặc chiều đi >45km.</span></div>
-                <div class="note-item"><i class="fas fa-clock"></i> <span data-i18n="note_wait_fee">Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.</span></div>
-            </div>
         </div>
     </div>
     
@@ -311,7 +312,7 @@
 
     let curLang = 'vi';
     const CFG = { p4: 10000, p7: 12000, wait: 50000 };
-    let map, pickerMap, routeLayer, activeInp, pendingMethod;
+    let map, pickerMap, routeLayer, markerLayer, activeInp, pendingMethod;
     let cachedData = { total:0 };
     let isSelecting = false;
 
@@ -319,6 +320,7 @@
         // Map hiển thị kết quả
         map = L.map('main-map').setView([10.7769, 106.7009], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        markerLayer = L.layerGroup().addTo(map); // Layer chứa markers
 
         // Map chọn vị trí (khởi tạo nhưng chưa hiện)
         pickerMap = L.map('picker-map').setView([10.7769, 106.7009], 13);
@@ -496,9 +498,14 @@
         let oldText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...'; btn.disabled=true;
 
+        // 1. Clear previous layers and markers
+        if(routeLayer) map.removeLayer(routeLayer);
+        markerLayer.clearLayers(); 
+
         // Gom tọa độ
         let points = [p, ...document.querySelectorAll('.stop-inp'), d];
-        let coords = points.filter(x => x.dataset.lat).map(x => `${x.dataset.lon},${x.dataset.lat}`).join(';');
+        let validPoints = points.filter(x => x.dataset.lat);
+        let coords = validPoints.map(x => `${x.dataset.lon},${x.dataset.lat}`).join(';');
 
         try {
             let res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
@@ -509,11 +516,26 @@
             let km = r.distance / 1000;
             let min = Math.round(r.duration / 60);
 
-            // Map Route
-            if(routeLayer) map.removeLayer(routeLayer);
+            // 2. Map Route
             routeLayer = L.geoJSON(r.geometry).addTo(map);
             map.fitBounds(routeLayer.getBounds(), {padding:[30,30]});
             document.getElementById('main-map').style.display = 'block';
+
+            // 3. Add Markers
+            validPoints.forEach((el, index) => {
+                let lat = parseFloat(el.dataset.lat);
+                let lon = parseFloat(el.dataset.lon);
+                let title = el.value;
+                
+                let label = '';
+                if (index === 0) label = 'Đón: ';
+                else if (index === validPoints.length - 1) label = 'Đến: ';
+                else label = `Dừng ${index}: `;
+
+                let marker = L.marker([lat, lon]).bindPopup(`<b>${label}${title}</b>`);
+                markerLayer.addLayer(marker); 
+            });
+
 
             // Calc Price
             let type = document.getElementById('tripType').value;
@@ -522,7 +544,7 @@
             let go = Math.round(km * unit);
             let back = 0, wait = 0;
             
-            // Reset
+            // Reset visibility
             document.getElementById('row-back-full').style.display = 'none';
             document.getElementById('row-back-disc').style.display = 'none';
             document.getElementById('row-wait').style.display = 'none';
@@ -532,17 +554,15 @@
                 // Điều kiện giảm giá: >45km 1 chiều
                 if(km >= 45) { 
                     back = Math.round(go * 0.6); // Giảm 40%
-                    // Hiện dòng Gốc (Gạch bỏ)
                     document.getElementById('row-back-full').style.display = 'flex';
                     document.getElementById('val-back-full').innerText = backFull.toLocaleString() + ' đ';
-                    // Hiện dòng Đã giảm
                     document.getElementById('row-back-disc').style.display = 'flex';
                     document.getElementById('val-back-disc').innerText = back.toLocaleString() + ' đ';
                 } else {
                     back = go;
-                    // Chỉ hiện dòng chưa giảm (vì ko đc giảm)
+                    // Hiển thị giá gốc cho chiều về (vì không đủ điều kiện giảm)
                     document.getElementById('row-back-full').style.display = 'flex';
-                    document.getElementById('val-back-full').style.textDecoration = 'none'; // Bỏ gạch
+                    document.getElementById('val-back-full').style.textDecoration = 'none'; 
                     document.getElementById('val-back-full').style.color = '#333';
                     document.getElementById('val-back-full').innerText = back.toLocaleString() + ' đ';
                 }
@@ -608,8 +628,8 @@
             n: document.getElementById('note').value
         };
 
-        // Tạo Link Map OSM (Lat,Lon)
-        const linkMap = (el) => `https://www.openstreetmap.org/?mlat=${el.dataset.lat}&mlon=${el.dataset.lon}`;
+        // Dùng Google Maps link ngắn gọn
+        const linkMap = (el) => `https://maps.google.com/?q=${el.dataset.lat},${el.dataset.lon}`;
 
         let msg = `🚖 ĐẶT XE TRƯỜNG AN\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
         
