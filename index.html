@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Xe Trường An</title>
+    <title>TRƯỜNG AN DRIVING</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-        /* CSS KHÔI PHỤC GIAO DIỆN GỐC */
+        /* CSS KHÔI PHỤC GIAO DIỆN CHUẨN THEO ẢNH */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f0f2f5; 
@@ -25,11 +25,12 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
             max-width: 500px; 
             width: 100%; 
-            margin: 20px auto; 
-            position: relative; /* Quan trọng cho Suggestion Box */
+            margin: 0 auto; /* Loại bỏ margin-top/bottom không cần thiết */
+            position: relative; 
+            padding-bottom: 70px; /* Thêm padding cho các nút Fixed bottom */
         }
         
-        /* HEADER - Màu xanh lá */
+        /* HEADER - Màu xanh lá đậm, đúng như ảnh */
         .header { 
             background-color: #28a745; 
             color: white; 
@@ -45,6 +46,11 @@
             margin: 0; 
             font-size: 1.2em; 
             font-weight: bold; 
+        }
+        .header span {
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-right: 10px;
         }
         
         /* Switch ngôn ngữ */
@@ -69,14 +75,14 @@
             border: 1px solid #ccc; 
             border-radius: 8px; 
             padding: 15px; 
-            margin-bottom: 20px; 
+            margin-bottom: 15px; 
             background-color: #fff; 
         }
         .section-box h3 { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            color: #007bff; 
+            color: #28a745; /* Màu xanh lá cho tiêu đề */
             border-bottom: none; 
             padding-bottom: 0; 
             margin-top: 0; 
@@ -84,8 +90,7 @@
             font-size: 1.2em; 
             font-weight: bold; 
         }
-        .section-box.route h3 { color: #28a745; }
-        .section-box.options h3 { color: #dc3545; }
+        .section-box.info h3 { color: #dc3545; } /* Đặt màu cho Thông tin (Nếu cần) */
 
         /* Input Group */
         .input-group { 
@@ -111,7 +116,7 @@
             font-size: 1em; 
         }
         input[type="text"]:focus, input[type="tel"]:focus, input[type="datetime-local"]:focus, select:focus, textarea:focus { 
-            border-color: #007bff; 
+            border-color: #28a745; 
             outline: none; 
         }
         
@@ -141,11 +146,13 @@
             color: #888; 
             transition: color 0.2s; 
         }
-        .btn-icon:hover { color: #007bff; }
+        .btn-icon:hover { color: #28a745; }
         .btn-icon.btn-x { color: #dc3545; display: none; }
         .btn-icon.btn-x:hover { color: #c82333; }
         .btn-icon.btn-trash { color: #dc3545; }
         .btn-icon.btn-trash:hover { color: #c82333; }
+        
+        /* Nút Map (Màu xanh lá đậm) - Chính xác theo ảnh */
         .btn-icon.btn-map { 
             background-color: #28a745; 
             color: white; 
@@ -160,7 +167,7 @@
         .input-group input[type="text"] { padding-right: 85px; } /* Đảm bảo đủ chỗ cho 2 nút icon */
         .input-group input[type="tel"] { padding-right: 40px; } /* Đảm bảo đủ chỗ cho nút X */
         
-        /* Nút Vị trí tôi (Màu ĐỎ) */
+        /* Nút Vị trí tôi (Màu ĐỎ - Đúng như ảnh) */
         #btn-loc { 
             background-color: #dc3545; 
             color: white; 
@@ -183,7 +190,7 @@
             border: 1px solid #ccc; 
         }
 
-        /* Nút Thêm điểm dừng */
+        /* Nút Thêm điểm dừng (Màu Xanh Ngọc - Đúng như ảnh) */
         #btn-add-stop { 
             background-color: #17a2b8; 
             color: white; 
@@ -199,10 +206,10 @@
         }
         #btn-add-stop:hover { background-color: #138496; }
 
-        /* Nút tính cước (Màu VÀNG/XANH LÁ) */
+        /* Nút tính cước (Màu XANH LÁ ĐẬM - Đúng như ảnh) */
         #btn-calc { 
-            background-color: #ffc107; 
-            color: #333; 
+            background-color: #28a745; 
+            color: white; 
             padding: 15px 15px; 
             border: none; 
             border-radius: 8px; 
@@ -213,14 +220,14 @@
             margin-top: 10px; 
             transition: background-color 0.3s; 
         }
-        #btn-calc:hover:not(:disabled) { background-color: #e0a800; }
+        #btn-calc:hover:not(:disabled) { background-color: #218838; }
 
         /* Kết quả giá cước */
         #result-box { 
             margin-top: 20px; 
             padding: 15px; 
-            background-color: #e9f7ff; 
-            border: 1px solid #007bff; 
+            background-color: #e6ffe6; /* Nền xanh nhạt */
+            border: 1px solid #28a745; 
             border-radius: 10px; 
             display: none; 
         }
@@ -242,7 +249,7 @@
         #result-box h4 { 
             margin-top: 0; 
             font-size: 1.1em; 
-            color: #007bff; 
+            color: #28a745; 
             text-align: center; 
         }
         
@@ -255,8 +262,23 @@
             border-top: 1px dashed #ccc; 
         }
         
-        /* Nút Đặt xe */
-        .btn-book-group { display: flex; gap: 10px; margin-top: 20px; }
+        /* Nút Đặt xe (Fixed Bottom) */
+        .btn-book-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 20px; 
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 50px); /* 100% max-width - 2*25px padding */
+            max-width: 500px;
+            padding: 10px 0;
+            background-color: #ffffff;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px 12px 0 0;
+            z-index: 100;
+        }
         .btn-book { 
             padding: 12px 15px; 
             border: none; 
@@ -272,7 +294,7 @@
         #btn-mail { background-color: #6c757d; color: white; }
         #btn-mail:hover:not(:disabled) { background-color: #5a6268; }
 
-        /* Modal (Giữ nguyên) */
+        /* Modal */
         .modal { 
             display: none; 
             position: fixed; 
@@ -291,21 +313,47 @@
             padding: 20px; 
             border-radius: 10px; 
             max-width: 90%; 
+            text-align: center;
         }
         #modal-map .modal-content { 
             width: 500px; 
-            max-width: 90%; 
+            max-width: 90%;
+            padding: 0; /* Remove padding */
+        }
+        /* Style cho Header của Modal Maps */
+        #modal-map h4 {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.2em;
         }
         #picker-map { 
             height: 300px; 
             width: 100%; 
-            margin-top: 10px; 
-            border-radius: 8px; 
+            margin: 0; 
+            position: relative;
         }
-        .modal-buttons { margin-top: 15px; text-align: right; }
+        /* Custom Marker */
+        #picker-map:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px; 
+            height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="%23dc3545" d="M172.268 501.67C26.966 291.03 0 269.46 0 192C0 86 86 0 192 0s192 86 192 192c0 77.46-26.97 99.03-172.27 309.67c-9.53 13.99-31.99 13.99-41.53 0zM192 256a64 64 0 1 0 0-128 64 64 0 1 0 0 128z"/></svg>') no-repeat center center;
+            background-size: 100%;
+            transform: translate(-50%, -100%); /* Đặt ghim vào giữa */
+            z-index: 1001; 
+            pointer-events: none;
+        }
+
+        .modal-buttons { margin-top: 15px; text-align: right; padding: 0 20px 20px 20px; }
         .modal-buttons button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
         .modal-buttons .btn-cancel { background-color: #f8f9fa; color: #333; }
-        .modal-buttons .btn-confirm { background-color: #28a745; color: white; }
+        .modal-buttons .btn-confirm { background-color: #28a745; color: white; font-weight: bold; }
 
         /* Gợi ý địa chỉ */
         .suggestions { 
@@ -319,7 +367,7 @@
             z-index: 10; 
             max-height: 150px; 
             overflow-y: auto; 
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); 
             border-radius: 0 0 8px 8px; 
             display: none; 
         }
@@ -335,8 +383,22 @@
         .select-group { position: relative; }
         .select-group select { appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 30px; }
         .select-group::after { content: '▼'; position: absolute; top: 50%; right: 10px; transform: translateY(-50%); font-size: 0.8em; color: #555; pointer-events: none; }
-        /* Điều chỉnh Tool cho Select Group */
         .select-group .tools { top: 0; }
+        
+        /* Gạch bỏ cho giá cước (Khắc phục lỗi gạch bỏ) */
+        .strikethrough {
+            text-decoration: line-through;
+            color: #888; 
+            font-weight: normal !important;
+        }
+
+        /* Dòng cảnh báo lỗi API */
+        .api-warning {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
         
     </style>
 </head>
@@ -344,6 +406,7 @@
 
     <div class="container">
         <div class="header">
+            <span>📞 084.752.6893</span>
             <h2 data-i18n="brand">TRƯỜNG AN DRIVING</h2>
             <div class="lang-switch">
                 <button class="lang-btn active" onclick="setLang('vi')">VN</button>
@@ -366,7 +429,7 @@
         </div>
         
         <div class="section-box route">
-            <h3 data-i18n="sec_route">🗺️ LỘ TRÌNH <button id="btn-loc" data-i18n="btn_myloc">🎯 Vị trí tôi</button></h3>
+            <h3 data-i18n="sec_route">🗺️ LỘ TRÌNH <button id="btn-loc" data-i18n="btn_myloc">🎯 VỊ TRÍ TÔI</button></h3>
             
             <div id="main-map"></div>
 
@@ -380,8 +443,8 @@
                 </div>
             </div>
 
-            <button id="btn-add-stop" data-i18n="btn_add_stop" onclick="addStop()">+ Thêm điểm dừng</button>
             <div id="stops-box"></div>
+            <button id="btn-add-stop" data-i18n="btn_add_stop" onclick="addStop()">+ Thêm điểm dừng</button>
             
             <div class="input-group">
                 <label for="dropoff" data-i18n="lbl_dropoff">Điểm đến:</label>
@@ -391,6 +454,7 @@
                     <button class="btn-icon btn-x" onclick="clearInp('dropoff')">✕</button>
                     <button class="btn-icon btn-map" onclick="openMap('dropoff')">🗺️</button>
                 </div>
+                <div id="api-warning-dropoff" class="api-warning" style="display:none;">⚠️ Thiếu API Key!</div>
             </div>
         </div>
 
@@ -482,11 +546,11 @@
     </div>
 
     <div id="phone-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 350px;">
             <h4 data-i18n="modal_phone_title">Nhập Số Điện Thoại</h4>
             <p data-i18n="modal_phone_desc">Nhà xe cần SĐT để liên hệ đón bạn:</p>
             <input type="tel" id="quick-phone" placeholder="VD: 0912345678" style="width:100%; margin-bottom:15px;">
-            <div class="modal-buttons">
+            <div class="modal-buttons" style="padding: 0; text-align: center;">
                 <button class="btn-cancel" onclick="closePhoneModal()" data-i18n="btn_cancel">Hủy</button>
                 <button class="btn-confirm" onclick="savePhoneAndBook()" data-i18n="btn_ok">Xác nhận</button>
             </div>
@@ -494,13 +558,14 @@
     </div>
 
     <script>
+        // Dữ liệu đa ngôn ngữ
         const LANG={
             vi:{
-                brand:"TRƯỜNG AN DRIVING",sec_info:"📋 THÔNG TIN",lbl_phone:"Số điện thoại:",lbl_time:"Thời gian đón:",sec_route:"🗺️ LỘ TRÌNH",btn_myloc:"🎯 Vị trí tôi",lbl_pickup:"Điểm đón:",lbl_dropoff:"Điểm đến:",btn_add_stop:"+ Thêm điểm dừng",sec_opt:"🚘 TÙY CHỌN",lbl_car:"Loại xe:",opt_4seat:"🚗 Xe 4 chỗ (10k/km)",opt_7seat:"🚐 Xe 7 chỗ (12k/km)",lbl_type:"Hình thức:",opt_1way:"➡️ 1 Chiều",opt_2way:"🔄 2 Chiều (Ưu đãi)",lbl_wait:"⏳ Giờ chờ (Miễn phí 3h đầu):",lbl_driver:"Tài xế:",opt_system:"⭐ Hệ thống (Nhanh nhất)",lbl_note:"📝 Yêu cầu/Ghi chú:",btn_calc:"💰 TÍNH GIÁ CƯỚC",lbl_est_price:"Giá dự kiến",res_dist:"Quãng đường:",res_time:"Thời gian:",res_go_price:"Giá chiều đi:",res_back_full:"Giá chiều về (Chưa giảm):",res_return_disc:"Giá chiều về (Sau giảm):",res_wait_fee:"Phí chờ (sau 3h):",res_deposit:"Đặt cọc (20%):",res_total_final:"**TỔNG CỘNG (Chưa gồm phí cầu đường, bến bãi):**",note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km",note_disc:"Đi 2 chiều (1 chiều >45km / Tổng >90km) giảm 40% chiều về.",note_wait:"Chờ: Miễn phí 3h đầu. Sau đó 50k/h.",note_fee:"Giá chưa gồm phí cầu đường, bến bãi.",modal_map_title:"Chọn vị trí",btn_confirm:"XÁC NHẬN",modal_phone_title:"Nhập Số Điện Thoại",modal_phone_desc:"Nhà xe cần SĐT để liên hệ đón bạn:",btn_cancel:"Hủy",btn_ok:"Xác nhận",
+                brand:"TRƯỜNG AN DRIVING",sec_info:"📋 THÔNG TIN",lbl_phone:"Số điện thoại:",lbl_time:"Thời gian đón:",sec_route:"🗺️ LỘ TRÌNH",btn_myloc:"🎯 VỊ TRÍ TÔI",lbl_pickup:"Điểm đón:",lbl_dropoff:"Điểm đến:",btn_add_stop:"+ Thêm điểm dừng",sec_opt:"🚘 TÙY CHỌN",lbl_car:"Loại xe:",opt_4seat:"🚗 Xe 4 chỗ (10k/km)",opt_7seat:"🚐 Xe 7 chỗ (12k/km)",lbl_type:"Hình thức:",opt_1way:"➡️ 1 Chiều",opt_2way:"🔄 2 Chiều (Ưu đãi)",lbl_wait:"⏳ Giờ chờ (Miễn phí 3h đầu):",lbl_driver:"Tài xế:",opt_system:"⭐ Hệ thống (Nhanh nhất)",lbl_note:"📝 Yêu cầu/Ghi chú:",btn_calc:"💰 TÍNH GIÁ CƯỚC",lbl_est_price:"Giá dự kiến",res_dist:"Quãng đường:",res_time:"Thời gian:",res_go_price:"Giá chiều đi:",res_back_full:"Giá chiều về (Chưa giảm):",res_return_disc:"Giá chiều về (Sau giảm):",res_wait_fee:"Phí chờ (sau 3h):",res_deposit:"Đặt cọc (20%):",res_total_final:"**TỔNG CỘNG (Chưa gồm phí cầu đường, bến bãi):**",note_price:"Giá 4 chỗ: 10k/km | 7 chỗ: 12k/km",note_disc:"Đi 2 chiều (1 chiều >45km / Tổng >90km) giảm 40% chiều về.",note_wait:"Chờ: Miễn phí 3h đầu. Sau đó 50k/h.",note_fee:"Giá chưa gồm phí cầu đường, bến bãi.",modal_map_title:"Chọn vị trí",btn_confirm:"XÁC NHẬN",modal_phone_title:"Nhập Số Điện Thoại",modal_phone_desc:"Nhà xe cần SĐT để liên hệ đón bạn:",btn_cancel:"Hủy",btn_ok:"Xác nhận",
                 plh_phone:"VD: 0912345678", plh_pickup:"VD: 200 Đồng Khởi, Quận 1", plh_dropoff:"VD: Sân bay Tân Sơn Nhất (TSN)", plh_stop:"Địa chỉ điểm dừng (nếu có)...", plh_note:"VD: Đón đúng giờ, xe sạch sẽ, có bật nhạc trữ tình."
             },
             en:{
-                brand:"TRUONG AN DRIVING",sec_info:"📋 INFORMATION",lbl_phone:"Phone Number:",lbl_time:"Pickup Time:",sec_route:"🗺️ ROUTE",btn_myloc:"🎯 My Location",lbl_pickup:"Pick-up:",lbl_dropoff:"Drop-off:",btn_add_stop:"+ Add Stop",sec_opt:"🚘 OPTIONS",lbl_car:"Car Type:",opt_4seat:"🚗 4 Seats (10k/km)",opt_7seat:"🚐 7 Seats (12k/km)",lbl_type:"Trip Type:",opt_1way:"➡️ One way",opt_2way:"🔄 Round trip",lbl_wait:"⏳ Waiting (Free 3h):",lbl_driver:"Driver:",opt_system:"⭐ System (Fastest)",lbl_note:"📝 Request/Note:",btn_calc:"💰 CALCULATE PRICE",lbl_est_price:"Estimated Price",res_dist:"Distance:",res_time:"Duration:",res_go_price:"One-way Price:",res_back_full:"Return Price (Before Disc.):",res_return_disc:"Return Price (After Discount):",res_wait_fee:"Waiting Fee (After 3h):",res_deposit:"Deposit (20%):",res_total_final:"**TOTAL (Tolls/Parking not included):**",note_price:"4 Seats: 10k/km | 7 Seats: 12k/km",note_disc:"Round trip (One-way >45km / Total >90km) get 40% off return.",note_wait:"Waiting: Free first 3h. Then 50k/h.",note_fee:"Tolls/Parking not included.",modal_map_title:"Pick Location",btn_confirm:"CONFIRM",modal_phone_title:"Enter Phone Number",modal_phone_desc:"We need your phone to contact:",btn_cancel:"Cancel",btn_ok:"Confirm",
+                brand:"TRUONG AN DRIVING",sec_info:"📋 INFORMATION",lbl_phone:"Phone Number:",lbl_time:"Pickup Time:",sec_route:"🗺️ ROUTE",btn_myloc:"🎯 MY LOCATION",lbl_pickup:"Pick-up:",lbl_dropoff:"Drop-off:",btn_add_stop:"+ Add Stop",sec_opt:"🚘 OPTIONS",lbl_car:"Car Type:",opt_4seat:"🚗 4 Seats (10k/km)",opt_7seat:"🚐 7 Seats (12k/km)",lbl_type:"Trip Type:",opt_1way:"➡️ One way",opt_2way:"🔄 Round trip",lbl_wait:"⏳ Waiting (Free 3h):",lbl_driver:"Driver:",opt_system:"⭐ System (Fastest)",lbl_note:"📝 Request/Note:",btn_calc:"💰 CALCULATE PRICE",lbl_est_price:"Estimated Price",res_dist:"Distance:",res_time:"Duration:",res_go_price:"One-way Price:",res_back_full:"Return Price (Before Disc.):",res_return_disc:"Return Price (After Discount):",res_wait_fee:"Waiting Fee (After 3h):",res_deposit:"Deposit (20%):",res_total_final:"**TOTAL (Tolls/Parking not included):**",note_price:"4 Seats: 10k/km | 7 Seats: 12k/km",note_disc:"Round trip (One-way >45km / Total >90km) get 40% off return.",note_wait:"Waiting: Free first 3h. Then 50k/h.",note_fee:"Tolls/Parking not included.",modal_map_title:"Pick Location",btn_confirm:"CONFIRM",modal_phone_title:"Enter Phone Number",modal_phone_desc:"We need your phone to contact:",btn_cancel:"Cancel",btn_ok:"Confirm",
                 plh_phone:"Ex: 0912345678", plh_pickup:"Ex: 200 Dong Khoi, Dist 1", plh_dropoff:"Ex: Tan Son Nhat Airport (TSN)", plh_stop:"Stop address (if any)...", plh_note:"Ex: Be on time, clean car, soft music."
             },
             cn:{
@@ -516,7 +581,7 @@
         let isSelecting = false; // Biến cờ để quản lý sự kiện chọn gợi ý
 
         window.onload=()=>{
-            // Khởi tạo bản đồ chính (Sử dụng OpenStreetMap)
+            // Khởi tạo bản đồ chính 
             try {
                 map=L.map('main-map').setView([10.7769,106.7009],13);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -608,9 +673,6 @@
             box.innerHTML='';
             if(valueToSearch.length<3){box.style.display='none';return}
             
-            // Bỏ qua logic tọa độ/plus code để đơn giản hóa quá trình cho người dùng
-            
-            // Tìm kiếm Địa chỉ thông thường
             timer=setTimeout(()=>{
                 let query = valueToSearch;
                 
@@ -691,26 +753,27 @@
         function openMapStop(btn){activeInp=btn.parentElement.parentElement.querySelector('input');openModalMap()}
         function openMap(id){activeInp=document.getElementById(id);openModalMap()}
         
-        // Cải tiến: Tối ưu khởi tạo/hiển thị bản đồ trong Modal (Khắc phục lỗi Maps)
+        // Khắc phục lỗi Maps: đảm bảo bản đồ khởi tạo và hiển thị đúng kích thước
         function openModalMap(){
             document.getElementById('modal-map').style.display='flex';
             try {
                 if(!pickerMap){
-                    pickerMap=L.map('picker-map').setView([10.7769,106.7009],13);
+                    pickerMap=L.map('picker-map', { zoomControl: false }).setView([10.7769,106.7009],13);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
                 }
                 
                 // Bắt buộc gọi invalidateSize khi modal hiện lên để bản đồ hiển thị đúng
-                setTimeout(()=>pickerMap.invalidateSize(), 200); 
-                
-                // Đặt vị trí bản đồ
-                if (activeInp.dataset.lat && activeInp.dataset.lon) {
-                    pickerMap.setView([activeInp.dataset.lat, activeInp.dataset.lon], 15);
-                } else if(navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(p=>pickerMap.setView([p.coords.latitude,p.coords.longitude],15));
-                } else {
-                    pickerMap.setView([10.7769,106.7009],13);
-                }
+                setTimeout(()=>{
+                    pickerMap.invalidateSize();
+                    // Đặt vị trí bản đồ dựa trên input
+                    if (activeInp.dataset.lat && activeInp.dataset.lon) {
+                        pickerMap.setView([activeInp.dataset.lat, activeInp.dataset.lon], 15);
+                    } else if(navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(p=>pickerMap.setView([p.coords.latitude,p.coords.longitude],15));
+                    } else {
+                        pickerMap.setView([10.7769,106.7009],13);
+                    }
+                }, 200); 
                 
             } catch(e) {
                  console.error("Lỗi khởi tạo Leaflet/Bản đồ chọn:", e);
@@ -728,7 +791,7 @@
         
         function getMyLoc(){
             let btn=document.getElementById('btn-loc'); btn.innerText=LANG[curLang].btn_myloc.replace('🎯','⏳'); 
-            btn.disabled = true; // Vô hiệu hóa nút trong khi tìm kiếm
+            btn.disabled = true; 
             if(!navigator.geolocation){
                 alert(curLang=='vi'?"Lỗi GPS":"GPS Error");
                 btn.innerText=LANG[curLang].btn_myloc; btn.disabled = false;
@@ -769,13 +832,14 @@
                  document.getElementById('row-back-full').style.display = 'flex'; 
                  const fullPrice = p.back_full.toLocaleString() + ' đ';
                  
-                 document.getElementById('val-back-full').innerHTML = p.isDiscounted ? `<s>${fullPrice}</s>` : `${fullPrice}`;
-                 
+                 // Khắc phục lỗi gạch bỏ
                  if (p.isDiscounted) {
+                     document.getElementById('val-back-full').innerHTML = `<span class="strikethrough">${fullPrice}</span>`;
                      document.getElementById('row-back-disc').style.display = 'flex';
                      const discountAmount = p.back_full - p.back_disc;
                      document.getElementById('val-back-disc').innerHTML = `${p.back_disc.toLocaleString()} đ (-${discountAmount.toLocaleString()}đ)`;
                  } else {
+                     document.getElementById('val-back-full').innerHTML = `${fullPrice}`;
                      document.getElementById('row-back-disc').style.display = 'none';
                  }
             } else {
@@ -796,7 +860,6 @@
         async function calculate(){
             let p=document.getElementById('pickup'),d=document.getElementById('dropoff');
             
-            // Yêu cầu tọa độ chính xác cho Pickup và Dropoff
             if(!p.dataset.lat||!d.dataset.lat)return alert(LANG[curLang].plh_pickup.includes('VD:') ? "Vui lòng chọn hoặc nhập đầy đủ địa chỉ đón/đến (hệ thống cần tọa độ chính xác)!" : "Please select or enter all pickup/drop-off addresses (system needs precise coordinates)!");
             
             let btn=document.getElementById('btn-calc');btn.disabled=true;btn.style.opacity=0.7;
@@ -883,9 +946,7 @@
         }
 
         const shortC = (l) => parseFloat(l).toFixed(6); 
-        
-        // Tạo URL Google Maps (Giữ nguyên theo logic cũ)
-        const createMapUrl = (lat, lon) => `https://www.google.com/maps/search/?api=1&query=${shortC(lat)},${shortC(lon)}`;
+        const createMapUrl = (lat, lon) => `https://maps.google.com/maps?q=${shortC(lat)},${shortC(lon)}`;
 
 
         function finalBook(method){
@@ -929,7 +990,7 @@
                 
                 if (prices.back_full > 0) {
                      if (prices.isDiscounted) {
-                         priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ\n`;
+                         priceDetail += `4. Giá chiều về (Chưa giảm): ${prices.back_full.toLocaleString()} đ (Gạch bỏ)\n`; // Đánh dấu Gạch bỏ cho Zalo/Mail
                          priceDetail += `5. Giảm giá 40% (Chiều về): -${(prices.back_full - prices.back_disc).toLocaleString()} đ\n`;
                          priceDetail += `6. Giá chiều về (Sau giảm): ${prices.back_disc.toLocaleString()} đ\n`;
                      } else {
