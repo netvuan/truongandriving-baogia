@@ -57,7 +57,7 @@
         .input-tools { position: absolute; right: 5px; top: 29px; display: flex; gap: 5px; }
         .tool-btn { width: 34px; height: 34px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .btn-x { background: #f0f0f0; color: #888; display: none; }
-        .btn-map { background: var(--green); color: white; } /* Nút Map Xanh */
+        .btn-map { background: var(--green); color: white; } 
         .btn-trash { background: var(--red); color: white; }
 
         /* ĐIỂM DỪNG */
@@ -72,23 +72,16 @@
         .price-tag { font-size: 26px; color: var(--red); font-weight: 900; text-align: center; margin: 10px 0; border-top: 1px dashed #ccc; padding-top: 10px; }
         .detail-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
         
-        /* FOOTER NOTES (Ghi chú chi tiết) */
-        .footer-notes {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #555;
-            background: #f0fff4; 
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #c3e6cb;
-        }
+        /* FOOTER NOTES */
+        .footer-notes { margin-top: 15px; font-size: 13px; color: #555; background: #f0fff4; padding: 10px; border-radius: 6px; border: 1px solid #c3e6cb; }
         .note-item { margin-bottom: 5px; display: flex; gap: 5px; }
         .note-item i { color: var(--green); margin-top: 3px; }
 
-        /* SUGGESTIONS (Gợi ý) */
-        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; z-index: 999; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
-        .sug-item { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        /* SUGGESTIONS (Gợi ý) - Style lại cho đẹp hơn với dữ liệu Goong */
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-top: none; z-index: 999; max-height: 250px; overflow-y: auto; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
+        .sug-item { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; }
         .sug-item:hover { background: #f5f5f5; }
+        .sug-item i { margin-top: 3px; color: #aaa; }
 
         /* MODAL & MAP */
         #main-map { height: 200px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc; display: none; }
@@ -101,25 +94,11 @@
         .btn-confirm { width: 100%; padding: 12px; background: var(--green); color: white; border: none; border-radius: 8px; font-weight: bold; }
 
         /* FOOTER BUTTONS */
-        .bottom-bar { 
-            position: fixed; 
-            bottom: 0; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 100%; 
-            max-width: 600px; 
-            background: white; 
-            padding: 10px; 
-            display: flex; 
-            gap: 10px; 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
-            z-index: 100; 
-        }
+        .bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: white; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
         .act-btn { flex: 1; padding: 12px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; }
         .zalo { background: #0068ff; }
         .mail { background: var(--red); }
         
-        /* Đảm bảo tất cả các nút ẩn ban đầu */
         #btn-calc-main { display: none; } 
         #book-buttons-bar { display: none; }
     </style>
@@ -297,7 +276,21 @@
 </div>
 
 <script>
-    // --- I18N DATA (Giữ nguyên) ---
+    // --- KHAI BÁO API KEY GOONG MAPS ---
+    // BẠN HÃY DÁN KHÓA API CỦA BẠN VÀO GIỮA DẤU NHÁY ĐƠN BÊN DƯỚI
+    const GOONG_API_KEY = 'DÁN_KHÓA_API_GOONG_CỦA_BẠN_VÀO_ĐÂY'; 
+    // Ví dụ: const GOONG_API_KEY = 'Abc123xyz...';
+
+    // Tạo Session Token (Để tiết kiệm chi phí tìm kiếm)
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+    let sessionToken = generateUUID();
+
+    // --- I18N DATA (Ngôn ngữ) ---
     const LANG = {
         vi: {
             brand:"TRƯỜNG AN DRIVING", sec_info:"THÔNG TIN", lbl_phone:"Số điện thoại:", lbl_time:"Thời gian đón:",
@@ -383,16 +376,15 @@
         // Map hiển thị kết quả
         map = L.map('main-map').setView([10.7769, 106.7009], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        markerLayer = L.layerGroup().addTo(map); // Layer chứa markers
+        markerLayer = L.layerGroup().addTo(map);
 
-        // Map chọn vị trí (khởi tạo nhưng chưa hiện)
+        // Map chọn vị trí
         pickerMap = L.map('picker-map').setView([10.7769, 106.7009], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
 
         let now = new Date(); now.setMinutes(now.getMinutes()+30-now.getTimezoneOffset());
         document.getElementById('time').value = now.toISOString().slice(0,16);
         
-        // Cấu hình các trường thông tin chung và gọi resetButtonsAndMap() khi thay đổi
         document.getElementById('phone').addEventListener('input', resetButtonsAndMap);
         document.getElementById('time').addEventListener('change', resetButtonsAndMap);
         document.getElementById('note').addEventListener('input', resetButtonsAndMap);
@@ -403,32 +395,25 @@
         updateCarNote();  
         updateTripNote(); 
         
-        // **ĐẢM BẢO ẨN CẢ HAI NÚT HÀNH ĐỘNG KHI TẢI TRANG**
         document.getElementById('btn-calc-main').style.display = 'none';
         document.getElementById('book-buttons-bar').style.display = 'none';
         
         checkIfReadyToCalculate();
     };
     
-    // --- UPDATE NOTES (Giữ nguyên) ---
+    // --- CÁC HÀM CẬP NHẬT GIAO DIỆN ---
     function updateCarNote() {
         const carType = document.getElementById('carType').value;
         const noteEl = document.getElementById('car-note');
-        if (carType === '4') {
-            noteEl.innerText = LANG[curLang].note_car_4;
-        } else if (carType === '7') {
-            noteEl.innerText = LANG[curLang].note_car_7;
-        }
+        if (carType === '4') noteEl.innerText = LANG[curLang].note_car_4;
+        else if (carType === '7') noteEl.innerText = LANG[curLang].note_car_7;
     }
 
     function updateTripNote() {
         const tripType = document.getElementById('tripType').value;
         const noteEl = document.getElementById('trip-note');
-        if (tripType === '2') {
-            noteEl.innerText = LANG[curLang].note_trip_disc;
-        } else {
-            noteEl.innerText = '';
-        }
+        if (tripType === '2') noteEl.innerText = LANG[curLang].note_trip_disc;
+        else noteEl.innerText = '';
     }
 
     function changeLang(code) {
@@ -436,7 +421,6 @@
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
         document.querySelector(`.lang-btn[onclick="changeLang('${code}')"]`).classList.add('active');
         
-        // Tải lại các option cho Select Options
         const updateSelectOptions = (id, options) => {
             const select = document.getElementById(id);
             const currentVal = select.value;
@@ -461,7 +445,6 @@
             { value: '2', i18nKey: 'opt_2way_disp' }
         ]);
         
-        // Cập nhật các text/placeholder khác
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.dataset.i18n;
             if(LANG[code][key]) {
@@ -470,39 +453,30 @@
             }
         });
         
-        // Update placeholders specific
         ['phone','pickup','dropoff','note'].forEach(id => {
             document.getElementById(id).placeholder = LANG[code][`plh_${id}`] || LANG[code][`plh_${id}`.replace('_disp','')];
         });
         document.querySelectorAll('.stop-inp').forEach(i => i.placeholder = LANG[code].plh_stop);
 
-        updateCarNote();  // Cập nhật chú thích theo ngôn ngữ mới
-        updateTripNote(); // Cập nhật chú thích theo ngôn ngữ mới
+        updateCarNote();
+        updateTripNote();
     }
 
-    // --- BUTTON AND MAP RESET (Giữ nguyên logic) ---
     function resetButtonsAndMap() {
-        // 1. Ẩn nút Đặt chuyến và kết quả
         document.getElementById('book-buttons-bar').style.display = 'none'; 
         document.getElementById('result-area').style.display = 'none'; 
-        
-        // 2. Clear map
         if(routeLayer) map.removeLayer(routeLayer);
         markerLayer.clearLayers();
         document.getElementById('main-map').style.display = 'none'; 
-        
-        // 3. Kiểm tra và chỉ hiển thị nút TÍNH GIÁ nếu có thông tin địa chỉ
         checkIfReadyToCalculate(); 
     }
     
-    // --- CHECK IF READY TO CALCULATE (Giữ nguyên logic) ---
     function checkIfReadyToCalculate() {
         const p = document.getElementById('pickup');
         const d = document.getElementById('dropoff');
         const stops = document.querySelectorAll('.stop-inp');
         const btnCalc = document.getElementById('btn-calc-main');
         
-        // Kiểm tra xem có bất kỳ trường địa chỉ nào có dữ liệu (tọa độ hoặc text) hay không
         const isPickupReady = (p.dataset.lat && p.value) || (p.value.length > 0);
         const isDropoffReady = (d.dataset.lat && d.value) || (d.value.length > 0);
         const isStopReady = Array.from(stops).some(s => (s.dataset.lat && s.value) || (s.value.length > 0));
@@ -510,17 +484,16 @@
         const isReady = isPickupReady || isDropoffReady || isStopReady;
         
         if (isReady) {
-            // Chỉ hiển thị nút Tính giá nếu nút Đặt chuyến đang ẩn
             if (document.getElementById('book-buttons-bar').style.display === 'none') {
-                btnCalc.style.display = 'flex'; // Hiển thị nút Tính giá
+                btnCalc.style.display = 'flex';
             }
         } else {
-            btnCalc.style.display = 'none'; // Ẩn nút Tính giá
+            btnCalc.style.display = 'none';
         }
     }
 
 
-    // --- INPUT HANDLING (Giữ nguyên) ---
+    // --- INPUT HANDLING ---
     function setupInp(id) {
         let el = document.getElementById(id);
         el.addEventListener('input', () => toggleX(el));
@@ -532,7 +505,7 @@
             if(isSelecting) { isSelecting=false; return; }
             toggleX(this);
             search(this);
-            resetButtonsAndMap(); // Reset khi người dùng nhập địa chỉ mới
+            resetButtonsAndMap();
         });
         el.addEventListener('focus', function() {
             toggleX(this);
@@ -551,49 +524,77 @@
         let el = document.getElementById(id);
         el.value=''; delete el.dataset.lat; delete el.dataset.lon;
         toggleX(el);
-        resetButtonsAndMap(); // Reset khi người dùng xóa địa chỉ
+        resetButtonsAndMap();
     }
 
-    // --- SEARCH (NOMINATIM) (Giữ nguyên) ---
+    // --- TÌM KIẾM ĐỊA ĐIỂM (DÙNG GOONG AUTOCOMPLETE) ---
     let timer;
     function search(inp) {
         clearTimeout(timer);
         let box = inp.parentElement.querySelector('.suggestions');
-        if(inp.value.length < 3) { box.style.display='none'; return; }
+        
+        if(inp.value.length < 2) { box.style.display='none'; return; }
 
         timer = setTimeout(() => {
-            let q = encodeURIComponent(inp.value);
-            let url = `https://nominatim.openstreetmap.org/search?q=${q}&format=json&countrycodes=vn&addressdetails=1&limit=10&viewbox=105.0,8.0,109.0,16.0&extratags=1&namedetails=1`;
+            // Kiểm tra xem đã có API Key chưa
+            if(!GOONG_API_KEY || GOONG_API_KEY.length < 10) {
+                 console.error("CHƯA NHẬP GOONG API KEY!");
+                 return;
+            }
+
+            let url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GOONG_API_KEY}&input=${encodeURIComponent(inp.value)}&session_token=${sessionToken}`;
             
-            fetch(url).then(r=>r.json()).then(data => {
-                box.innerHTML = '';
-                if(!data.length) { box.style.display='none'; return; }
-                
-                data.forEach(item => {
-                    let div = document.createElement('div');
-                    div.className = 'sug-item';
-                    let name = item.display_name; 
-                    div.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${name}`;
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    box.innerHTML = '';
+                    if (!data.predictions || !data.predictions.length) { 
+                        box.style.display='none'; return; 
+                    }
                     
-                    div.onmousedown = (e) => {
-                        e.preventDefault();
-                        isSelecting = true;
-                        inp.value = name;
-                        inp.dataset.lat = item.lat;
-                        inp.dataset.lon = item.lon;
-                        box.style.display = 'none';
-                        toggleX(inp);
-                        inp.blur(); 
-                        resetButtonsAndMap(); // Reset khi chọn địa chỉ mới
-                    };
-                    box.appendChild(div);
-                });
-                box.style.display = 'block';
-            });
+                    data.predictions.forEach(item => {
+                        let div = document.createElement('div');
+                        div.className = 'sug-item';
+                        div.innerHTML = `<i class="fas fa-map-marker-alt"></i> <div><strong>${item.structured_formatting.main_text}</strong><br><small style="color:#666">${item.structured_formatting.secondary_text || ''}</small></div>`;
+                        
+                        div.onmousedown = (e) => {
+                            e.preventDefault();
+                            isSelecting = true;
+                            inp.value = item.description;
+                            
+                            // Lấy tọa độ chi tiết & Reset Token
+                            getPlaceDetail(item.place_id, inp);
+                            
+                            box.style.display = 'none';
+                            toggleX(inp);
+                        };
+                        box.appendChild(div);
+                    });
+                    box.style.display = 'block';
+                })
+                .catch(err => console.error("Lỗi Goong Autocomplete:", err));
         }, 300);
     }
 
-    // --- MAP PICKER (Giữ nguyên) ---
+    // --- LẤY CHI TIẾT TỌA ĐỘ TỪ PLACE ID (DÙNG GOONG DETAIL) ---
+    function getPlaceDetail(placeId, inpElement) {
+        let url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${GOONG_API_KEY}&session_token=${sessionToken}`;
+        
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                if(data.result && data.result.geometry) {
+                    inpElement.dataset.lat = data.result.geometry.location.lat;
+                    inpElement.dataset.lon = data.result.geometry.location.lng;
+                    
+                    // Tạo Token mới cho phiên tiếp theo
+                    sessionToken = generateUUID();
+                    resetButtonsAndMap();
+                }
+            });
+    }
+
+    // --- MAP PICKER (DÙNG GOONG GEOCODE KHI CONFIRM) ---
     function openMap(id) {
         activeInp = document.getElementById(id);
         document.getElementById('modal-map').style.display = 'flex';
@@ -607,50 +608,59 @@
     
     function confirmMap() {
         let c = pickerMap.getCenter();
-        activeInp.dataset.lat = c.lat; activeInp.dataset.lon = c.lng;
-        // Reverse Geocode
-        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${c.lat}&lon=${c.lng}&format=json`)
+        activeInp.dataset.lat = c.lat; 
+        activeInp.dataset.lon = c.lng;
+        
+        // Dùng Goong Reverse Geocode
+        let url = `https://rsapi.goong.io/Geocode?latlng=${c.lat},${c.lng}&api_key=${GOONG_API_KEY}`;
+        
+        fetch(url)
         .then(r=>r.json()).then(d => {
-            activeInp.value = d.display_name || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+            if(d.results && d.results.length > 0) {
+                 activeInp.value = d.results[0].formatted_address;
+            } else {
+                 activeInp.value = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+            }
             toggleX(activeInp);
         });
+        
         closeMap();
         resetButtonsAndMap(); 
     }
 
-    // --- getMyLoc (Giữ nguyên logic timeout) ---
+    // --- LẤY VỊ TRÍ TÔI (DÙNG GOONG GEOCODE) ---
     function getMyLoc() {
         if(!navigator.geolocation) return alert("Vui lòng bật GPS!");
         let btn = document.getElementById('btn-loc'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
         
-        // Thêm timeout 7 giây
         navigator.geolocation.getCurrentPosition(p => {
+            let lat = p.coords.latitude;
+            let lon = p.coords.longitude;
             let i = document.getElementById('pickup');
-            i.dataset.lat = p.coords.latitude; i.dataset.lon = p.coords.longitude;
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${p.coords.latitude}&lon=${p.coords.longitude}&format=json`)
+            
+            i.dataset.lat = lat; i.dataset.lon = lon;
+            
+            // Dùng Goong Reverse Geocode
+            let url = `https://rsapi.goong.io/Geocode?latlng=${lat},${lon}&api_key=${GOONG_API_KEY}`;
+            
+            fetch(url)
             .then(r=>r.json()).then(d => { 
-                i.value = d.display_name; 
+                if(d.results && d.results.length > 0) {
+                    i.value = d.results[0].formatted_address;
+                } else {
+                    i.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                }
                 toggleX(i); 
                 btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
-                resetButtonsAndMap(); // Reset khi lấy vị trí hiện tại
+                resetButtonsAndMap();
             });
         }, (error) => {
-            let msg = "Không thể lấy vị trí!";
-            if (error.code === error.TIMEOUT) {
-                msg = "Lấy vị trí quá lâu (Timeout 7s). Vui lòng thử lại hoặc nhập thủ công.";
-            } else if (error.code === error.PERMISSION_DENIED) {
-                 msg = "Vui lòng cho phép truy cập vị trí (GPS) trong cài đặt trình duyệt.";
-            }
-            alert(msg);
+            alert("Không thể lấy vị trí! Hãy kiểm tra quyền truy cập GPS.");
             btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
-        }, { 
-            enableHighAccuracy: true, 
-            timeout: 7000, 
-            maximumAge: 0 
-        });
+        }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
-    // --- ADD STOP (Giữ nguyên) ---
+    // --- ADD STOP ---
     function addStop() {
         let id = 'stop-' + Date.now();
         let div = document.createElement('div');
@@ -670,7 +680,7 @@
         resetButtonsAndMap(); 
     }
 
-    // --- CALCULATE (Giữ nguyên logic) ---
+    // --- CALCULATE (DÙNG OSRM - MIỄN PHÍ) ---
     function toggleWait() {
         document.getElementById('wait-area').style.display = document.getElementById('tripType').value=='2' ? 'block' : 'none';
     }
@@ -679,21 +689,17 @@
         let p = document.getElementById('pickup'), d = document.getElementById('dropoff');
         
         if(!p.dataset.lat && !d.dataset.lat) {
-            return alert("Vui lòng chọn Điểm đón và Điểm đến từ gợi ý/bản đồ để tính toán!");
+            return alert("Vui lòng chọn Điểm đón và Điểm đến từ gợi ý/bản đồ!");
         }
         
         let points = [p, ...document.querySelectorAll('.stop-inp'), d];
         let validPoints = points.filter(x => x.dataset.lat);
-        if (validPoints.length < 2) {
-            return alert("Vui lòng chọn cả Điểm đón và Điểm đến từ gợi ý/bản đồ!");
-        }
-
+        if (validPoints.length < 2) return alert("Thiếu điểm đi hoặc điểm đến!");
 
         let btn = document.getElementById('btn-calc-main');
         let oldText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...'; btn.disabled=true;
 
-        // 1. Clear previous layers and markers
         if(routeLayer) map.removeLayer(routeLayer);
         markerLayer.clearLayers(); 
 
@@ -708,7 +714,6 @@
             let km = r.distance / 1000;
             let min = Math.round(r.duration / 60);
 
-            // 2. Map Route
             routeLayer = L.geoJSON(r.geometry, {
                 style: { color: '#007bff', weight: 6, opacity: 1.0 } 
             }).addTo(map);
@@ -716,44 +721,22 @@
             document.getElementById('main-map').style.display = 'block';
             map.invalidateSize(); 
 
-            // 3. Tính toán khung nhìn mới:
             const bounds = routeLayer.getBounds(); 
-            validPoints.forEach(el => {
-                bounds.extend(new L.LatLng(el.dataset.lat, el.dataset.lon));
-            });
-            
-            const mapOptions = {padding:[60, 60]}; 
-            map.fitBounds(bounds, mapOptions); 
-            setTimeout(() => { map.fitBounds(bounds, mapOptions); }, 50);
+            validPoints.forEach(el => bounds.extend(new L.LatLng(el.dataset.lat, el.dataset.lon)));
+            map.fitBounds(bounds, {padding:[60, 60]}); 
 
-            // 4. Add Markers & Permanent Tooltips
             validPoints.forEach((el, index) => {
-                let lat = parseFloat(el.dataset.lat);
-                let lon = parseFloat(el.dataset.lon);
-                let title = el.value;
-                
-                let label = '';
-                if (index === 0) label = 'ĐÓN: ';
-                else if (index === validPoints.length - 1) label = 'ĐẾN: ';
-                else label = `DỪNG ${index}: `;
+                let lat = parseFloat(el.dataset.lat), lon = parseFloat(el.dataset.lon);
+                let label = (index === 0) ? 'ĐÓN: ' : (index === validPoints.length - 1) ? 'ĐẾN: ' : `DỪNG ${index}: `;
                 
                 let marker = L.marker([lat, lon])
-                    .bindPopup(`<b>${label}${title}</b>`) 
-                    .bindTooltip(label + title, { 
-                        permanent: true, 
-                        direction: 'right', 
-                        offset: [10, 0] 
-                    });
-                
-                marker.openTooltip();
+                    .bindTooltip(label + el.value, { permanent: true, direction: 'right', offset: [10, 0] });
                 markerLayer.addLayer(marker); 
             });
 
-
-            // 5. Calc Price
+            // Tính giá
             let type = document.getElementById('tripType').value;
             let unit = document.getElementById('carType').value=='4' ? CFG.p4 : CFG.p7;
-            
             let go = Math.round(km * unit);
             let back = 0, wait = 0;
             
@@ -802,16 +785,13 @@
             }
 
             cachedData = { total, km: km.toFixed(1), time: min, go, back, wait, deposit, type };
-            
             document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
             
-            // 6. Hoán đổi nút hành động ở thanh dưới: Ẩn Tính giá, hiện Đặt chuyến
             btn.style.display = 'none'; 
-            document.getElementById('book-buttons-bar').style.display = 'flex'; // Hiển thị nút Đặt chuyến
+            document.getElementById('book-buttons-bar').style.display = 'flex';
 
         } catch(e) { 
-            alert("Không tìm thấy đường đi giữa các điểm đã chọn. Vui lòng kiểm tra lại tọa độ đã chọn trên bản đồ/gợi ý."); 
-            // Nếu tính toán lỗi, quay lại trạng thái chỉ hiển thị nút Tính giá
+            alert("Không tìm thấy đường đi. Vui lòng kiểm tra lại tọa độ!"); 
             resetButtonsAndMap();
             checkIfReadyToCalculate();
         }
@@ -819,7 +799,7 @@
         btn.innerHTML = oldText; btn.disabled=false;
     }
 
-    // --- BOOK (Giữ nguyên) ---
+    // --- BOOK ---
     function preBook(method) {
         if(!document.getElementById('phone').value) {
             pendingMethod = method;
@@ -848,19 +828,13 @@
             n: document.getElementById('note').value
         };
 
-        // Sử dụng một tên miền giả để mô phỏng link map cho tin nhắn
-        const linkMap = (el) => `https://maps.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
+        const linkMap = (el) => `https://maps.google.com/maps?q=$${el.dataset.lat},${el.dataset.lon}`;
 
-        let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Yêu cầu tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
-        
-        document.querySelectorAll('.stop-inp').forEach((inp, i) => {
-            if(inp.dataset.lat) msg += `🔸 Dừng ${i+1}: ${inp.value}\n   👉 Map: ${linkMap(inp)}\n`;
-        });
-
+        let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
+        document.querySelectorAll('.stop-inp').forEach((inp, i) => msg += `🔸 Dừng ${i+1}: ${inp.value}\n   👉 Map: ${linkMap(inp)}\n`);
         msg += `🏁 Đến: ${d.value}\n   👉 Map: ${linkMap(d)}\n\n`;
         
         msg += `--- CHI TIẾT GIÁ ---\n`;
-        msg += `⚠️ Lưu ý: Giá chưa bao gồm phí cầu đường, bến bãi.\n`; 
         msg += `1. Quãng đường: ${cachedData.km} km\n`;
         msg += `2. Chiều đi: ${cachedData.go.toLocaleString()} đ\n`;
         if(cachedData.type == '2') {
@@ -869,21 +843,16 @@
         }
         msg += `💰 TỔNG: ${cachedData.total.toLocaleString()} đ\n`;
         if(cachedData.deposit > 0) msg += `💳 Cọc (20%): ${cachedData.deposit.toLocaleString()} đ\n`;
-        
         if(info.n) msg += `\n📝 Ghi chú: ${info.n}`;
 
         if(method == 'zalo') {
             navigator.clipboard.writeText(msg).then(() => {
                 window.open('https://zalo.me/0847526893');
-            }).catch(err => {
-                 window.open('https://zalo.me/0847526893');
-            });
+            }).catch(err => { window.open('https://zalo.me/0847526893'); });
         } else {
-            const subject = 'ĐẶT XE TRƯỜNG AN DRIVING'; 
-            window.location.href = `mailto:truongan.driving@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
+            window.location.href = `mailto:truongan.driving@gmail.com?subject=ĐẶT XE TRƯỜNG AN&body=${encodeURIComponent(msg)}`;
         }
     }
-
 </script>
 
 </body>
