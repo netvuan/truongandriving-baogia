@@ -276,8 +276,11 @@
 </div>
 
 <script>
-    // --- KHAI BÁO API KEY GOONG MAPS (ĐÃ CẬP NHẬT) ---
+    // --- KHAI BÁO API KEY GOONG MAPS ---
     const GOONG_API_KEY = 'Lrrqqduqt0pfhNfmh0bzjN9lqwEqqY8rSpCs3gcG'; 
+
+    // --- CẤU HÌNH TỐI ƯU CHI PHÍ ---
+    const DEBOUNCE_DELAY = 1000; // 1 giây sau khi ngừng gõ mới gọi API
 
     // Tạo Session Token (Để tiết kiệm chi phí tìm kiếm)
     function generateUUID() {
@@ -286,6 +289,8 @@
             return v.toString(16);
         });
     }
+    
+    // Khởi tạo token ban đầu
     let sessionToken = generateUUID();
 
     // --- I18N DATA (Ngôn ngữ) ---
@@ -526,6 +531,7 @@
     }
 
     // --- TÌM KIẾM ĐỊA ĐIỂM (DÙNG GOONG AUTOCOMPLETE) ---
+    // Đã chỉnh sửa: DEBOUNCE 1s và Session Token
     let timer;
     function search(inp) {
         clearTimeout(timer);
@@ -533,12 +539,15 @@
         
         if(inp.value.length < 2) { box.style.display='none'; return; }
 
+        // Sử dụng hằng số DEBOUNCE_DELAY = 1000
         timer = setTimeout(() => {
-            // Kiểm tra xem đã có API Key chưa
             if(!GOONG_API_KEY || GOONG_API_KEY.length < 10) {
                  console.error("CHƯA NHẬP GOONG API KEY!");
                  return;
             }
+
+            // Đảm bảo sessionToken luôn tồn tại trước khi search
+            if (!sessionToken) sessionToken = generateUUID();
 
             let url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${GOONG_API_KEY}&input=${encodeURIComponent(inp.value)}&session_token=${sessionToken}`;
             
@@ -560,7 +569,7 @@
                             isSelecting = true;
                             inp.value = item.description;
                             
-                            // Lấy tọa độ chi tiết & Reset Token
+                            // Gọi Detail với CÙNG MỘT Session Token để được gom nhóm tính tiền
                             getPlaceDetail(item.place_id, inp);
                             
                             box.style.display = 'none';
@@ -571,11 +580,12 @@
                     box.style.display = 'block';
                 })
                 .catch(err => console.error("Lỗi Goong Autocomplete:", err));
-        }, 300);
+        }, DEBOUNCE_DELAY); // Chờ 1 giây
     }
 
     // --- LẤY CHI TIẾT TỌA ĐỘ TỪ PLACE ID (DÙNG GOONG DETAIL) ---
     function getPlaceDetail(placeId, inpElement) {
+        // Dùng token hiện tại cho bước cuối cùng này
         let url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${GOONG_API_KEY}&session_token=${sessionToken}`;
         
         fetch(url)
@@ -585,7 +595,8 @@
                     inpElement.dataset.lat = data.result.geometry.location.lat;
                     inpElement.dataset.lon = data.result.geometry.location.lng;
                     
-                    // Tạo Token mới cho phiên tiếp theo
+                    // CHỈ RESET SESSION TOKEN SAU KHI ĐÃ LẤY THÀNH CÔNG CHI TIẾT
+                    // Đây là thời điểm "Kết thúc Session" chuẩn của Google/Goong
                     sessionToken = generateUUID();
                     resetButtonsAndMap();
                 }
