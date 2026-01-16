@@ -10,152 +10,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* --- 1. CẤU HÌNH GIAO DIỆN CHUẨN THEO ẢNH --- */
         :root {
-            --primary: #008000;    /* Xanh lá đậm (Header) */
-            --light-green: #e8f5e9; /* Nền bảng giá */
+            --primary: #008000;
+            --light-green: #e8f5e9;
             --border-green: #c8e6c9;
-            --red: #dc3545;        /* Màu đỏ (Giá tiền, Nút Mail) */
-            --blue: #007bff;       /* Màu xanh (Nút Zalo, Vị trí) */
-            --yellow-bg: #fff3cd;  /* Nền dòng Cọc */
-            --yellow-text: #856404;
+            --red: #dc3545;
+            --blue: #007bff;
+            --yellow-bg: #fff3cd;
             --gray-bg: #f5f5f5;
         }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-            margin: 0; padding: 0; 
-            background-color: var(--gray-bg); 
-            padding-bottom: 80px; /* Chừa chỗ cho footer */
-        }
-
-        /* HEADER GIỐNG ẢNH 1 */
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .brand-name { font-weight: 900; font-size: 16px; text-transform: uppercase; margin-bottom: 4px; }
-        .hotline-badge {
-            background: yellow; color: #d00; font-weight: bold;
-            padding: 2px 8px; border-radius: 4px; font-size: 13px; text-decoration: none;
-            display: inline-block;
-        }
-        .lang-btn {
-            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
-            color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; cursor: pointer;
-        }
+        body { font-family: -apple-system, sans-serif; margin: 0; background-color: var(--gray-bg); padding-bottom: 80px; }
+        header { background-color: var(--primary); color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .brand-name { font-weight: 900; font-size: 16px; text-transform: uppercase; }
+        .hotline-badge { background: yellow; color: #d00; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-size: 13px; text-decoration: none; }
+        .lang-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; }
         .lang-btn.active { background: white; color: var(--primary); font-weight: bold; }
 
-        /* CÁC SECTION */
-        .card {
-            background: white; margin-bottom: 10px; padding: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .sec-title {
-            font-weight: 700; color: #555; margin-bottom: 12px; font-size: 14px; text-transform: uppercase;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .card { background: white; margin-bottom: 10px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .sec-title { font-weight: 700; color: #555; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
         .t-green { color: var(--primary); }
 
-        /* INPUT STYLING (Bo tròn, Icon map xanh) */
         .form-group { margin-bottom: 12px; position: relative; }
         .lbl { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 5px; display: block; }
-        input, select {
-            width: 100%; padding: 12px 10px; padding-right: 85px;
-            border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none;
-            box-sizing: border-box; transition: border 0.3s;
-        }
-        input:focus { border-color: var(--primary); }
+        input, select { width: 100%; padding: 12px 10px; padding-right: 85px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; box-sizing: border-box; }
 
-        /* CÔNG CỤ TRONG INPUT */
-        .input-actions {
-            position: absolute; right: 5px; top: 28px;
-            display: flex; gap: 5px;
-        }
-        .act-btn {
-            width: 32px; height: 32px; border: none; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
+        .input-actions { position: absolute; right: 5px; top: 28px; display: flex; gap: 5px; }
+        .act-btn { width: 32px; height: 32px; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-clear { background: #eee; color: #777; display: none; }
         .btn-map-icon { background: var(--primary); color: white; }
+        .btn-myloc { float: right; font-size: 12px; color: var(--blue); background: none; border: none; font-weight: bold; cursor: pointer; margin-top: -25px; }
 
-        /* NÚT VỊ TRÍ TÔI */
-        .btn-myloc {
-            float: right; font-size: 12px; color: var(--blue); background: none; border: none; 
-            font-weight: bold; cursor: pointer; margin-top: -25px;
-        }
+        .loading-text { font-size: 11px; color: var(--red); font-style: italic; margin-top: 4px; display: none; }
+        .suggestions { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 999; max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .sug-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; display: flex; gap: 8px; cursor: pointer; }
 
-        /* AUTOCOMPLETE & LOADING */
-        .loading-text { font-size: 11px; color: #d00; font-style: italic; margin-top: 4px; display: none; }
-        .suggestions {
-            position: absolute; top: 100%; left: 0; right: 0;
-            background: white; border: 1px solid #ddd; z-index: 999;
-            max-height: 200px; overflow-y: auto; border-radius: 0 0 8px 8px; display: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .sug-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; display: flex; gap: 8px; cursor: pointer;}
-        .sug-item:hover { background: #f9f9f9; }
+        #map { height: 200px; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; }
+        .add-stop { color: var(--primary); font-size: 13px; font-weight: bold; cursor: pointer; text-align: right; display: block; margin-top: 5px; }
 
-        /* BẢN ĐỒ */
-        #map { height: 200px; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; z-index: 1; }
-
-        /* NÚT THÊM ĐIỂM DỪNG */
-        .add-stop { color: var(--primary); font-size: 13px; font-weight: bold; cursor: pointer; text-align: right; display: block; margin-top: 5px;}
-
-        /* --- KẾT QUẢ TÍNH GIÁ (GIỐNG ẢNH 2) --- */
-        #result-section { display: none; }
-
-        /* Box Chính sách giá (Màu xanh nhạt) */
-        .policy-box {
-            background: var(--light-green); border: 1px solid var(--border-green); border-radius: 6px;
-            padding: 10px; margin-bottom: 15px; font-size: 12px; color: #2e7d32; line-height: 1.6;
-        }
-        .policy-box i { width: 15px; text-align: center; margin-right: 5px; }
-
-        /* Bảng giá chi tiết */
-        .price-table {
-            background: var(--light-green); border-radius: 8px; padding: 15px; border: 1px solid var(--border-green);
-        }
+        .policy-box { background: var(--light-green); border: 1px solid var(--border-green); border-radius: 6px; padding: 10px; margin-bottom: 15px; font-size: 12px; color: #2e7d32; }
+        .price-table { background: var(--light-green); border-radius: 8px; padding: 15px; border: 1px solid var(--border-green); }
         .p-title { color: var(--primary); font-weight: bold; text-align: center; margin-bottom: 15px; font-size: 15px; text-transform: uppercase; }
-        .p-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; color: #333; }
-        .p-row.total-row {
-            margin-top: 15px; padding-top: 15px; border-top: 1px dashed #bbb;
-            display: block; text-align: center;
-        }
-        .big-price { font-size: 26px; color: var(--red); font-weight: 900; display: block; margin-top: 5px; }
-        
-        /* Dòng Cọc (Nền vàng) */
-        .deposit-row {
-            background: var(--yellow-bg); color: var(--yellow-text);
-            padding: 10px; border-radius: 4px; font-weight: bold;
-            display: flex; justify-content: space-between; margin-top: 10px;
-        }
-        .strike { text-decoration: line-through; color: #888; font-size: 12px; margin-right: 5px; }
-        .green-text { color: var(--primary); font-weight: bold; }
+        .p-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+        .deposit-row { background: var(--yellow-bg); padding: 10px; border-radius: 4px; font-weight: bold; display: flex; justify-content: space-between; margin-top: 10px; }
+        .big-price { font-size: 26px; color: var(--red); font-weight: 900; text-align: center; display: block; margin-top: 10px; }
 
-        /* FOOTER (Cố định dưới cùng) */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: white; padding: 10px; display: flex; gap: 10px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000;
-        }
-        .btn-full {
-            flex: 1; padding: 12px; border: none; border-radius: 6px;
-            color: white; font-weight: bold; font-size: 14px; cursor: pointer; text-transform: uppercase;
-        }
-        .btn-calc { background: var(--primary); width: 100%; display: block; font-size: 16px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .btn-full { flex: 1; padding: 12px; border: none; border-radius: 6px; color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; cursor: pointer; }
+        .btn-calc { background: var(--primary); width: 100%; }
         .btn-zalo { background: #0088ff; }
         .btn-mail { background: #dc3545; }
         
-        /* MODAL BẢN ĐỒ LỚN ĐỂ CHỌN */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
-        .modal-content { background: white; width: 90%; height: 80%; margin: 10% auto; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
-        #picker-map { flex: 1; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; }
+        .modal-content { background: white; width: 90%; height: 80%; margin: 10% auto; border-radius: 10px; display: flex; flex-direction: column; position: relative;}
     </style>
 </head>
 <body>
@@ -172,385 +79,214 @@
     </div>
 </header>
 
-<div class="container">
+<div class="card">
+    <div class="sec-title"><i class="fas fa-clipboard-list"></i> THÔNG TIN</div>
+    <div class="form-group">
+        <label class="lbl">Số điện thoại:</label>
+        <input type="tel" id="phone" placeholder="VD: 0912345678">
+        <div class="input-actions" style="top:28px"><button class="act-btn btn-clear" onclick="clearInp('phone')">✕</button></div>
+    </div>
+    <div class="form-group">
+        <label class="lbl">Thời gian đón:</label>
+        <input type="datetime-local" id="time">
+    </div>
+</div>
+
+<div class="card">
+    <div class="sec-title t-green"><i class="fas fa-map-marked-alt"></i> LỘ TRÌNH</div>
+    <button class="btn-myloc" onclick="getMyLoc()"><i class="fas fa-crosshairs"></i> VỊ TRÍ TÔI</button>
     
-    <div class="card">
-        <div class="sec-title"><i class="fas fa-clipboard-list"></i> THÔNG TIN</div>
-        <div class="form-group">
-            <label class="lbl">Số điện thoại:</label>
-            <input type="tel" id="phone" placeholder="VD: 0912345678">
-            <div class="input-actions" style="top:29px"><button class="act-btn btn-clear" onclick="clearInp('phone')">✕</button></div>
+    <div class="form-group">
+        <label class="lbl">Điểm đón:</label>
+        <input type="text" id="pickup" placeholder="Nhập điểm đón..." autocomplete="off">
+        <div class="input-actions">
+            <button class="act-btn btn-clear" onclick="clearInp('pickup')">✕</button>
+            <button class="act-btn btn-map-icon" onclick="openMap('pickup')"><i class="fas fa-map"></i></button>
         </div>
-        <div class="form-group">
-            <label class="lbl">Thời gian đón:</label>
-            <input type="datetime-local" id="time">
-        </div>
+        <div class="loading-text">⏳ Chờ nhập xong (1s)...</div>
+        <div class="suggestions"></div>
     </div>
 
-    <div class="card">
-        <div class="sec-title t-green"><i class="fas fa-map-marked-alt"></i> LỘ TRÌNH</div>
-        <button class="btn-myloc" onclick="getMyLoc()"><i class="fas fa-crosshairs"></i> VỊ TRÍ TÔI</button>
+    <div id="stops-container"></div>
+    <div class="add-stop" onclick="addStop()">+ Thêm điểm dừng</div>
 
-        <div class="form-group">
-            <label class="lbl">Điểm đón:</label>
-            <input type="text" id="pickup" placeholder="Nhập điểm đón..." autocomplete="off">
-            <div class="input-actions">
-                <button class="act-btn btn-clear" onclick="clearInp('pickup')">✕</button>
-                <button class="act-btn btn-map-icon" onclick="openMap('pickup')"><i class="fas fa-map"></i></button>
-            </div>
-            <div class="loading-text" id="load-pickup">⏳ Chờ nhập xong (1s)...</div>
-            <div class="suggestions"></div>
+    <div class="form-group" style="margin-top:10px;">
+        <label class="lbl">Điểm đến:</label>
+        <input type="text" id="dropoff" placeholder="Nhập điểm đến..." autocomplete="off">
+        <div class="input-actions">
+            <button class="act-btn btn-clear" onclick="clearInp('dropoff')">✕</button>
+            <button class="act-btn btn-map-icon" onclick="openMap('dropoff')"><i class="fas fa-map"></i></button>
         </div>
-
-        <div id="stops-container"></div>
-        <div class="add-stop" onclick="addStop()">+ Thêm điểm dừng</div>
-
-        <div class="form-group" style="margin-top:10px;">
-            <label class="lbl">Điểm đến:</label>
-            <input type="text" id="dropoff" placeholder="Nhập điểm đến..." autocomplete="off">
-            <div class="input-actions">
-                <button class="act-btn btn-clear" onclick="clearInp('dropoff')">✕</button>
-                <button class="act-btn btn-map-icon" onclick="openMap('dropoff')"><i class="fas fa-map"></i></button>
-            </div>
-            <div class="loading-text" id="load-dropoff">⏳ Chờ nhập xong (1s)...</div>
-            <div class="suggestions"></div>
-        </div>
-
-        <div id="map"></div>
+        <div class="loading-text">⏳ Chờ nhập xong (1s)...</div>
+        <div class="suggestions"></div>
     </div>
+    <div id="map"></div>
+</div>
 
-    <div class="card">
-        <div class="form-group">
-            <label class="lbl">Loại xe:</label>
-            <select id="carType" onchange="hideResult()">
-                <option value="4">Xe 4 chỗ (10.000đ/km)</option>
-                <option value="7">Xe 7 chỗ (12.000đ/km)</option>
-            </select>
+<div class="card">
+    <div class="form-group"><label class="lbl">Loại xe:</label><select id="carType"><option value="4">Xe 4 chỗ (10.000đ/km)</option><option value="7">Xe 7 chỗ (12.000đ/km)</option></select></div>
+    <div class="form-group"><label class="lbl">Hình thức:</label><select id="tripType"><option value="1">1 Chiều</option><option value="2">2 Chiều (Giảm 40% chiều về)</option></select></div>
+    <div class="form-group"><label class="lbl">Ghi chú:</label><input type="text" id="note" placeholder="Xe sạch, đúng giờ..."></div>
+
+    <div id="result-area" style="display:none;">
+        <div class="policy-box">
+            <b>CHÍNH SÁCH GIÁ CƯỚC</b><br>
+            • 4 chỗ: 10.000đ/km | 7 chỗ: 12.000đ/km<br>
+            • Ưu đãi 2 chiều: Giảm 40% chiều về.<br>
+            • Giá chưa bao gồm phí cầu đường, bến bãi.
         </div>
-        <div class="form-group">
-            <label class="lbl">Hình thức:</label>
-            <select id="tripType" onchange="hideResult()">
-                <option value="1">1 Chiều</option>
-                <option value="2">2 Chiều (Giảm 40% chiều về)</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label class="lbl">Ghi chú:</label>
-            <input type="text" id="note" placeholder="VD: Xe sạch, đón đúng giờ...">
-        </div>
-
-        <div id="result-section">
-            <div class="policy-box">
-                <div style="font-weight:bold; margin-bottom:5px; text-decoration:underline">CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)</div>
-                <div><i class="fas fa-tag"></i> Giá 4 chỗ: 10.000đ/km | 7 chỗ: 12.000đ/km</div>
-                <div><i class="fas fa-sync-alt"></i> Ưu đãi 2 chiều: Giảm 40% chiều về.</div>
-                <div><i class="fas fa-exclamation-triangle" style="color:#d00"></i> Giá tạm tính chưa bao gồm phí cầu đường, bến bãi.</div>
-            </div>
-
-            <div class="price-table">
-                <div class="p-title">BẢNG GIÁ CHI TIẾT</div>
-                <div class="p-row"><span>Quãng đường:</span> <strong id="res-km">... km</strong></div>
-                <div class="p-row"><span>Thời gian (dự kiến):</span> <strong id="res-time">... phút</strong></div>
-                <div class="p-row"><span>Chiều đi:</span> <strong id="res-go">... đ</strong></div>
-                
-                <div id="row-back-detail" style="display:none;">
-                    <div class="p-row">
-                        <span>Chiều về (Gốc):</span> 
-                        <span class="strike" id="res-back-raw">... đ</span>
-                    </div>
-                    <div class="p-row">
-                        <span>Chiều về (-40%):</span> 
-                        <strong class="green-text" id="res-back-discount">... đ</strong>
-                    </div>
-                </div>
-
-                <div class="deposit-row" id="row-deposit" style="display:none;">
-                    <span>Cọc (20%):</span> <span id="res-deposit">... đ</span>
-                </div>
-
-                <div class="p-row total-row">
-                    <span class="big-price" id="res-total">0 đ</span>
-                    <div style="font-size:11px; color:#777; margin-top:5px; font-style:italic">Giá chưa bao gồm phí cầu đường, bến bãi.</div>
-                </div>
-            </div>
+        <div class="price-table">
+            <div class="p-title">BẢNG GIÁ CHI TIẾT</div>
+            <div class="p-row"><span>Quãng đường:</span> <b id="res-km">0 km</b></div>
+            <div class="p-row"><span>Chiều đi:</span> <b id="res-go">0 đ</b></div>
+            <div id="res-back-area" style="display:none;"><div class="p-row"><span>Chiều về (-40%):</span> <b style="color:var(--primary)" id="res-back">0 đ</b></div></div>
+            <div class="deposit-row" id="res-dep-area" style="display:none;"><span>Cọc (20%):</span> <span id="res-dep">0 đ</span></div>
+            <span class="big-price" id="res-total">0 đ</span>
         </div>
     </div>
 </div>
 
 <div class="bottom-nav">
-    <button id="btn-calc" class="btn-full btn-calc" onclick="calculatePrice()">TÍNH GIÁ CƯỚC</button>
-    
-    <div id="btn-actions" style="display:none; width:100%; gap:10px;">
-        <button class="btn-full btn-zalo" onclick="book('zalo')">Đặt chuyến qua ZALO</button>
-        <button class="btn-full btn-mail" onclick="book('mail')">Đặt chuyến qua MAIL</button>
+    <button id="btn-calc" class="btn-full btn-calc" onclick="calculate()">TÍNH GIÁ CƯỚC</button>
+    <div id="btn-group" style="display:none; width:100%; gap:10px;">
+        <button class="btn-full btn-zalo" onclick="window.open('https://zalo.me/0847526893')">ĐẶT QUA ZALO</button>
+        <button class="btn-full btn-mail" onclick="location.href='mailto:truongandriving@gmail.com'">ĐẶT QUA MAIL</button>
     </div>
 </div>
 
 <div id="modal-map" class="modal">
     <div class="modal-content">
-        <div style="padding:10px; background:var(--primary); color:white; font-weight:bold; display:flex; justify-content:space-between;">
-            <span>CHỌN VỊ TRÍ</span>
-            <span onclick="closeMap()" style="cursor:pointer">✕</span>
-        </div>
-        <div id="picker-map"></div>
-        <div style="padding:10px;">
-            <button onclick="confirmMap()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:5px; font-weight:bold;">XÁC NHẬN</button>
-        </div>
-        <img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -100%); z-index:2001; pointer-events:none;">
+        <div id="picker-map" style="flex:1"></div>
+        <button onclick="confirmMap()" style="padding:15px; background:var(--primary); color:white; border:none; font-weight:bold;">XÁC NHẬN VỊ TRÍ</button>
     </div>
 </div>
 
 <script>
-    // --- CẤU HÌNH API & LOGIC TỐI ƯU ---
     const API_KEY = 'Lrrqqduqt0pfhNfmh0bzjN9lqwEqqY8rSpCs3gcG';
-    let sessionToken = generateUUID(); // TOKEN SESSION (TIẾT KIỆM TIỀN)
-    let debounceTimer; // TIMER CHO DEBOUNCE
-
+    let sessionToken = crypto.randomUUID(); // [MỚI] Khởi tạo Session Token ban đầu
+    let debounceTimer; 
     let map, pickerMap, routeLayer, activeInput;
-    
-    // Tạo UUID cho Session
-    function generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
 
     window.onload = function() {
-        // Init Map Nhỏ
         map = L.map('map').setView([10.7769, 106.7009], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        // Init Map Picker (Modal)
         pickerMap = L.map('picker-map').setView([10.7769, 106.7009], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
-
-        // Setup 2 input chính
-        setupSmartInput('pickup');
-        setupSmartInput('dropoff');
-
-        // Phone input clear btn
-        document.getElementById('phone').addEventListener('input', function(){
-            toggleClearBtn(this);
-        });
+        
+        setupSearch('pickup');
+        setupSearch('dropoff');
     };
 
-    // --- HÀM TỐI ƯU HÓA DEBOUNCE 1 GIÂY ---
-    function setupSmartInput(id) {
-        let inp = document.getElementById(id);
-        let loading = inp.parentElement.querySelector('.loading-text');
-        
-        inp.addEventListener('input', function() {
-            toggleClearBtn(this);
-            hideResult(); // Ẩn kết quả cũ khi sửa
-            
-            clearTimeout(debounceTimer); // Xóa timer cũ
-            
-            // Ẩn gợi ý cũ
-            let box = this.parentElement.querySelector('.suggestions');
-            box.style.display = 'none';
+    // [TÍNH NĂNG TỐI ƯU 1: DEBOUNCE 1S]
+    function setupSearch(id) {
+        const inp = document.getElementById(id);
+        const loading = inp.parentElement.querySelector('.loading-text');
+        const sugBox = inp.parentElement.querySelector('.suggestions');
 
-            if(this.value.length > 1) {
-                loading.style.display = 'block'; // Hiện "Đang chờ..."
-                
-                // CHỜ ĐÚNG 1000ms (1 giây) MỚI GỌI API
+        inp.addEventListener('input', function() {
+            toggleClear(this);
+            clearTimeout(debounceTimer);
+            sugBox.style.display = 'none';
+
+            if (this.value.length > 2) {
+                loading.style.display = 'block';
+                // Chờ 1 giây sau khi khách dừng gõ mới gọi API
                 debounceTimer = setTimeout(() => {
-                    callGoongAPI(this);
+                    fetchPlaces(this);
                     loading.style.display = 'none';
-                }, 1000);
+                }, 1000); 
             } else {
                 loading.style.display = 'none';
             }
         });
     }
 
-    // --- GỌI API GOONG VỚI SESSION TOKEN ---
-    function callGoongAPI(inp) {
-        let val = inp.value;
-        // Gắn session_token vào để Goong tính tiền 1 lần/phiên
-        let url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${API_KEY}&input=${encodeURIComponent(val)}&session_token=${sessionToken}`;
-        
-        fetch(url).then(res => res.json()).then(data => {
-            let box = inp.parentElement.querySelector('.suggestions');
-            box.innerHTML = '';
-            if(data.predictions) {
-                data.predictions.forEach(p => {
-                    let div = document.createElement('div');
-                    div.className = 'sug-item';
-                    div.innerHTML = `<i class="fas fa-map-marker-alt" style="color:#777"></i> <div><b>${p.structured_formatting.main_text}</b><br><small>${p.structured_formatting.secondary_text || ''}</small></div>`;
-                    div.onclick = () => {
-                        inp.value = p.description;
-                        getDetail(p.place_id, inp); // Lấy tọa độ
-                        box.style.display = 'none';
-                    };
-                    box.appendChild(div);
-                });
-                box.style.display = 'block';
-            }
-        });
-    }
-
-    function getDetail(placeId, inp) {
-        // Dùng lại Token cũ để kết thúc phiên
-        let url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${API_KEY}&session_token=${sessionToken}`;
-        fetch(url).then(res => res.json()).then(data => {
-            if(data.result && data.result.geometry) {
-                inp.dataset.lat = data.result.geometry.location.lat;
-                inp.dataset.lng = data.result.geometry.location.lng;
-                
-                // RESET TOKEN MỚI NGAY SAU KHI CHỌN XONG
-                sessionToken = generateUUID();
-                console.log("New Session:", sessionToken);
-            }
-        });
-    }
-
-    // --- TÍNH TOÁN & HIỂN THỊ KẾT QUẢ (LOGIC GIỐNG ẢNH 2) ---
-    async function calculatePrice() {
-        let p = document.getElementById('pickup');
-        let d = document.getElementById('dropoff');
-        let stops = document.querySelectorAll('.stop-inp');
-        
-        // Check input
-        let points = [];
-        if(p.dataset.lat) points.push(p);
-        stops.forEach(s => { if(s.dataset.lat) points.push(s) });
-        if(d.dataset.lat) points.push(d);
-
-        if(points.length < 2) return alert("Vui lòng chọn đủ Điểm đón và Điểm đến từ danh sách gợi ý!");
-
-        // Loading
-        let btn = document.getElementById('btn-calc');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG TÍNH...';
-        btn.disabled = true;
-
-        // OSRM API Call
-        let coords = points.map(i => `${i.dataset.lng},${i.dataset.lat}`).join(';');
+    // [TÍNH NĂNG TỐI ƯU 2: SESSION TOKEN]
+    async function fetchPlaces(inp) {
+        // Gửi kèm session_token để Goong gom nhóm các request tìm kiếm thành 1 phiên duy nhất (tiết kiệm tiền)
+        const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${API_KEY}&input=${encodeURIComponent(inp.value)}&session_token=${sessionToken}`;
         try {
-            let res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
-            let data = await res.json();
-            if(!data.routes || !data.routes.length) throw new Error("Không tìm thấy đường");
-            
-            let route = data.routes[0];
-            let distKm = route.distance / 1000;
-            let durationMin = Math.round(route.duration / 60);
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!data.predictions) return;
 
-            // Vẽ Map
+            const box = inp.parentElement.querySelector('.suggestions');
+            box.innerHTML = data.predictions.map(p => `
+                <div class="sug-item" onclick="selectPlace('${inp.id}', '${p.place_id}', '${p.description}')">
+                    <i class="fas fa-map-marker-alt" style="color:#888"></i>
+                    <div>${p.description}</div>
+                </div>
+            `).join('');
+            box.style.display = 'block';
+        } catch (e) { console.error(e); }
+    }
+
+    async function selectPlace(inpId, placeId, desc) {
+        const inp = document.getElementById(inpId);
+        inp.value = desc;
+        inp.parentElement.querySelector('.suggestions').style.display = 'none';
+
+        // Lấy tọa độ chi tiết dùng Session Token để kết thúc phiên tìm kiếm thành công
+        const url = `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=${API_KEY}&session_token=${sessionToken}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.result) {
+            inp.dataset.lat = data.result.geometry.location.lat;
+            inp.dataset.lng = data.result.geometry.location.lng;
+            // Sau khi tìm kiếm thành công 1 địa điểm, tạo Token mới cho lần tìm kiếm sau
+            sessionToken = crypto.randomUUID(); 
+        }
+    }
+
+    async function calculate() {
+        const p = document.getElementById('pickup'), d = document.getElementById('dropoff');
+        if (!p.dataset.lat || !d.dataset.lat) return alert("Vui lòng chọn địa chỉ từ gợi ý!");
+
+        const coords = `${p.dataset.lng},${p.dataset.lat};${d.dataset.lng},${d.dataset.lat}`;
+        const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
+        const data = await res.json();
+        
+        if (data.routes) {
+            const route = data.routes[0];
+            const km = route.distance / 1000;
+            const price = document.getElementById('carType').value == '4' ? 10000 : 12000;
+            const go = Math.round(km * price);
+            let total = go;
+
+            document.getElementById('res-km').innerText = km.toFixed(1) + ' km';
+            document.getElementById('res-go').innerText = go.toLocaleString() + ' đ';
+
+            if (document.getElementById('tripType').value == '2') {
+                const back = Math.round(go * 0.6);
+                total = go + back;
+                document.getElementById('res-back').innerText = back.toLocaleString() + ' đ';
+                document.getElementById('res-back-area').style.display = 'block';
+                document.getElementById('res-dep').innerText = Math.round(total * 0.2).toLocaleString() + ' đ';
+                document.getElementById('res-dep-area').style.display = 'flex';
+            } else {
+                document.getElementById('res-back-area').style.display = 'none';
+                document.getElementById('res-dep-area').style.display = 'none';
+            }
+
+            document.getElementById('res-total').innerText = total.toLocaleString() + ' đ';
+            document.getElementById('result-area').style.display = 'block';
+            document.getElementById('btn-calc').style.display = 'none';
+            document.getElementById('btn-group').style.display = 'flex';
+
             if(routeLayer) map.removeLayer(routeLayer);
             routeLayer = L.geoJSON(route.geometry, {style: {color: 'blue', weight: 5}}).addTo(map);
-            map.fitBounds(routeLayer.getBounds(), {padding: [50,50]});
-
-            // LOGIC GIÁ
-            let carType = document.getElementById('carType').value;
-            let tripType = document.getElementById('tripType').value;
-            let pricePerKm = (carType == '4') ? 10000 : 12000;
-
-            let goPrice = Math.round(distKm * pricePerKm);
-            let total = goPrice;
-
-            // Fill Data vào bảng
-            document.getElementById('res-km').innerText = distKm.toFixed(1) + " km";
-            document.getElementById('res-time').innerText = durationMin + " phút";
-            document.getElementById('res-go').innerText = goPrice.toLocaleString() + " đ";
-
-            // Xử lý 2 chiều
-            if(tripType == '2') {
-                let backPriceRaw = goPrice;
-                let backPriceDiscount = Math.round(goPrice * 0.6); // 60% = Giảm 40%
-                total += backPriceDiscount;
-                
-                document.getElementById('row-back-detail').style.display = 'block';
-                document.getElementById('res-back-raw').innerText = backPriceRaw.toLocaleString() + " đ";
-                document.getElementById('res-back-discount').innerText = backPriceDiscount.toLocaleString() + " đ";
-
-                // Hiện Cọc (Chỉ 2 chiều mới hiện cọc, hoặc tùy logic của bạn)
-                let deposit = Math.round(total * 0.2);
-                document.getElementById('row-deposit').style.display = 'flex';
-                document.getElementById('res-deposit').innerText = deposit.toLocaleString() + " đ";
-            } else {
-                document.getElementById('row-back-detail').style.display = 'none';
-                document.getElementById('row-deposit').style.display = 'none';
-            }
-
-            // Tổng tiền
-            document.getElementById('res-total').innerText = total.toLocaleString() + " đ";
-
-            // Hiện kết quả
-            document.getElementById('result-section').style.display = 'block';
-            
-            // Đổi nút Footer
-            document.getElementById('btn-calc').style.display = 'none';
-            document.getElementById('btn-actions').style.display = 'flex';
-
-            // Cuộn xuống xem kết quả
-            document.getElementById('result-section').scrollIntoView({behavior:'smooth'});
-
-        } catch(e) {
-            alert("Lỗi tính đường. Thử lại sau!");
+            map.fitBounds(routeLayer.getBounds(), {padding: [30,30]});
         }
-
-        btn.innerHTML = "TÍNH GIÁ CƯỚC";
-        btn.disabled = false;
     }
 
-    // --- UTILS ---
-    function toggleClearBtn(inp) {
-        let btn = inp.parentElement.querySelector('.btn-clear');
-        if(btn) btn.style.display = inp.value ? 'flex' : 'none';
-    }
-    function clearInp(id) {
-        let inp = document.getElementById(id);
-        inp.value = ''; delete inp.dataset.lat; delete inp.dataset.lng;
-        toggleClearBtn(inp); hideResult();
-    }
-    function hideResult() {
-        document.getElementById('result-section').style.display = 'none';
-        document.getElementById('btn-calc').style.display = 'block';
-        document.getElementById('btn-actions').style.display = 'none';
-    }
-    function getMyLoc() {
-        navigator.geolocation.getCurrentPosition(p => {
-            let el = document.getElementById('pickup');
-            el.dataset.lat = p.coords.latitude; el.dataset.lng = p.coords.longitude;
-            el.value = "📍 Vị trí hiện tại";
-            hideResult();
-        });
-    }
-    function addStop() {
-        let id = 'stop-' + Date.now();
-        let div = document.createElement('div');
-        div.className = 'form-group';
-        div.style.marginTop = "10px";
-        div.innerHTML = `
-            <label class="lbl">Điểm dừng:</label>
-            <input type="text" id="${id}" class="stop-inp" placeholder="..." autocomplete="off">
-            <div class="input-actions">
-                <button class="act-btn btn-clear" onclick="clearInp('${id}')">✕</button>
-                <button class="act-btn" style="background:#d00; color:white" onclick="this.parentElement.parentElement.remove(); hideResult()">🗑</button>
-            </div>
-            <div class="loading-text">⏳ Chờ nhập xong (1s)...</div>
-            <div class="suggestions"></div>`;
-        document.getElementById('stops-container').appendChild(div);
-        setupSmartInput(id);
-    }
-    
-    // MAP PICKER
-    function openMap(id) {
-        activeInput = document.getElementById(id);
-        document.getElementById('modal-map').style.display = 'block';
-        setTimeout(()=>pickerMap.invalidateSize(), 200);
-    }
+    function toggleClear(inp) { inp.parentElement.querySelector('.btn-clear').style.display = inp.value ? 'flex' : 'none'; }
+    function clearInp(id) { const i = document.getElementById(id); i.value = ''; delete i.dataset.lat; toggleClear(i); }
+    function openMap(id) { activeInput = document.getElementById(id); document.getElementById('modal-map').style.display = 'block'; setTimeout(() => pickerMap.invalidateSize(), 200); }
     function closeMap() { document.getElementById('modal-map').style.display = 'none'; }
-    function confirmMap() {
-        let c = pickerMap.getCenter();
-        activeInput.dataset.lat = c.lat; activeInput.dataset.lng = c.lng;
-        activeInput.value = `📍 ${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
-        closeMap(); hideResult();
-    }
-    function book(type) { alert(`Chuyển đến ${type}...`); }
-
+    function confirmMap() { const c = pickerMap.getCenter(); activeInput.dataset.lat = c.lat; activeInput.dataset.lng = c.lng; activeInput.value = "📍 Tọa độ ghim trên bản đồ"; closeMap(); }
+    function addStop() { alert("Tính năng đang hoàn thiện"); }
+    function getMyLoc() { navigator.geolocation.getCurrentPosition(p => { const e = document.getElementById('pickup'); e.dataset.lat = p.coords.latitude; e.dataset.lng = p.coords.longitude; e.value = "📍 Vị trí của tôi"; }); }
 </script>
-
 </body>
 </html>
