@@ -913,7 +913,7 @@
                 n: document.getElementById('note').value
             };
 
-            const linkMap = (el) => `https://maps.google.com/maps?q=$$?q=${el.dataset.lat},${el.dataset.lon}`;
+            const linkMap = (el) => `https://www.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
 
             let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
             document.querySelectorAll('.stop-inp').forEach((inp, i) => msg += `🔸 Dừng ${i+1}: ${inp.value}\n   👉 Map: ${linkMap(inp)}\n`);
