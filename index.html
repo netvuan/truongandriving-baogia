@@ -898,7 +898,9 @@
             document.getElementById('phone').value = p;
             closePhone();
             book(pendingMethod);
-                function book(method) {
+        }
+
+        function book(method) {
             let p = document.getElementById('pickup'), d = document.getElementById('dropoff');
             if(cachedData.total == 0) return alert("Vui lòng tính giá trước!");
 
@@ -911,8 +913,7 @@
                 n: document.getElementById('note').value
             };
 
-            // --- SỬA LỖI TẠI ĐÂY: Dùng đúng link chuẩn của Google Maps ---
-            const linkMap = (el) => `https://www.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
+            const linkMap = (el) => `https://maps.google.com/maps?q=$$?q=${el.dataset.lat},${el.dataset.lon}`;
 
             let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
             document.querySelectorAll('.stop-inp').forEach((inp, i) => msg += `🔸 Dừng ${i+1}: ${inp.value}\n   👉 Map: ${linkMap(inp)}\n`);
@@ -941,7 +942,6 @@
                 window.location.href = `mailto:truongan.driving@gmail.com?subject=ĐẶT XE TRƯỜNG AN&body=${encodeURIComponent(msg)}`;
             }
         }
-
     </script>
 </body>
 </html>
