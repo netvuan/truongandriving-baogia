@@ -11,8 +11,8 @@
 
     <style>
         :root {
-            --primary-green: #008000; /* Màu header theo ảnh */
-            --light-green-bg: #e8f5e9; /* Màu nền khung giá */
+            --primary-green: #008000;
+            --light-green-bg: #e8f5e9;
             --border-green: #c8e6c9;
             --zalo-blue: #0068ff;
             --mail-red: #dc3545;
@@ -23,7 +23,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background: var(--bg-gray); color: var(--text-dark); padding-bottom: 80px; }
 
-        /* HEADER GIỐNG ẢNH 2 */
         .header {
             background: var(--primary-green);
             color: white;
@@ -65,7 +64,6 @@
         }
         .lang-btn.active { background: white; color: var(--primary-green); font-weight: 700; border-color: white; }
 
-        /* SECTIONS */
         .container { max-width: 600px; margin: 0 auto; padding: 10px; }
         
         .card-header {
@@ -84,7 +82,6 @@
             margin-bottom: 10px;
         }
 
-        /* FORM ELEMENTS */
         .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .form-group { flex: 1; position: relative; margin-bottom: 10px; }
         .form-group:last-child { margin-bottom: 0; }
@@ -103,7 +100,6 @@
         input:focus, select:focus, textarea:focus { border-color: var(--primary-green); }
         textarea { resize: none; height: 60px; }
 
-        /* INPUT CÓ ICON BÊN PHẢI (Giống ảnh 2) */
         .input-wrapper { position: relative; }
         .input-wrapper input { padding-right: 70px; }
         .input-tools {
@@ -118,10 +114,9 @@
             display: flex; align-items: center; justify-content: center;
             color: #555;
         }
-        .btn-map { background: var(--primary-green); color: white; } /* Nút map màu xanh */
+        .btn-map { background: var(--primary-green); color: white; }
         .btn-x { background: transparent; color: #999; font-size: 16px; display: none;}
 
-        /* SUGGESTIONS */
         .suggestions {
             position: absolute; top: 100%; left: 0; right: 0;
             background: white; border: 1px solid #ddd; border-top: none;
@@ -132,10 +127,8 @@
         .sug-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; cursor: pointer; display: flex; gap: 10px; }
         .sug-item i { color: #888; margin-top: 3px; }
 
-        /* MAP */
         #main-map { height: 200px; width: 100%; border-radius: 8px; margin-top: 10px; display: none; z-index: 1; border: 1px solid #ddd; }
 
-        /* POLICY CARD (GIỐNG ẢNH 1) */
         .policy-card {
             background: var(--light-green-bg);
             border: 1px solid var(--border-green);
@@ -148,7 +141,6 @@
         .policy-item i { color: var(--primary-green); margin-top: 2px; width: 14px; }
         .policy-item.warning i { color: #f57f17; }
 
-        /* RESULT AREA (GIỐNG ẢNH 1) */
         #result-area { display: none; margin-top: 15px; }
         .price-details-card {
             background: var(--light-green-bg);
@@ -168,35 +160,55 @@
         .total-price {
             display: block;
             font-size: 24px; font-weight: 700;
-            color: #d32f2f; /* Đỏ đậm giống ảnh */
+            color: #d32f2f;
             margin-top: 5px;
         }
         
         .note-small { font-size: 11px; color: #777; font-style: italic; text-align: center; margin-top: 8px; display: block; }
 
-        /* BUTTONS */
         .btn-full { width: 100%; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; text-transform: uppercase; font-size: 14px; }
         
         .btn-calc { background: #ffc107; color: #333; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-add-stop { background: #f0f0f0; color: #333; font-size: 12px; padding: 6px; width: auto; display: inline-block; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
         
-        .btn-myloc { border: 1px solid #ccc; background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; float: right; margin-top: -2px; }
+        /* Đã sửa lại CSS cho nút Vị trí tôi gọn hơn */
+        .btn-myloc { border: 1px solid #d32f2f; background: white; color: #d32f2f; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; float: right; margin-top: -2px; font-weight: 500;}
 
-        /* STICKY BOTTOM BAR */
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: white; padding: 10px 15px;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             display: flex; gap: 10px; z-index: 900;
-            display: none; /* Hiện khi có kết quả */
+            display: none;
         }
         .btn-zalo { background: var(--zalo-blue); color: white; flex: 1; }
         .btn-mail { background: var(--mail-red); color: white; flex: 1; }
 
-        /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; display: flex; flex-direction: column; }
-        #picker-map { height: 300px; width: 100%; border-radius: 6px; margin-bottom: 10px; }
+        
+        /* Mới thêm: Wrapper cho map picker để đặt ghim */
+        .map-picker-wrapper {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 10px;
+        }
+        #picker-map { height: 100%; width: 100%; border-radius: 6px; }
+        
+        /* Mới thêm: Cái ghim ở giữa map */
+        .map-center-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -100%); /* Căn đáy ghim vào đúng tâm */
+            z-index: 1000;
+            pointer-events: none; /* Để có thể kéo map bên dưới */
+            font-size: 32px;
+            color: #d32f2f;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
         .close-modal { align-self: flex-end; font-size: 24px; cursor: pointer; color: #555; line-height: 1; margin-bottom: 10px; }
 
     </style>
@@ -234,10 +246,11 @@
         <div class="card-header">
             <i class="fas fa-map-marked-alt"></i> 
             <span data-i18n="sec_route" style="flex:1">LỘ TRÌNH</span>
-            <button class="btn-myloc" onclick="getMyLoc()" style="color: red; border-color: red; font-weight: id="btn-loc"><i class="fas fa-crosshairs"></i> <span data-i18n="btn_myloc">Vị trí tôi</span></button>
+            
+            <button class="btn-myloc" id="btn-loc" onclick="getMyLoc()"><i class="fas fa-crosshairs"></i> <span data-i18n="btn_myloc">Vị trí tôi</span></button>
         </div>
         
-        <div class="White-card">
+        <div class="white-card">
             <div class="form-group">
                 <label class="form-label" data-i18n="lbl_pickup">Điểm đón:</label>
                 <div class="input-wrapper">
@@ -374,7 +387,12 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeMap()">×</span>
             <h3 style="margin-top:0; text-align:center; color:var(--primary-green)" data-i18n="modal_map_title">CHỌN VỊ TRÍ</h3>
-            <div id="picker-map"></div>
+            
+            <div class="map-picker-wrapper">
+                <div id="picker-map"></div>
+                <i class="fas fa-map-marker-alt map-center-pin"></i>
+            </div>
+            
             <button class="btn-full btn-zalo" onclick="confirmMap()" data-i18n="btn_confirm">XÁC NHẬN</button>
         </div>
     </div>
@@ -392,7 +410,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // --- GIỮ NGUYÊN TOÀN BỘ LOGIC JS CŨ ---
         const GOONG_API_KEY = 'Lrrqqduqt0pfhNfmh0bzjN9lqwEqqY8rSpCs3gcG'; 
         const DEBOUNCE_DELAY = 1000; 
 
@@ -405,7 +422,7 @@
         
         let sessionToken = generateUUID();
 
-        // I18N DATA (Updated with image text)
+        // I18N DATA
         const LANG = {
             vi: {
                 brand:"TRƯỜNG AN DRIVING", sec_info:"THÔNG TIN", lbl_phone:"Số điện thoại:", lbl_time:"Thời gian đón:",
@@ -494,7 +511,6 @@
             checkIfReadyToCalculate();
         };
         
-        // --- LOGIC HELPER FUNCTIONS ---
         function updatePolicyUI() {
             const car = document.getElementById('carType').value;
             const rateTxt = (car === '4') ? LANG[curLang].note_price_4 : LANG[curLang].note_price_7;
@@ -729,7 +745,10 @@
 
         function getMyLoc() {
             if(!navigator.geolocation) return alert("Vui lòng bật GPS!");
-            let btn = document.getElementById('btn-loc'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            let btn = document.getElementById('btn-loc'); 
+            
+            // Check nếu btn tồn tại (đã fix lỗi id)
+            if(btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             
             navigator.geolocation.getCurrentPosition(p => {
                 let lat = p.coords.latitude, lon = p.coords.longitude;
@@ -741,12 +760,12 @@
                     if(d.results && d.results.length > 0) i.value = d.results[0].formatted_address;
                     else i.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                     toggleX(i); 
-                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
+                    if(btn) btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
                     resetButtonsAndMap();
                 });
             }, (error) => {
-                alert("Không thể lấy vị trí!");
-                btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
+                alert("Không thể lấy vị trí! Hãy cấp quyền truy cập vị trí.");
+                if(btn) btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
             }, { enableHighAccuracy: true, timeout: 10000 });
         }
 
