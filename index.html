@@ -171,8 +171,7 @@
         .btn-calc { background: #ffc107; color: #333; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-add-stop { background: #f0f0f0; color: #333; font-size: 12px; padding: 6px; width: auto; display: inline-block; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
         
-        /* ---------------------------------------------------- */
-        /* [FIX 1] CSS NÚT VỊ TRÍ TÔI ĐÃ ĐƯỢC CHUẨN HÓA */
+        /* FIX: CSS NÚT VỊ TRÍ TÔI CHUẨN */
         .btn-myloc { 
             border: 1px solid #d32f2f; 
             background: white; 
@@ -183,9 +182,8 @@
             cursor: pointer; 
             float: right; 
             margin-top: -2px; 
-            font-weight: 700; /* Thay vì dùng inline style lỗi */
+            font-weight: 700;
         }
-        /* ---------------------------------------------------- */
 
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -200,8 +198,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; display: flex; flex-direction: column; }
         
-        /* ---------------------------------------------------- */
-        /* [FIX 2] CSS CHO CÁI GHIM Ở GIỮA BẢN ĐỒ */
+        /* FIX: CSS CHO GHIM BẢN ĐỒ */
         .map-picker-wrapper {
             position: relative;
             width: 100%;
@@ -216,12 +213,11 @@
             left: 50%;
             transform: translate(-50%, -100%); /* Căn đáy ghim vào tâm */
             z-index: 1000;
-            pointer-events: none; /* Quan trọng: Để bấm xuyên qua ghim kéo map được */
-            font-size: 32px;
-            color: #d32f2f; /* Màu đỏ */
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            pointer-events: none;
+            font-size: 36px;
+            color: #d32f2f;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        /* ---------------------------------------------------- */
 
         .close-modal { align-self: flex-end; font-size: 24px; cursor: pointer; color: #555; line-height: 1; margin-bottom: 10px; }
 
@@ -264,7 +260,7 @@
             <button class="btn-myloc" id="btn-loc" onclick="getMyLoc()">
                 <i class="fas fa-crosshairs"></i> <span data-i18n="btn_myloc">Vị trí tôi</span>
             </button>
-            </div>
+        </div>
         
         <div class="white-card">
             <div class="form-group">
@@ -339,7 +335,7 @@
 
             <div class="policy-card">
                 <div class="policy-title" data-i18n="note_policy_title">PRICING POLICY (Details)</div>
-                <div class="policy-item"><i class="fas fa-tag"></i> <span id="policy-rate">4 Seats: 10,000đ/km. 7 Seats: 12,000đ/km </span></div>
+                <div class="policy-item"><i class="fas fa-tag"></i> <span id="policy-rate">4 Seats: 10,000đ/km. 7 Seats: 14,000đ/km</span></div>
                 <div class="policy-item"><i class="fas fa-sync-alt"></i> <span data-i18n="note_disc_cond">Round Trip Offer: 40% off return if one-way distance is over 45km.</span></div>
                 <div class="policy-item"><i class="fas fa-clock"></i> <span data-i18n="note_wait_fee">Waiting Fee: First 3 hours free. After that, 50,000đ/hour.</span></div>
                 <div class="policy-item warning"><i class="fas fa-exclamation-triangle"></i> <span data-i18n="note_toll_fee">Estimated price excludes toll fees and parking fees.</span></div>
@@ -412,6 +408,7 @@
             <button class="btn-full btn-zalo" onclick="confirmMap()" data-i18n="btn_confirm">XÁC NHẬN</button>
         </div>
     </div>
+
     <div class="modal" id="phone-modal">
         <div class="modal-content" style="max-width:300px">
             <span class="close-modal" onclick="closePhone()">×</span>
@@ -437,6 +434,7 @@
         
         let sessionToken = generateUUID();
 
+        // FIX: CẬP NHẬT GIÁ VÀ NGÔN NGỮ
         const LANG = {
             vi: {
                 brand:"TRƯỜNG AN DRIVING", sec_info:"THÔNG TIN", lbl_phone:"Số điện thoại:", lbl_time:"Thời gian đón:",
@@ -449,7 +447,8 @@
                 lbl_est_price:"CHI TIẾT GIÁ", res_dist:"Quãng đường:", res_time:"Thời gian:", res_go_price:"Chiều đi:",
                 res_back_full:"Chiều về (Gốc):", res_return_disc:"Chiều về (-40%):", res_wait_fee:"Phí chờ:", res_deposit:"Cọc (20%):",
                 note_policy_title: "CHÍNH SÁCH GIÁ CƯỚC (Chi tiết)", 
-                note_price_4:"Giá 4 chỗ: 10.000đ/km.", note_price_7:"Giá 7 chỗ: 12.000đ/km.",
+                note_price_4:"Giá 4 chỗ: 10.000đ/km.", 
+                note_price_7:"Giá 7 chỗ: 14.000đ/km.", /* Đã sửa giá */
                 note_disc_cond:"Ưu đãi 2 chiều: Giảm 40% chiều về nếu chiều đi trên 45km.", 
                 note_wait_fee:"Phí chờ: Miễn phí 3 giờ đầu tiên. Sau đó tính 50.000đ/giờ.",
                 note_toll_fee:"⚠️ Giá ước tính chưa bao gồm phí cầu đường và bến bãi.", 
@@ -468,7 +467,8 @@
                 lbl_est_price:"PRICE DETAILS", res_dist:"Distance:", res_time:"Duration:", res_go_price:"One-way:",
                 res_back_full:"Return (Orig):", res_return_disc:"Return (-40%):", res_wait_fee:"Waiting Fee:", res_deposit:"Deposit (20%):",
                 note_policy_title: "PRICING POLICY (Details)", 
-                note_price_4:"4 Seats: 10,000đ/km.", note_price_7:"7 Seats: 12,000đ/km.",
+                note_price_4:"4 Seats: 10,000đ/km.", 
+                note_price_7:"7 Seats: 14,000đ/km.", /* Đã sửa giá */
                 note_disc_cond:"Round Trip Offer: 40% off return if one-way distance is over 45km.", 
                 note_wait_fee:"Waiting Fee: First 3 hours free. After that, 50,000đ/hour.",
                 note_toll_fee:"⚠️ Estimated price excludes toll fees and parking fees.", 
@@ -487,7 +487,8 @@
                 lbl_est_price:"价格详情", res_dist:"距离:", res_time:"时间:", res_go_price:"去程:",
                 res_back_full:"回程 (原价):", res_return_disc:"回程 (-40%):", res_wait_fee:"等待费:", res_deposit:"定金 (20%):",
                 note_policy_title: "价格政策 (详情)", 
-                note_price_4:"4座: 10,000đ/km.", note_price_7:"7座: 12,000đ/km.",
+                note_price_4:"4座: 10,000đ/km.", 
+                note_price_7:"7座: 14,000đ/km.", /* Đã sửa giá */
                 note_disc_cond:"往返优惠: 单程距离超过45公里，回程减40%。", 
                 note_wait_fee:"等待费: 前3小时免费。之后50,000đ/小时。",
                 note_toll_fee:"⚠️ 预估价格不包含过路费和停车费。", 
@@ -498,7 +499,8 @@
         };
 
         let curLang = 'vi';
-        const CFG = { p4: 10000, p7: 12000, wait: 50000 };
+        // FIX: CẬP NHẬT GIÁ XE 7 CHỖ 14000
+        const CFG = { p4: 10000, p7: 14000, wait: 50000 };
         let map, pickerMap, routeLayer, markerLayer, activeInp, pendingMethod;
         let cachedData = { total:0 };
         let isSelecting = false;
@@ -510,6 +512,8 @@
 
             pickerMap = L.map('picker-map').setView([10.7769, 106.7009], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(pickerMap);
+            // Fix map resize in modal
+            pickerMap.whenReady(() => { setTimeout(() => pickerMap.invalidateSize(), 500); });
 
             let now = new Date(); now.setMinutes(now.getMinutes()+30-now.getTimezoneOffset());
             document.getElementById('time').value = now.toISOString().slice(0,16);
@@ -527,6 +531,7 @@
         
         function updatePolicyUI() {
             const car = document.getElementById('carType').value;
+            // Tự động hiện giá đúng theo xe
             const rateTxt = (car === '4') ? LANG[curLang].note_price_4 : LANG[curLang].note_price_7;
             document.getElementById('policy-rate').innerText = rateTxt;
         }
@@ -757,11 +762,12 @@
             resetButtonsAndMap(); 
         }
 
+        // FIX: HÀM LẤY VỊ TRÍ TÔI ĐÃ FIX VÀ TEST
         function getMyLoc() {
-            if(!navigator.geolocation) return alert("Vui lòng bật GPS!");
+            if(!navigator.geolocation) return alert("Vui lòng bật GPS trên điện thoại và cho phép trình duyệt truy cập!");
             let btn = document.getElementById('btn-loc'); 
             
-            if(btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             
             navigator.geolocation.getCurrentPosition(p => {
                 let lat = p.coords.latitude, lon = p.coords.longitude;
@@ -773,12 +779,12 @@
                     if(d.results && d.results.length > 0) i.value = d.results[0].formatted_address;
                     else i.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                     toggleX(i); 
-                    if(btn) btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
+                    btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
                     resetButtonsAndMap();
                 });
             }, (error) => {
-                alert("Không thể lấy vị trí! Hãy cấp quyền truy cập vị trí.");
-                if(btn) btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
+                alert("Không thể lấy vị trí! Hãy kiểm tra lại cài đặt quyền truy cập vị trí.");
+                btn.innerHTML = '<i class="fas fa-crosshairs"></i> ' + LANG[curLang].btn_myloc;
             }, { enableHighAccuracy: true, timeout: 10000 });
         }
 
@@ -832,7 +838,10 @@
                 
                 let r = data.routes[0];
                 let km = r.distance / 1000;
-                let min = Math.round(r.duration / 60);
+                
+                // FIX: TÍNH THỜI GIAN THEO TỐC ĐỘ 30KM/H
+                // Công thức: Thời gian (phút) = km * 2 (Vì 30km đi mất 60p => 1km đi mất 2p)
+                let min = Math.round(km * 2);
 
                 routeLayer = L.geoJSON(r.geometry, { style: { color: '#007bff', weight: 6, opacity: 1.0 } }).addTo(map);
                 
@@ -888,7 +897,17 @@
 
                 document.getElementById('result-area').style.display = 'block';
                 document.getElementById('res-km').innerText = km.toFixed(1) + ' km';
-                document.getElementById('res-time').innerText = min + ' phút';
+                // Hiển thị giờ phút cho đẹp
+                let timeStr = "";
+                if(min >= 60) {
+                    let h = Math.floor(min/60);
+                    let m = min % 60;
+                    timeStr = `${h} giờ ${m} phút`;
+                } else {
+                    timeStr = `${min} phút`;
+                }
+                document.getElementById('res-time').innerText = timeStr;
+
                 document.getElementById('val-go').innerText = go.toLocaleString() + ' đ';
                 document.getElementById('res-total').innerText = total.toLocaleString() + ' đ';
                 
@@ -899,7 +918,7 @@
                     document.getElementById('row-deposit').style.display = 'none';
                 }
 
-                cachedData = { total, km: km.toFixed(1), time: min, go, back, wait, deposit, type };
+                cachedData = { total, km: km.toFixed(1), time: timeStr, go, back, wait, deposit, type };
                 
                 // Cuộn xuống kết quả
                 setTimeout(() => {
@@ -910,6 +929,7 @@
                 document.getElementById('book-buttons-bar').style.display = 'flex';
 
             } catch(e) { 
+                console.log(e);
                 alert("Không tìm thấy đường đi hoặc lỗi dịch vụ!"); 
                 resetButtonsAndMap();
                 checkIfReadyToCalculate();
@@ -945,7 +965,7 @@
                 n: document.getElementById('note').value
             };
 
-            const linkMap = (el) => `https://www.google.com/maps?q=${el.dataset.lat},${el.dataset.lon}`;
+            const linkMap = (el) => `https://www.google.com/maps/search/?api=1&query=${el.dataset.lat},${el.dataset.lon}`;
 
             let msg = `TRƯỜNG AN DRIVING\n----------------\n📞 ${info.ph}\n🕒 ${info.t}\n🚘 ${info.c}\n🔄 ${info.k}\n🧑‍✈️ Tài xế: ${info.dr}\n\n📍 Đón: ${p.value}\n   👉 Map: ${linkMap(p)}\n`;
             document.querySelectorAll('.stop-inp').forEach((inp, i) => msg += `🔸 Dừng ${i+1}: ${inp.value}\n   👉 Map: ${linkMap(inp)}\n`);
@@ -953,10 +973,11 @@
             
             msg += `--- CHI TIẾT GIÁ ---\n`;
             msg += `1. Quãng đường: ${cachedData.km} km\n`;
-            msg += `2. Chiều đi: ${cachedData.go.toLocaleString()} đ\n`;
+            msg += `2. Thời gian dự kiến: ${cachedData.time}\n`;
+            msg += `3. Chiều đi: ${cachedData.go.toLocaleString()} đ\n`;
             if(cachedData.type == '2') {
-                msg += `3. Chiều về: ${cachedData.back.toLocaleString()} đ\n`;
-                if(cachedData.wait > 0) msg += `4. Phí chờ: ${cachedData.wait.toLocaleString()} đ\n`;
+                msg += `4. Chiều về: ${cachedData.back.toLocaleString()} đ\n`;
+                if(cachedData.wait > 0) msg += `5. Phí chờ: ${cachedData.wait.toLocaleString()} đ\n`;
             }
             msg += `💰 TỔNG: ${cachedData.total.toLocaleString()} đ\n`;
             if(cachedData.deposit > 0) msg += `💳 Cọc (20%): ${cachedData.deposit.toLocaleString()} đ\n`;
